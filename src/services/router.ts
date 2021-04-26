@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Router, { Route } from 'vue-router';
+
 import { ChildViewHolder } from '@/common/components/child-view-holder';
-import { $root } from '@/services';
 
 Vue.use(Router);
 
@@ -93,16 +93,16 @@ export const $router = new Router({
 export let $route: Route;
 
 $router.beforeEach((to, from, next) => {
-  if(to.path === '/login') {
+  if (to.path === '/login') {
     localStorage.removeItem('user');
   }
   const info = localStorage.getItem('user') || '{}';
-  if(!JSON.parse(info).token && to.path !== '/login') {
+  if (!JSON.parse(info).token && to.path !== '/login') {
     next({
       path: '/login',
       query: { redirect: to.fullPath },
     });
-  } else if(to.path === '/login'){
+  } else if (to.path === '/login'){
     next();
   } else {
     next();
