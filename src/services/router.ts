@@ -93,7 +93,6 @@ export const $router = new Router({
 export let $route: Route;
 
 $router.beforeEach((to, from, next) => {
-  $root.notifys = [];
   if(to.path === '/login') {
     localStorage.removeItem('user');
   }
