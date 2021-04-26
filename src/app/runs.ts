@@ -1,8 +1,19 @@
-import axios, { AxiosError, AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 import '@/common/app/run';
 import { $root, $router, _updateVueInstance } from '@/services';
 import { InvalidTokenCode } from '@/constants';
+
+axios.interceptors.request.use((config: AxiosRequestConfig) => {
+  const user = localStorage.getItem('user') || '{}';
+  const token = JSON.parse(user).token;
+  if (token) {
+    config.headers = { token };
+  } else {
+    $router.replace('/login').catch(Boolean);
+  }
+  return config;
+});
 
 axios.interceptors.response.use((value: AxiosResponse) => {
   if (value.config.url.startsWith(`/api`)) {
