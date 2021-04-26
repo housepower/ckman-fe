@@ -2,7 +2,7 @@
   "name": "ckman-fe",
   "displayName": "ClickHouse Management Console",
   "version": "0.1.0",
-  "private": true,
+  "license": "Apache",
   "scripts": {
     "serve": "node_modules/.bin/vue-cli-service serve src/main.tsx",
     "build": "vue-cli-service build src/main.tsx",
