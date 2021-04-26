@@ -158,7 +158,6 @@ export default class TimeFilter extends VueComponentBase {
   }
 
   setRefresh(t: string) {
-    console.log(t)
     clearInterval(this.refreshPromise);
 
     if (t) {
