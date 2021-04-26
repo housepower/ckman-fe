@@ -1,6 +1,6 @@
 {
-  "name": "ckman",
-  "displayName": "ckman管理平台",
+  "name": "ckman-fe",
+  "displayName": "ClickHouse Management Console",
   "version": "0.1.0",
   "private": true,
   "scripts": {
