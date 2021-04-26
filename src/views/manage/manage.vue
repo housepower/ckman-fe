@@ -72,6 +72,10 @@
                            show-overflow-tooltip
                            label="replica number"
                            align="center" />
+          <el-table-column prop="status"
+                           show-overflow-tooltip
+                           label="Node Status"
+                           align="center" />
           <el-table-column label="Actions"
                            v-if="mode === 'deploy'"
                            #default="{ row }"

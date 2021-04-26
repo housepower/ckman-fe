@@ -45,6 +45,9 @@
         <el-table-column prop="cluster"
                          show-overflow-tooltip
                          label="Cluster Name" />
+        <el-table-column prop="mode"
+                         show-overflow-tooltip
+                         label="Mode" />
         <el-table-column prop="isReplica"
                          show-overflow-tooltip
                          label="Replica" />
