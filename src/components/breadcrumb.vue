@@ -2,7 +2,7 @@
   <section class="breadcrum mb-10 flex-vcenter flex-between plr-10">
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item>
-        <router-link :to="{ path: '/' }"><i class="fa fa-home"></i></router-link>
+        <router-link to="/"><i class="fa fa-home"></i></router-link>
       </el-breadcrumb-item>
       <el-breadcrumb-item v-for="(item, index) of data"
                           :key="index"

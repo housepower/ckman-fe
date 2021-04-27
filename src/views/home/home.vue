@@ -14,7 +14,7 @@
           <el-button type="primary"
                      size="large"
                      class="mb-20 fs-18"
-                     @click="importCk(1)">Create a ClickHouse Cluster</el-button>
+                     @click="importCk(1)">{{$t('home.Create a ClickHouse Cluster')}}</el-button>
           <el-button type="primary"
                      size="large"
                      class="fs-18"
@@ -44,7 +44,7 @@
                 header-cell-class-name="header-cell-class-name">
         <el-table-column prop="cluster"
                          show-overflow-tooltip
-                         label="Cluster Name" />
+                         :label="$t('home.Cluster Name')" />
         <el-table-column prop="mode"
                          show-overflow-tooltip
                          label="Mode" />
@@ -62,17 +62,13 @@
                          label="Zookeeper Node List" />
         <el-table-column label="Actions"
                          #default="{ row }">
-          <template>
-            <el-link type="primary"
-                     underline
-                     @click.prevent="toCluster(row)">
-              <router-link :to="'/clusters/' + row.cluster">Go to cluster</router-link>
-            </el-link>
-
-            <i class="fa fa-trash pointer fs-18 ml-15"
-               v-tooltip="'Delete'"
-               @click="remove(row)" />
-          </template>
+          <el-link type="primary"
+                   underline
+                   @click.prevent="toCluster(row)"
+                   :to="'/clusters/' + row.cluster">Go to cluster</el-link>
+          <i class="fa fa-trash pointer fs-18 ml-15"
+             v-tooltip="'Delete'"
+             @click="remove(row)" />
         </el-table-column>
       </el-table>
     </div>
