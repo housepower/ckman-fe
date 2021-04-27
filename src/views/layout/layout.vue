@@ -1,8 +1,12 @@
 <template>
   <div class="layout">
     <header class="flex-between flex-vcenter plr-20">
-      <span class="fs-18 font-bold">ClickHouse Management Console</span>
+      <span class="fs-18 font-bold">{{$t('layout.ClickHouse Management Console')}}</span>
       <div class="header-right">
+        <el-select v-model="$i18n.locale">
+          <el-option value="en" label="English" />
+          <el-option value="zh" label="中文" />
+        </el-select>
         <el-dropdown class="pointer">
           <div>
             <i class="fa fa-user-o fs-20"></i>
@@ -42,6 +46,7 @@
 </template>
 <script>
 import { Menus, LoaderMenus } from "@/constants";
+import { $i18n } from '@/services';
 export default {
   name: "Layout",
   data() {
@@ -67,10 +72,13 @@ export default {
   },
   watch: {
     $route: {
-      handler: function (route, prevRoute) {
+      handler(route, prevRoute) {
         this.menus = route.meta === "loader" ? LoaderMenus : Menus;
       },
       immediate: true,
+    },
+    '$i18n.locale'(value) {
+      localStorage.setItem('locale', value);
     },
   },
 };

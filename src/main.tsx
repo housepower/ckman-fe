@@ -5,7 +5,7 @@ import '@/app';
 import '@/components';
 import '@/directives';
 import { Component } from '@/common/VueComponentBase';
-import { $router, _updateVueInstance } from '@/services';
+import { $router, $i18n, _updateVueInstance } from '@/services';
 
 Component.registerHooks([
   'beforeRouteEnter',
@@ -19,7 +19,6 @@ import locale from 'element-ui/lib/locale/lang/en';
 Vue.use(ElementUI, { locale });
 
 Vue.config.productionTip = false;
-
 
 const data = {
   modals: [],
@@ -35,6 +34,7 @@ _updateVueInstance(data as any);
 new Vue({
   data,
   router: $router,
+  i18n: $i18n,
   render() {
     return (
       <div id="app" style="height: 100%">

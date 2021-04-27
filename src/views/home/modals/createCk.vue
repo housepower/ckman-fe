@@ -19,7 +19,7 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="Cluster Name:"
+      <el-form-item :label="$t('home.Cluster Name') + ':'"
                     prop="cluster"
                     required>
         <el-input v-model="formModel.cluster"
@@ -35,7 +35,7 @@
                   placeholder="多个ip,请以逗号,分隔填写"
                   class="width-350" />
       </el-form-item>
-      <el-form-item label="ClickHouse TCP Port:"
+      <el-form-item :label="$t('home.ClickHouse TCP Port') + ':'"
                     prop="port"
                     required>
         <el-input v-model="formModel.port"

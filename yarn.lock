@@ -2592,14 +2592,9 @@ caniuse-api@^3.0.0:
     lodash.memoize "^4.1.2"
     lodash.uniq "^4.5.0"
 
-caniuse-lite@^1.0.0, caniuse-lite@^1.0.30001109, caniuse-lite@^1.0.30001111:
-  version "1.0.30001112"
-  resolved "https://registry.npm.taobao.org/caniuse-lite/download/caniuse-lite-1.0.30001112.tgz?cache=0&sync_timestamp=1596773136074&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fcaniuse-lite%2Fdownload%2Fcaniuse-lite-1.0.30001112.tgz#0fffc3b934ff56ff0548c37bc9dad7d882bcf672"
-
-caniuse-lite@^1.0.30001214:
-  version "1.0.30001215"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001215.tgz#4e7b45ecb88ea9d0c57aa0ee7acd18ae6515b645"
-  integrity sha512-48WKhSpgduUNyY7cHO3lVy7v5Nx2FrvYJrmZjOoQP7w+5dMejWUhjAAszUXioV5UwT2ZWHDEbPgv4sBkd20jDA==
+caniuse-lite@^1.0.0, caniuse-lite@^1.0.30001109, caniuse-lite@^1.0.30001111, caniuse-lite@^1.0.30001214:
+  version "1.0.30001218"
+  resolved "https://registry.nlark.com/caniuse-lite/download/caniuse-lite-1.0.30001218.tgz"
 
 case-sensitive-paths-webpack-plugin@^2.3.0:
   version "2.3.0"
@@ -3406,10 +3401,6 @@ destroy@~1.0.4:
   version "1.0.4"
   resolved "https://registry.npm.taobao.org/destroy/download/destroy-1.0.4.tgz#978857442c44749e4206613e37946205826abd80"
 
-detect-libc@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.npm.taobao.org/detect-libc/download/detect-libc-1.0.3.tgz#fa137c4bd698edf55cd5cd02ac559f91a4c4ba9b"
-
 detect-node@^2.0.4:
   version "2.0.4"
   resolved "https://registry.npm.taobao.org/detect-node/download/detect-node-2.0.4.tgz#014ee8f8f669c5c58023da64b8179c083a28c46c"
@@ -4109,12 +4100,6 @@ faye-websocket@~0.11.1:
   resolved "https://registry.npm.taobao.org/faye-websocket/download/faye-websocket-0.11.3.tgz#5c0e9a8968e8912c286639fde977a8b209f2508e"
   dependencies:
     websocket-driver ">=0.5.1"
-
-fibers@^5.0.0:
-  version "5.0.0"
-  resolved "https://registry.npm.taobao.org/fibers/download/fibers-5.0.0.tgz#3a60e0695b3ee5f6db94e62726716fa7a59acc41"
-  dependencies:
-    detect-libc "^1.0.3"
 
 figgy-pudding@^3.5.1:
   version "3.5.2"
@@ -8334,6 +8319,11 @@ vm-browserify@^1.0.1:
 vue-hot-reload-api@^2.3.0:
   version "2.3.4"
   resolved "https://registry.npm.taobao.org/vue-hot-reload-api/download/vue-hot-reload-api-2.3.4.tgz#532955cc1eb208a3d990b3a9f9a70574657e08f2"
+
+vue-i18n@^8.24.3:
+  version "8.24.3"
+  resolved "https://registry.npm.taobao.org/vue-i18n/download/vue-i18n-8.24.3.tgz?cache=0&sync_timestamp=1618508691259&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fvue-i18n%2Fdownload%2Fvue-i18n-8.24.3.tgz#2233ae11ec59e8204df58a28fc41afe9754e3b41"
+  integrity sha1-IjOuEexZ6CBN9Yoo/EGv6XVOO0E=
 
 "vue-loader-v16@npm:vue-loader@^16.1.0":
   version "16.2.0"
