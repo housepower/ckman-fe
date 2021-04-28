@@ -8,7 +8,7 @@
                    v-for="item of clusterStatus"
                    :key="item"
                    :disabled="isStatusDisable(item)"
-                   @click="clusterOptation(item)">{{ item }} Cluster</el-button>
+                   @click="clusterOptation(item)">{{$t('manage.' + item + ' Cluster') }}</el-button>
       </template>
     </breadcrumb>
     <section class="container">

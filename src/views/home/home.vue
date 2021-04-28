@@ -8,7 +8,7 @@
             <i class="fa fa-database"></i>
             <span class="inline-block ml-10 font-bold">Provision</span>
           </p>
-          <p class="fs-14 font-bold">Create or import a ClickHouse Cluster</p>
+          <p class="fs-14 font-bold">{{$t('home.Create or import a ClickHouse Cluster')}}</p>
         </div>
         <div class="btns flex flex-column width-6">
           <el-button type="primary"
@@ -28,11 +28,11 @@
             <i class="fa fa-database"></i>
             <span class="inline-block ml-10 font-bold">Loader</span>
           </p>
-          <p class="fs-14 font-bold">{{$t('home.Data loader management')}}</p>
+          <p class="fs-14 font-bold">{{$t('home.Data Loader Management')}}</p>
         </div>
         <div class="btns flex flex-column width-6">
           <router-link to="/loader"
-                       class="el-button mb-20 fs-18 el-button--primary el-button--large">Data Loader Management</router-link>
+                       class="el-button mb-20 fs-18 el-button--primary el-button--large">{{$t('home.Data Loader Management')}}</router-link>
         </div>
       </div>
     </section>

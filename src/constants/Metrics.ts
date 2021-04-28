@@ -2,7 +2,7 @@ export const Metrics = Object.freeze([
   {
     title: 'ClickHouse Table KPIs',
     metrics: [{
-      expect: 'clickhouse.Query',
+      expect: 'clickhouse Query',
       metric: 'ClickHouseMetrics_Query',
     }],
   },{
@@ -46,22 +46,22 @@ export const LoaderMetrics = Object.freeze([
     title: 'Clickhouse Sinker KPIs',
     metrics: [
       {
-        expect: 'sum by(task)(rate(clickhouse_sinker_consume_msgs_total[1m]))',
+        expect: 'rate clickhouse_sinker_consume_msgs_total 1m',
         metric: 'sum(rate(clickhouse_sinker_consume_msgs_total[1m])) by(job,task)',
       },{
-        expect: 'sum by(task) (rate(clickhouse_sinker_flush_msgs_total[1m]))',
+        expect: 'rate clickhouse_sinker_flush_msgs_total 1m',
         metric: 'sum(rate(clickhouse_sinker_flush_msgs_total[1m])) by(job,task)',
       },{
-        expect: 'sum by(task) (clickhouse_sinker_shard_msgs)',
+        expect: 'rate clickhouse_sinker_shard_msgs 1m',
         metric: 'sum(clickhouse_sinker_shard_msgs) by(job,task)',
       },{
-        expect: 'sum by(task) (clickhouse_sinker_ring_msgs)',
+        expect: 'rate clickhouse_sinker_ring_msgs 1m',
         metric: 'sum(clickhouse_sinker_ring_msgs) by(job,task)',
       },{
-        expect: 'sum by(task)(clickhouse_sinker_parsing_pool_backlog)',
+        expect: 'rate clickhouse_sinker_parsing_pool_backlog 1m',
         metric: 'sum(clickhouse_sinker_parsing_pool_backlog) by(job,task)',
       },{
-        expect: 'sum by(task) (clickhouse_sinker_writing_pool_backlog)',
+        expect: 'rate clickhouse_sinker_writing_pool_backlog 1m',
         metric: 'sum(clickhouse_sinker_writing_pool_backlog) by(job,task)',
       },
     ],
