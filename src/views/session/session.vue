@@ -39,10 +39,10 @@ export default {
     async fetchData() {
       const id = this.$route.params.id;
       const {
-        data: { data: openList },
+        data: { entity: openList },
       } = await SessionApi.open(id);
       const {
-        data: { data: closeList },
+        data: { entity: closeList },
       } = await SessionApi.close(id);
       this.openList = openList;
       this.closeList = closeList;
