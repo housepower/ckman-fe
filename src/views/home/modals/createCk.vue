@@ -3,7 +3,7 @@
     <el-form ref="Form"
              :model="formModel"
              label-width="150px">
-      <el-form-item label="ClickHouse Version:"
+      <el-form-item :label="$t('home.ClickHouse Version') + ':'"
                     prop="packageVersion"
                     v-if="type"
                     required>
@@ -25,7 +25,7 @@
         <el-input v-model="formModel.cluster"
                   class="width-350" />
       </el-form-item>
-      <el-form-item label="ClickHouse Node IP:"
+      <el-form-item :label="$t('home.ClickHouse Node IP') + ':'"
                     prop="hosts"
                     v-if="!type"
                     required>
@@ -41,7 +41,7 @@
         <el-input v-model="formModel.port"
                   class="width-350" />
       </el-form-item>
-      <el-form-item label="ClickHouse Node List:"
+      <el-form-item :label="$t('home.ClickHouse Node List') + ':'"
                     prop="hosts"
                     v-if="type"
                     required>
@@ -51,12 +51,12 @@
                   placeholder="多个ip,请以逗号,分隔填写"
                   class="width-350" />
       </el-form-item>
-      <el-form-item label="Replica"
+      <el-form-item :label="$t('home.Replica')"
                     v-if="type"
                     prop="isReplica">
         <el-switch v-model="formModel.isReplica"></el-switch>
       </el-form-item>
-      <el-form-item label="Zookeeper Node List:"
+      <el-form-item :label="$t('home.Zookeeper Node List') + ':'"
                     prop="zkNodes"
                     required>
         <el-input type="textarea"
@@ -65,32 +65,32 @@
                   v-model="formModel.zkNodes"
                   class="width-350" />
       </el-form-item>
-      <el-form-item label="ZooKeeper Port:"
+      <el-form-item :label="$t('home.ZooKeeper Port') + ':'"
                     prop="zkPort"
                     required>
         <el-input v-model="formModel.zkPort"
                   class="width-350" />
       </el-form-item>
-      <el-form-item label="ZK Status Port:"
+      <el-form-item :label="$t('home.ZK Status Port') + ':'"
                     prop="zkStatusPort"
                     required>
         <el-input v-model="formModel.zkStatusPort"
                   class="width-350" />
       </el-form-item>
-      <el-form-item label="Data path:"
+      <el-form-item :label="$t('home.Data pat') + ':'"
                     prop="path"
                     v-if="type"
                     required>
         <el-input v-model="formModel.path"
                   class="width-350" />
       </el-form-item>
-      <el-form-item label="Cluster Username:"
+      <el-form-item :label="$t('home.Cluster Username') + ':'"
                     prop="user"
                     required>
         <el-input v-model="formModel.user"
                   class="width-350" />
       </el-form-item>
-      <el-form-item label="Cluster Password:"
+      <el-form-item :label="$t('home.Cluster Password') + ':'"
                     prop="password"
                     required>
         <el-input v-model="formModel.password"
@@ -100,14 +100,14 @@
                   class="width-350" />
       </el-form-item>
 
-      <el-form-item label="SSH Username:"
+      <el-form-item :label="$t('home.SSH Username') + ':'"
                     prop="sshUser"
                     v-if="type"
                     required>
         <el-input v-model="formModel.sshUser"
                   class="width-350" />
       </el-form-item>
-      <el-form-item label="SSH Password:"
+      <el-form-item :label="$t('home.SSH Password') + ':'"
                     prop="sshPassword"
                     v-if="type"
                     required>

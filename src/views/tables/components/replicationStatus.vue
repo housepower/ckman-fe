@@ -1,7 +1,7 @@
 <template>
   <div class="replication-status pb-20">
     <div class="title flex flex-between flex-vcenter ptb-10">
-      <span class="fs-20 font-bold">Table Replication Status</span>
+      <span class="fs-20 font-bold">{{$t('tables.Table Replication Status')}}</span>
       <time-filter v-model="timeFilter"
                    :refreshDuration.sync="refresh"
                    @input="timeFilterChange"

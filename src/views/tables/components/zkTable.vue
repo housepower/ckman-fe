@@ -1,7 +1,7 @@
 <template>
   <div class="zkTable">
     <div class="title flex flex-between flex-vcenter ptb-10">
-      <span class="fs-20 font-bold">Zookeeper Status</span>
+      <span class="fs-20 font-bold">{{$t('tables.Zookeeper Status')}}</span>
       <time-filter v-model="timeFilter"
                    :refreshDuration.sync="refresh"
                    @input="timeFilterChange"

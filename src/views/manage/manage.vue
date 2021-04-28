@@ -13,10 +13,10 @@
     </breadcrumb>
     <section class="container">
       <div class="uprade ptb-15">
-        <span class="fs-18 font-bold mb-15 inline-block">Upgrade Cluster</span>
+        <span class="fs-18 font-bold mb-15 inline-block">{{$t('manage.Upgrade Cluster')}}</span>
         <div class="">
-          <span class="fs-14 font-bold">ClickHouse Version: {{ list.version }}</span>
-          <span v-if="mode === 'deploy'" class="fs-14 font-bold ml-50">Upgrade to:</span>
+          <span class="fs-14 font-bold">{{$t('home.ClickHouse Version')}}: {{ list.version }}</span>
+          <span v-if="mode === 'deploy'" class="fs-14 font-bold ml-50">{{$t('manage.Upgrade to')}}:</span>
           <el-select v-model="packageVersion"
                      v-if="mode === 'deploy'"
                      size="small"
@@ -39,7 +39,7 @@
         </div>
       </div>
       <div class="node-list">
-        <h3 class="mt-15 mb-30">ClickHouse Node List</h3>
+        <h3 class="mt-15 mb-30">{{$t('home.ClickHouse Node List')}}</h3>
         <div class="search flex flex-between">
           <el-input v-model="input"
                     placeholder="search"
@@ -58,25 +58,25 @@
                   border>
           <el-table-column prop="ip"
                            show-overflow-tooltip
-                           label="Node IP"
+                           :label="$t('manage.Node IP')"
                            align="center" />
           <el-table-column prop="hostname"
                            show-overflow-tooltip
-                           label="Node Name"
+                           :label="$t('manage.Node Name')"
                            align="center" />
           <el-table-column prop="shardNumber"
                            show-overflow-tooltip
-                           label="shard number"
+                           :label="$t('manage.shard number')"
                            align="center" />
           <el-table-column prop="replicaNumber"
                            show-overflow-tooltip
-                           label="replica number"
+                           :label="$t('manage.replica number')"
                            align="center" />
           <el-table-column prop="status"
                            show-overflow-tooltip
-                           label="Node Status"
+                           :label="$t('manage.Node Status')"
                            align="center" />
-          <el-table-column label="Actions"
+          <el-table-column :label="$t('home.Actions')"
                            v-if="mode === 'deploy'"
                            #default="{ row }"
                            align="center">

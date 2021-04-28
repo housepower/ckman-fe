@@ -4,10 +4,10 @@
     <el-form ref="Form"
              :model="formModel"
              label-width="150px">
-      <el-form-item label="Replica">
+      <el-form-item :label="$t('home.Replica')">
         <el-switch v-model="formModel.isReplica"></el-switch>
       </el-form-item>
-      <el-form-item label="Zookeeper Node List:"
+      <el-form-item :label="$t('home.Zookeeper Node List') + ':'"
                     prop="zkNodes">
         <el-input type="textarea"
                   :autosize="{ minRows: 2 }"
@@ -15,17 +15,17 @@
                   placeholder="多个ip,请以逗号,分隔填写"
                   class="width-350" />
       </el-form-item>
-      <el-form-item label="Data path:"
+      <el-form-item :label="$t('home.Data path') + ':'"
                     prop="path">
         <el-input v-model="formModel.path"
                   class="width-350" />
       </el-form-item>
-      <el-form-item label="Cluster Username:"
+      <el-form-item :label="$t('home.Cluster Username') + ':'"
                     prop="user">
         <el-input v-model="formModel.user"
                   class="width-350" />
       </el-form-item>
-      <el-form-item label="Cluster Password:"
+      <el-form-item :label="$t('home.Cluster Password') + ':'"
                     prop="password">
         <el-input v-model="formModel.password"
                   class="width-350" />

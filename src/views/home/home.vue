@@ -18,7 +18,7 @@
           <el-button type="primary"
                      size="large"
                      class="fs-18"
-                     @click="importCk(0)">Import a ClickHouse Cluster</el-button>
+                     @click="importCk(0)">{{$t('home.Import a ClickHouse Cluster')}}</el-button>
         </div>
       </div>
       <div class="flex-1">
@@ -28,7 +28,7 @@
             <i class="fa fa-database"></i>
             <span class="inline-block ml-10 font-bold">Loader</span>
           </p>
-          <p class="fs-14 font-bold">Data loader management</p>
+          <p class="fs-14 font-bold">{{$t('home.Data loader management')}}</p>
         </div>
         <div class="btns flex flex-column width-6">
           <router-link to="/loader"
@@ -38,7 +38,7 @@
     </section>
 
     <div class="list mt-50">
-      <p class="font-bold mb-10 fs-18">All ClickHouse Clusters</p>
+      <p class="font-bold mb-10 fs-18">{{$t('home.All ClickHouse Clusters')}}</p>
       <el-table :data="list"
                 border
                 header-cell-class-name="header-cell-class-name">
@@ -47,25 +47,25 @@
                          :label="$t('home.Cluster Name')" />
         <el-table-column prop="mode"
                          show-overflow-tooltip
-                         label="Mode" />
+                         :label="$t('home.Mode')" />
         <el-table-column prop="isReplica"
                          show-overflow-tooltip
-                         label="Replica" />
+                         :label="$t('home.Replica')" />
         <el-table-column prop="hosts"
                          show-overflow-tooltip
-                         label="ClickHouse Node IP" />
+                         :label="$t('home.ClickHouse Node IP')" />
         <el-table-column prop="count"
                          show-overflow-tooltip
-                         label="ClickHouse Node Count" />
+                         :label="$t('home.ClickHouse Node Count')" />
         <el-table-column prop="zkNodes"
                          show-overflow-tooltip
-                         label="Zookeeper Node List" />
-        <el-table-column label="Actions"
+                         :label="$t('home.Zookeeper Node List')" />
+        <el-table-column :label="$t('home.Actions')"
                          #default="{ row }">
           <el-link type="primary"
                    underline
                    @click.prevent="toCluster(row)"
-                   :to="'/clusters/' + row.cluster">Go to cluster</el-link>
+                   :to="'/clusters/' + row.cluster">{{$t('home.Go to cluster')}}</el-link>
           <i class="fa fa-trash pointer fs-18 ml-15"
              v-tooltip="'Delete'"
              @click="remove(row)" />
@@ -117,8 +117,8 @@ export default {
         component: CreateCk,
         props: {
           title: type
-            ? "Create a new ClickHouse Cluster"
-            : "Import a ClickHouse Cluster",
+            ? this.$t("home.Create a ClickHouse Cluster")
+            : this.$t("home.Import a ClickHouse Cluster"),
           width: 600,
           cancelText: "Cancel",
           okText: type ? "Create" : "Import",

@@ -176,10 +176,7 @@
     ],
     "space-infix-ops": "warn",
     "prefer-const": "warn",
-    "quote-props": [
-      "warn",
-      "as-needed"
-    ],
+    "quote-props": [0, "always"],
     "radix": "warn",
     "space-before-function-paren": [
       "warn",
