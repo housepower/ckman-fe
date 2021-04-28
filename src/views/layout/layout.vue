@@ -1,9 +1,9 @@
 <template>
   <div class="layout">
     <header class="flex-between flex-vcenter plr-20">
-      <span class="fs-18 font-bold">{{$t('layout.ClickHouse Management Console')}}</span>
+      <router-link to="/" class="fs-18 font-bold">{{title}}</router-link>
       <div class="header-right">
-        <el-select v-model="$i18n.locale">
+        <el-select v-model="$i18n.locale" class="mr-10 width-100" size="mini">
           <el-option value="en" label="English" />
           <el-option value="zh" label="中文" />
         </el-select>
@@ -14,12 +14,10 @@
                   class="fs-16 ml-5 user" />
           </div>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item @click.native="loginOut">Login out</el-dropdown-item>
+            <el-dropdown-item @click.native="logout">Logout</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
-        <router-link to="/setting">
-          <i class="fa fa-cog fs-20 pointer ml-10"></i>
-        </router-link>
+        <router-link to="/setting" class="fa fa-cog fs-20 pointer ml-10" />
       </div>
     </header>
 
@@ -46,7 +44,7 @@
 </template>
 <script>
 import { Menus, LoaderMenus } from "@/constants";
-import { $i18n } from '@/services';
+
 export default {
   name: "Layout",
   data() {
@@ -62,12 +60,10 @@ export default {
     handleMenuClick(e) {
       console.log(e);
     },
-    loginOut() {
+    logout() {
       localStorage.removeItem("user");
       this.$message.success("成功登出");
-      setTimeout(() => {
-        this.$router.push({ path: "/login" });
-      }, 1000);
+      this.$router.push('/login');
     },
   },
   watch: {
@@ -79,6 +75,13 @@ export default {
     },
     '$i18n.locale'(value) {
       localStorage.setItem('locale', value);
+      document.title = this.title;
+      document.documentElement.lang = value;
+    },
+  },
+  computed: {
+    title() {
+      return this.$t('layout.ClickHouse Management Console');
     },
   },
 };
