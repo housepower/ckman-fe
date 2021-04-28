@@ -24,10 +24,11 @@
                       autocomplete="off"
                       class="width-300"></el-input>
           </el-form-item>
+          <el-button type="primary"
+                     @click.prevent="login"
+                     native-type="submit"
+                     class="width-full">Login</el-button>
         </el-form>
-        <el-button type="primary"
-                   @click="login"
-                   class="width-full">Login in</el-button>
       </section>
       <p style="position: absolute; bottom: -50px">Copyright © 2016-2020 上海擎创信息技术有限公司</p>
     </section>
