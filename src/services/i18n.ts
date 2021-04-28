@@ -25,7 +25,8 @@ const messages = {
   },
 };
 
-export const $i18n = new VueI18n({
-  locale: localStorage.getItem('locale') || 'en',
-  messages,
-});
+const locale = localStorage.getItem('locale') || 'en';
+export const $i18n = new VueI18n({ locale, messages });
+const title = $i18n.t('layout.ClickHouse Management Console') + '';
+document.title = title;
+document.documentElement.lang = locale;
