@@ -7,3 +7,4 @@ coverage
 /**/*.jsx
 /**/*.vue
 /src/assets
+/src/services/i18n.ts

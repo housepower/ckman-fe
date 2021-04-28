@@ -35,7 +35,7 @@
                        exact-active-class="router-active"
                        v-for="item of menus"
                        :key="item.name">
-            <span class="fs-20">{{ item.name }}</span>
+            <span class="fs-20">{{$t('home.' + item.name) }}</span>
           </router-link>
         </div>
       </footer>

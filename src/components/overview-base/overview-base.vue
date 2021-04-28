@@ -5,7 +5,7 @@
       <div v-for="(item, index) of chartMetrics"
            :key="item.title">
         <div class="title flex flex-vcenter flex-between">
-          <span class="fs-18 font-bold mtb-20">{{ item.title }}</span>
+          <span class="fs-18 font-bold mtb-20">{{$t('ClickHouseEcharts.' + item.title)}}</span>
           <time-filter v-model="timeFilter"
                        :refreshDuration.sync="refresh"
                        @input="timeFilterChange"
@@ -16,7 +16,7 @@
           <li class="chart-item mb-50"
               v-for="(item, index) of item.metrics"
               :key="index">
-            <p class="mtb-10 fs-16 font-bold expect">{{ item.expect }}</p>
+            <p class="mtb-10 fs-16 font-bold expect">{{$t('ClickHouseEcharts.' + item.expect)}}</p>
             <vue-echarts v-if="item.option"
                          ref="Charts"
                          :option="item.option"
