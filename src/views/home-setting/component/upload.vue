@@ -9,7 +9,7 @@
                :on-remove="removeFile"
                accept=".rpm">
       <el-button type="primary"
-                 class="mb-15">Upload RPMs</el-button>
+                 class="mb-15">{{$t('homeSetting.Upload RPMs')}}</el-button>
     </el-upload>
     <el-progress :text-inside="true"
                  :stroke-width="15"

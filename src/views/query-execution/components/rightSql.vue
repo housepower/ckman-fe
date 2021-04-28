@@ -27,7 +27,7 @@
                size="large"
                class="fs-18 width-full mt-15"
                :disabled="sqlInput === ''"
-               @click="query">Execute Query</el-button>
+               @click="query">{{$t('queryExecution.Execute Query')}}</el-button>
     <section class="list">
       <el-table :data="tableData"
                 class="mt-15"

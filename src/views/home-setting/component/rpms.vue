@@ -2,7 +2,7 @@
   <section class="rpms text-right">
     <el-button type="primary"
                class="mb-15"
-               @click="chooseFile">Upload RPMs</el-button>
+               @click="chooseFile">{{$t('homeSetting.Upload RPMs')}}</el-button>
     <el-table :data="list"
               border>
       <el-table-column prop="version"

@@ -13,9 +13,9 @@
         </div>
       </div>
       <div class="tables">
-        <h3 class="mb-10">Open Sessions</h3>
+        <h3 class="mb-10">{{$t('session.Open Sessions')}}</h3>
         <session-table :list="openList" />
-        <h3 class="mb-10 mt-50">Slow Sessions</h3>
+        <h3 class="mb-10 mt-50">{{$t('session.Slow Sessions')}}</h3>
         <session-table :list="closeList" />
       </div>
     </section>

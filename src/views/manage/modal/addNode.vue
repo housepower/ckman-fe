@@ -3,12 +3,12 @@
     <el-form ref="Form"
              :model="formModel"
              label-width="150px">
-      <el-form-item label="New Node IP:"
+      <el-form-item :label="$t('manage.New Node IP') + ':'"
                     prop="ip">
         <el-input v-model="formModel.ip"
                   class="width-350" />
       </el-form-item>
-      <el-form-item label="Node Shard:"
+      <el-form-item :label="$t('manage.Node Shard') + ':'"
                     prop="shard">
         <el-input-number v-model="formModel.shard"
                          :step="1"

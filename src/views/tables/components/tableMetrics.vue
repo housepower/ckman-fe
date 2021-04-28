@@ -1,7 +1,7 @@
 <template>
   <div class="table-metric pb-20">
     <div class="title flex flex-between flex-vcenter ptb-10">
-      <span class="fs-20 font-bold">Table Metrics</span>
+      <span class="fs-20 font-bold">{{$t('tables.Table Metrics')}}</span>
     </div>
     <el-table :data="tableData"
               cneter
@@ -23,40 +23,6 @@ export default {
   data() {
     return {
       tableData: [],
-      columns: [
-        {
-          prop: "tableName",
-          label: "Table Name",
-        },
-        {
-          prop: "columns",
-          label: "Columns",
-        },
-        {
-          prop: "rows",
-          label: "Rows",
-        },
-        {
-          prop: "parts",
-          label: "Parts",
-        },
-        {
-          prop: "space",
-          label: "Disk Space",
-        },
-        {
-          prop: "completedQueries",
-          label: "Completed Queries in last 24h",
-        },
-        {
-          prop: "failedQueries",
-          label: "Failed Queries in last 24h",
-        },
-        {
-          prop: "queryCost",
-          label: "Queries Cost(0.5, 0.99, max) in last 7 days",
-        },
-      ],
     };
   },
   mounted() {
@@ -92,6 +58,45 @@ export default {
       });
     },
   },
+  computed: {
+    columns() {
+      let columns = [
+        {
+          prop: "tableName",
+          label: this.$t('tables.Table Name'),
+        },
+        {
+          prop: "columns",
+          label: this.$t('tables.Columns'),
+        },
+        {
+          prop: "rows",
+          label: this.$t('tables.Rows'),
+        },
+        {
+          prop: "parts",
+          label: this.$t('tables.Parts'),
+        },
+        {
+          prop: "space",
+          label: this.$t('tables.Disk Space'),
+        },
+        {
+          prop: "completedQueries",
+          label: this.$t('tables.Completed Queries in last 24h'),
+        },
+        {
+          prop: "failedQueries",
+          label: this.$t('tables.Failed Queries in last 24h'),
+        },
+        {
+          prop: "queryCost",
+          label: this.$t('tables.Last 7 days info'),
+        },
+      ];
+      return columns
+    }
+  }
 };
 </script>
 

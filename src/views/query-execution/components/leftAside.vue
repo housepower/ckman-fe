@@ -3,7 +3,7 @@
     <div class="left-aside-content">
       <ul class="custom-scrollbar">
         <li class="flex flex-column ptb-15 plr-10 flex-center">
-          <span class="fs-18 font-bold mb-10">Query History</span>
+          <span class="fs-18 font-bold mb-10">{{$t('queryExecution.Query History')}}</span>
           <el-input v-model="input"
                     placeholder="search"
                     autocomplete="false"

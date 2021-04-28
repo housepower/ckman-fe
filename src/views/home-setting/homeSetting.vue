@@ -28,7 +28,7 @@
                class="ml-360"
                @click="saveConfig">Save & Reboot</el-button>
     <section class="rpms">
-      <el-divider content-position="left">ClickHouse RPMs</el-divider>
+      <el-divider content-position="left">{{$t('homeSetting.ClickHouse RPMs')}}</el-divider>
       <rpm-list />
     </section>
   </main>
