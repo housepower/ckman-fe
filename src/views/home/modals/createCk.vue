@@ -32,7 +32,7 @@
         <el-input v-model="formModel.hosts"
                   type="textarea"
                   :autosize="{ minRows: 2 }"
-                  placeholder="多个ip,请以逗号,分隔填写"
+                  :placeholder="$t('common.placeholderIp')"
                   class="width-350" />
       </el-form-item>
       <el-form-item :label="$t('home.ClickHouse TCP Port') + ':'"
@@ -48,7 +48,7 @@
         <el-input type="textarea"
                   :autosize="{ minRows: 2 }"
                   v-model="formModel.hosts"
-                  placeholder="多个ip,请以逗号,分隔填写"
+                  :placeholder="$t('common.placeholderIp')"
                   class="width-350" />
       </el-form-item>
       <el-form-item :label="$t('home.Replica')"
@@ -61,7 +61,7 @@
                     required>
         <el-input type="textarea"
                   :autosize="{ minRows: 2 }"
-                  placeholder="多个ip,请以逗号,分隔填写"
+                  :placeholder="$t('common.placeholderIp')"
                   v-model="formModel.zkNodes"
                   class="width-350" />
       </el-form-item>

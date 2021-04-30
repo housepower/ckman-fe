@@ -24,7 +24,7 @@
           <span>{{ column.label }}</span>
         </template>
         <template slot-scope="{ row, column }">
-          <span v-if="index === 0">{{ Object.keys(row)[0] }}</span>
+          <span v-if="index === 0">{{ Object.keys(row)[0] === "Table Name" ? $t('common.' + Object.keys(row)[0]) : Object.keys(row)[0] }}</span>
           <span v-else>{{ Object.values(row)[0][column.property] }}</span>
         </template>
       </el-table-column>
