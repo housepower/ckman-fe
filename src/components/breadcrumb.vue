@@ -6,7 +6,7 @@
       </el-breadcrumb-item>
       <el-breadcrumb-item v-for="(item, index) of data"
                           :key="index"
-                          :class="{ active: index === data.length - 1 }">{{ item }}</el-breadcrumb-item>
+                          :class="{ active: index === data.length - 1 }">{{index !== 1  ? $t('common.' + item) : item }}</el-breadcrumb-item>
     </el-breadcrumb>
     <div class="slot">
       <slot></slot>

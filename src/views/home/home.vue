@@ -120,8 +120,8 @@ export default {
             ? this.$t("home.Create a ClickHouse Cluster")
             : this.$t("home.Import a ClickHouse Cluster"),
           width: 600,
-          cancelText: "Cancel",
-          okText: type ? "Create" : "Import",
+          cancelText: this.$t("common.Cancel"),
+          okText: type ? this.$t("common.Create") : this.$t("common.Import"),
         },
         data: {
           type,
@@ -138,8 +138,8 @@ export default {
     },
     async remove(item) {
       await this.$confirm("Confirm whether to delete ?", "Tip", {
-        confirmButtonText: "Delete",
-        cancelButtonText: "Cancel",
+        confirmButtonText: this.$t("common.Delete"),
+        cancelButtonText: this.$t("common.Cancel"),
         text: "warning",
       });
       await ClusterApi.deleteCluster(`${item.cluster}`);
