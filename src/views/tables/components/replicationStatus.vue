@@ -57,8 +57,7 @@ export default {
       this.cols = [{ prop: "", label: "" }];
       this.headerData = cloneDeep(header);
       this.tableData = [];
-      let tableNameItem = {},
-        tableItem = {};
+      let tableNameItem = {};
       header.forEach((item, index) => {
         const shard = `shard${index + 1}`;
         item.forEach((v, index) => {
@@ -73,14 +72,15 @@ export default {
         ["Table Name"]: tableNameItem,
       });
       tables.forEach(({ name, values }) => {
+        let tableItem = {};
         values.forEach((val, index) => {
           const shard = `shard${index + 1}`;
           val.forEach((v, index) => {
             tableItem[`${shard}_${index}`] = v;
           });
-          this.tableData.push({
-            [name]: tableItem,
-          });
+        });
+        this.tableData.push({
+          [name]: tableItem,
         });
         this.tableData = uniqWith(this.tableData, isEqual);
       });
