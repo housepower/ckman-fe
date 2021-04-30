@@ -14,7 +14,7 @@
                   class="fs-16 ml-5 user" />
           </div>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item @click.native="logout">Logout</el-dropdown-item>
+            <el-dropdown-item @click.native="logout">{{$t("common.Logout")}}</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
         <router-link to="/setting" class="fa fa-cog fs-20 pointer ml-10" />

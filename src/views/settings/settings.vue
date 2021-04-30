@@ -12,7 +12,7 @@
         <el-input type="textarea"
                   :autosize="{ minRows: 2 }"
                   v-model="formModel.zkNodes"
-                  placeholder="多个ip,请以逗号,分隔填写"
+                  :placeholder="$t('common.placeholderIp')"
                   class="width-350" />
       </el-form-item>
       <el-form-item :label="$t('home.Data path') + ':'"
@@ -33,7 +33,7 @@
     </el-form>
     <el-button type="primary"
                class="ml-200"
-               @click="save">Save & Reboot</el-button>
+               @click="save">{{$t('common.Save Reboot')}}</el-button>
   </main>
 </template>
 <script>

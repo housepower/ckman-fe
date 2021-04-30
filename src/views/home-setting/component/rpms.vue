@@ -7,14 +7,14 @@
               border>
       <el-table-column prop="version"
                        show-overflow-tooltip
-                       label="Version"
+                       :label="$t('common.Version')"
                        align="center" />
       <el-table-column prop="files"
                        show-overflow-tooltip
-                       label="Files"
+                       :label="$t('common.Files')"
                        align="center"
                        min-width="500" />
-      <el-table-column label="Action"
+      <el-table-column :label="$t('common.Action')"
                        #default="{ row }"
                        align="center">
         <template>
@@ -55,10 +55,10 @@ export default {
     async chooseFile() {
       await $modal({
         props: {
-          title: "Upload File",
+          title: this.$t('common.Upload File'),
           width: "650px",
-          cancelText: "Cancel",
-          okText: "Upload",
+          cancelText: this.$t('common.Cancel'),
+          okText: this.$t('common.Upload'),
         },
         component: Upload,
       });
@@ -66,8 +66,8 @@ export default {
     },
     async remove(item) {
       await this.$confirm("Confirm whether to delete ?", "Tip", {
-        confirmButtonText: "Delete",
-        cancelButtonText: "Cancel",
+        confirmButtonText: this.$t('common.Delete'),
+        cancelButtonText: this.$t('common.Cancel'),
         text: "warning",
       });
       await PackageApi.deletePackage({ packageVersion: item.version });

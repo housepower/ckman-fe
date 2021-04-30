@@ -8,7 +8,7 @@
                    v-for="item of clusterStatus"
                    :key="item"
                    :disabled="isStatusDisable(item)"
-                   @click="clusterOptation(item)">{{$t('manage.' + item + ' Cluster') }}</el-button>
+                   @click="clusterOptation(item)">{{$t('manage.' + item + ' Cluster')}}</el-button>
       </template>
     </breadcrumb>
     <section class="container">
@@ -35,7 +35,7 @@
                      size="mini"
                      class="fs-16"
                      :disabled="!packageVersion"
-                     @click="clusterOptation('upgrade')">Upgrade</el-button>
+                     @click="clusterOptation('upgrade')">{{$t('common.Upgrade')}}</el-button>
         </div>
       </div>
       <div class="node-list">
@@ -50,7 +50,7 @@
                      v-if="mode === 'deploy'"
                      size="mini"
                      class="fs-16"
-                     @click="addNode">Add Node</el-button>
+                     @click="addNode">{{$t('common.Add Node')}}</el-button>
         </div>
 
         <el-table class="mt-10"
@@ -179,8 +179,8 @@ export default {
         props: {
           title: "Add Node",
           width: 600,
-          cancelText: "Cancel",
-          okText: "Save",
+          cancelText: this.$t("common.Cancel"),
+          okText: this.$t("common.Save"),
         },
         data: {
           numberRange: this.numberRange(),
@@ -192,8 +192,8 @@ export default {
     async remove(item) {
       console.log(item);
       await this.$confirm("Confirm whether to delete ?", "Tip", {
-        confirmButtonText: "Delete",
-        cancelButtonText: "Cancel",
+        confirmButtonText: this.$t("common.Delete"),
+        cancelButtonText: this.$t("common.Cancel"),
         text: "warning",
       });
       await ClusterApi.deleteClusterNode(this.$route.params.id, {
@@ -204,9 +204,9 @@ export default {
     },
     async clusterOptation(type) {
       type = lowerFirst(type);
-      await this.$confirm(`确认要进行 ${ClusterStatus[type]} 操作么`, "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
+      await this.$confirm(this.$t('common.' + ClusterStatus[type]), this.$t('common.tips'), {
+        confirmButtonText: this.$t("common.Confirm"),
+        cancelButtonText: this.$t("common.Cancel"),
       });
       $loading.increase();
       let params = {

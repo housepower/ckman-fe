@@ -26,7 +26,7 @@
     </el-form>
     <el-button type="primary"
                class="ml-360"
-               @click="saveConfig">Save & Reboot</el-button>
+               @click="saveConfig">{{$t('common.Save Reboot')}}</el-button>
     <section class="rpms">
       <el-divider content-position="left">{{$t('homeSetting.ClickHouse RPMs')}}</el-divider>
       <rpm-list />
