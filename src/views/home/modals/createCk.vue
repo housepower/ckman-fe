@@ -117,6 +117,13 @@
                   autocomplete="new-password"
                   class="width-350" />
       </el-form-item>
+      <el-form-item :label="$t('home.SSH Port') + ':'"
+                    prop="sshPort"
+                    v-if="type"
+                    required>
+        <el-input v-model="formModel.sshPort"
+                  class="width-350" />
+      </el-form-item>
     </el-form>
   </section>
 </template>
@@ -137,6 +144,7 @@ export default {
         password: "",
         sshUser: "",
         sshPassword: "",
+        sshPort:22,
         isReplica: false,
         port: 9000,
         zkPort: 2181,
@@ -172,6 +180,7 @@ export default {
         password,
         sshUser,
         sshPassword,
+        sshPort,
         isReplica,
         port,
         zkPort,
@@ -208,6 +217,7 @@ export default {
           hosts: lineFeed(hosts),
           password: sshPassword,
           user: sshUser,
+          sshPort: +sshPort,
         });
       }
     },
