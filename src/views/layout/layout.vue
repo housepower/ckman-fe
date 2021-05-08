@@ -1,7 +1,7 @@
 <template>
   <div class="layout">
     <header class="flex-between flex-vcenter plr-20">
-      <router-link to="/" class="fs-18 font-bold">{{title}}</router-link>
+      <router-link to="/" class="fs-18 font-bold">{{title}}  {{version}}</router-link>
       <div class="header-right">
         <el-select v-model="$i18n.locale" class="mr-10 width-100" size="mini">
           <el-option value="en" label="English" />
@@ -44,6 +44,7 @@
 </template>
 <script>
 import { Menus, LoaderMenus } from "@/constants";
+import { PackageApi } from "@/apis";
 
 export default {
   name: "Layout",
@@ -51,10 +52,12 @@ export default {
     return {
       menus: Menus,
       user: "",
+      version: "",
     };
   },
   mounted() {
     this.user = JSON.parse(localStorage.getItem("user") || "{}").username;
+    this.fetchVersion();
   },
   methods: {
     handleMenuClick(e) {
@@ -64,6 +67,12 @@ export default {
       localStorage.removeItem("user");
       this.$message.success("成功登出");
       this.$router.push('/login');
+    },
+    async fetchVersion() {
+      const {
+        data: { entity },
+      } = await PackageApi.getVersion();
+      this.version = entity;
     },
   },
   watch: {
@@ -83,6 +92,9 @@ export default {
     title() {
       return this.$t('layout.ClickHouse Management Console');
     },
+    version() {
+      return this.version
+    }
   },
 };
 </script>

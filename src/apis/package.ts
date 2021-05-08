@@ -18,4 +18,7 @@ export const PackageApi = {
   deletePackage(params) {
     return axios.delete(`${url}/package`, { params });
   },
+  getVersion() {
+    return axios.get(`${url}/version`);
+  },
 };
