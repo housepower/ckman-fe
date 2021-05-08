@@ -1,6 +1,6 @@
 <template>
   <main class="home-setting">
-    <breadcrumb :data="['setting']"></breadcrumb>
+    <breadcrumb :data="['settings']"></breadcrumb>
     <el-form ref="Form"
              :model="formModel"
              label-width="280px"

@@ -77,7 +77,7 @@
         <el-input v-model="formModel.zkStatusPort"
                   class="width-350" />
       </el-form-item>
-      <el-form-item :label="$t('home.Data pat') + ':'"
+      <el-form-item :label="$t('home.Data path') + ':'"
                     prop="path"
                     v-if="type"
                     required>
