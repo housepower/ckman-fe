@@ -218,7 +218,10 @@ export default {
       await ClusterApi.manageCluster(type, params).finally(() =>
         $loading.decrease()
       );
-      this.$message.success(`集群${ClusterStatus[type]}成功`);
+      this.$message.success(`${this.$t('manage.' + type + ' Cluster')}成功`);
+      if (type === 'Destroy') {
+        this.$router.push('/home');
+      }
       this.fetchData();
     },
   },
