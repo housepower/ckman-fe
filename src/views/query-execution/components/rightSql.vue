@@ -32,11 +32,16 @@
       <el-table :data="tableData"
                 class="mt-15"
                 border>
-        <el-table-column show-overflow-tooltip
-                         v-for="(item, index) of columns"
+        <el-table-column v-for="(item, index) of columns"
                          :key="index"
                          :prop="item"
-                         :label="item" />
+                         :label="item">
+          <template slot-scope="scope">
+            <el-tooltip effect="dark" :content="scope.row[item]" placement="top">
+              <div class="text-ellipsis">{{scope.row[item]}}</div>
+            </el-tooltip>
+          </template>
+        </el-table-column>
       </el-table>
     </section>
   </main>
