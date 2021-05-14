@@ -21,20 +21,6 @@
                      @click="importCk(0)">{{$t('home.Import a ClickHouse Cluster')}}</el-button>
         </div>
       </div>
-      <div class="flex-1">
-        <div class="title flex flex-column mb-30">
-          <p class="mb-5"
-             style="font-size: 40px">
-            <i class="fa fa-database"></i>
-            <span class="inline-block ml-10 font-bold">Loader</span>
-          </p>
-          <p class="fs-14 font-bold">{{$t('home.Data Loader Management')}}</p>
-        </div>
-        <div class="btns flex flex-column width-6">
-          <router-link to="/loader"
-                       class="el-button mb-20 fs-18 el-button--primary el-button--large">{{$t('home.Data Loader Management')}}</router-link>
-        </div>
-      </div>
     </section>
 
     <div class="list mt-50">

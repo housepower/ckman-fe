@@ -66,25 +66,6 @@ export const $router = new Router({
             },
           ],
         },
-        {
-          path: '/loader',
-          component: ChildViewHolder,
-          redirect: '/loader/overview',
-          children:[
-            {
-              path: 'overview',
-              name: 'LoaderOverview',
-              meta: 'loader',
-              component: () => import('@/views/loader/overview.vue'),
-            },
-            {
-              path: 'manage',
-              name: 'LoaderManage',
-              meta: 'loader',
-              component: () => import('@/views/loader/manage.vue'),
-            },
-          ],
-        },
       ],
     },
   ],
