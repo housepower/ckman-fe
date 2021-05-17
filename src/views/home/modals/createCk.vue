@@ -130,7 +130,7 @@
 <script>
 import { chunk } from "lodash-es";
 import { ClusterApi } from "@/apis";
-import { lineFeed } from "@/helpers";
+import { lineFeed, getCirdOrRangeIps } from "@/helpers";
 export default {
   props: ["type", "versionOptions"],
   data() {
@@ -190,17 +190,16 @@ export default {
       if (!this.type) {
         await ClusterApi.importCluster({
           cluster,
-          hosts: lineFeed(hosts),
+          hosts: getCirdOrRangeIps(lineFeed(hosts)),
           port: +port,
           user,
           password,
-          zkNodes: lineFeed(zkNodes),
+          zkNodes: getCirdOrRangeIps(lineFeed(zkNodes)),
           zkPort: +zkPort,
           zkStatusPort: +zkStatusPort,
         });
       } else {
-        console.log(lineFeed(hosts));
-        const shards = await this.dealShards(isReplica, lineFeed(hosts));
+        const shards = await this.dealShards(isReplica, getCirdOrRangeIps(lineFeed(hosts)));
         await ClusterApi.createCluster({
           clickhouse: {
             ckTcpPort: +port,
@@ -210,7 +209,7 @@ export default {
             password,
             path,
             user,
-            zkNodes: lineFeed(zkNodes),
+            zkNodes: getCirdOrRangeIps(lineFeed(zkNodes)),
             zkPort: +zkPort,
             zkStatusPort: +zkStatusPort,
           },
