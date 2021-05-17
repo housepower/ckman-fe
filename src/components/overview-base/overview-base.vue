@@ -70,16 +70,17 @@ export default {
     fetchData() {
       this.chartMetrics.forEach((item, index) => {
         item.metrics.forEach((metric, index) => {
-          this.fetchChartData(metric, index);
+          this.fetchChartData(item.title, metric, index);
         });
       });
     },
-    async fetchChartData(chart, index) {
+    async fetchChartData(title, chart, index) {
       const { duration, min, max } = convertTimeBounds(this.timeFilter);
       const step = Math.floor(+duration / 360 / 1000);
       const {
         data: { entity },
-      } = await MetricApi.queryRangeMetric({
+      } = await MetricApi.queryRangeMetric(this.$route.params.id, {
+        title: title,
         metric: chart.metric,
         start: Math.floor(min / 1000),
         end: Math.floor(max / 1000),

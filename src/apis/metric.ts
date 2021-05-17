@@ -6,7 +6,7 @@ export const MetricApi = {
   querymetric(params) {
     return axios.get(`${url}/query`, { params });
   },
-  queryRangeMetric(params) {
-    return axios.get(`${url}/query_range`, { params });
+  queryRangeMetric(id, params) {
+    return axios.get(`${url}/query_range/${id}`, { params });
   },
 };
