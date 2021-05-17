@@ -71,7 +71,7 @@ export const chartOption = (data: MetricData[], min: number, max: number) => ({
         return `job:${metric.job}-task:${metric.task}`;
       }
     })(),
-    data: values.map(item => ([item[0] * 1000, item[1]])),
+    data: values.map(item => ([item[0] * 1000, Number(item[1]).toFixed(2).replace('.00', '')])),
     type: 'line',
     // sampling: 'average',
     symbol: 'none',
