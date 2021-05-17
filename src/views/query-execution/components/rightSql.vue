@@ -35,12 +35,11 @@
         <el-table-column v-for="(item, index) of columns"
                          :key="index"
                          :prop="item"
-                         :label="item">
-          <template slot-scope="scope">
-            <el-tooltip effect="dark" :content="scope.row[item]" placement="top">
-              <div class="text-ellipsis">{{scope.row[item]}}</div>
-            </el-tooltip>
-          </template>
+                         :label="item"
+                         #default="{ row }">
+          <el-tooltip effect="dark" :content="row[item]" placement="top">
+            <div class="text-ellipsis">{{row[item]}}</div>
+          </el-tooltip>
         </el-table-column>
       </el-table>
     </section>
