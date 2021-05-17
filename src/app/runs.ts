@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 import '@/common/app/run';
-import { $root, $router, _updateVueInstance } from '@/services';
+import { $root, $router, _updateVueInstance, $i18n } from '@/services';
 import { InvalidTokenCode } from '@/constants';
 
 axios.interceptors.request.use((config: AxiosRequestConfig) => {
@@ -12,6 +12,7 @@ axios.interceptors.request.use((config: AxiosRequestConfig) => {
   } else {
     $router.replace('/login').catch(Boolean);
   }
+  config.headers['Accept-Language'] = $i18n.locale;
   return config;
 });
 
