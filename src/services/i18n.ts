@@ -5,6 +5,7 @@ Vue.use(VueI18n);
 const messages = {
   en: {
     common: {
+      'Success': 'Success',
       'Create': 'Create',
       'Confirm': 'Confirm',
       'Cancel': 'Cancel',
@@ -144,6 +145,7 @@ const messages = {
   },
   zh: {
     common: {
+      'Success': '成功',
       'Create': '创建',
       'Confirm': '确定',
       'Cancel': '取消',

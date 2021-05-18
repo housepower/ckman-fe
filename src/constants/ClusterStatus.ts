@@ -1,8 +1,8 @@
 export const ClusterStatus = Object.freeze({
-  start: 'start',
-  stop: 'stop',
-  destroy: 'destroy',
-  rebalance: 'rebalance',
-  upgrade: 'upgrade',
+  start: 'Start',
+  stop: 'Stop',
+  destroy: 'Destroy',
+  rebalance: 'Rebalance',
+  upgrade: 'Upgrade',
 });
 export const ClusterTypeStatus = Object.freeze(['green','red','yellow']);
