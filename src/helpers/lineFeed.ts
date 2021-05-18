@@ -14,8 +14,8 @@ export function getCirdOrRangeIps(arr: string[]) {
     if (item.startsWith('CIDR')) {
       const ipv4CIDR = getIPRange(item.slice(5, -1));
       endArr = endArr.concat(ipv4CIDR);
-    } else if (item.includes('-')) {
-      const ipv4Range = getIPRange(item);
+    } else if (item.startsWith('Range')) {
+      const ipv4Range = getIPRange(item.slice(6, -1));
       endArr = endArr.concat(ipv4Range);
     } else {
       endArr.push(item);
