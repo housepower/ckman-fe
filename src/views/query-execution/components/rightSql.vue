@@ -1,5 +1,5 @@
 <template>
-  <main>
+  <main class="manageContent">
     <section class="rightSql custom-scrollbar">
       <div class="tags flex-vcenter">
         <el-tag :class="['fs-14', 'mr-10', 'pointer', 'tag', 'flex', 'flex-vcenter', { active: activeIndex === index }]"
@@ -29,7 +29,7 @@
                :disabled="sqlInput === ''"
                @click="query">{{$t('queryExecution.Execute Query')}}</el-button>
     <section class="list">
-      <el-table :data="tableData"
+      <el-table :data="tableData.slice((currentPage - 1)*pageSize, currentPage*pageSize)"
                 class="mt-15"
                 border>
         <el-table-column v-for="(item, index) of columns"
@@ -42,6 +42,16 @@
           </el-tooltip>
         </el-table-column>
       </el-table>
+      <!-- 前端分页 -->
+      <el-pagination v-if="tableData.length > 0"
+                     @size-change="handleSizeChange"
+                     @current-change="handleCurrentChange"
+                     :current-page="currentPage"
+                     :page-sizes="[5, 10, 20, 40]"
+                     :page-size="pageSize"
+                     layout="sizes, prev, pager, next, jumper"
+                     :total="tableData.length">
+      </el-pagination>
     </section>
   </main>
 </template>
@@ -62,6 +72,8 @@ export default {
       activeIndex: 0,
       columns: [],
       tableData: [],
+      currentPage: 1,
+      pageSize: 10,
     };
   },
   mounted() {
@@ -115,6 +127,13 @@ export default {
       }
       this.$nextTick(() => this.$emit("updateData", curTag));
     },
+    // 前端分页
+    handleSizeChange(size) {
+      this.pageSize = size;
+    },
+    handleCurrentChange(currentPage) {
+      this.currentPage = currentPage;
+    },
   },
   watch: {
     selectSql(item) {
@@ -135,22 +154,25 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.tags {
-  padding: 5px 3px;
+.manageContent {
+  padding-bottom: 85px;
+  .tags {
+    padding: 5px 3px;
 
-  .tag {
-    width: 132px;
-    justify-content: flex-end;
+    .tag {
+      width: 132px;
+      justify-content: flex-end;
 
-    &:hover,
-    &.active {
-      background: var(--primary-color);
-      color: var(--color-white);
+      &:hover,
+      &.active {
+        background: var(--primary-color);
+        color: var(--color-white);
+      }
     }
-  }
 
-  i:hover {
-    color: var(--primary-color);
+    i:hover {
+      color: var(--primary-color);
+    }
   }
 }
 </style>
