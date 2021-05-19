@@ -11,12 +11,9 @@ export function lineFeed(str: string) {
 export function getCirdOrRangeIps(arr: string[]) {
   let endArr = [];
   arr.forEach(item => {
-    if (item.startsWith('CIDR')) {
-      const ipv4CIDR = getIPRange(item.slice(5, -1));
+    if (item.includes('/') || item.includes('-')) {
+      const ipv4CIDR = getIPRange(item);
       endArr = endArr.concat(ipv4CIDR);
-    } else if (item.startsWith('Range')) {
-      const ipv4Range = getIPRange(item.slice(6, -1));
-      endArr = endArr.concat(ipv4Range);
     } else {
       endArr.push(item);
     }
