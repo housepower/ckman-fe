@@ -50,7 +50,7 @@
                      v-if="mode === 'deploy'"
                      size="mini"
                      class="fs-16"
-                     @click="addNode">{{$t('common.Add Node')}}</el-button>
+                     @click="addNode">{{$t('manage.Add Node')}}</el-button>
         </div>
 
         <el-table class="mt-10"
@@ -177,7 +177,7 @@ export default {
       await $modal({
         component: AddNode,
         props: {
-          title: "Add Node",
+          title: this.$t("manage.Add Node"),
           width: 600,
           cancelText: this.$t("common.Cancel"),
           okText: this.$t("common.Save"),
