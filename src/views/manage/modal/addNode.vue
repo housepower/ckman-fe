@@ -4,8 +4,8 @@
              :model="formModel"
              label-width="150px">
       <el-form-item :label="$t('manage.New Node IP') + ':'"
-                    prop="ip">
-        <el-input v-model="formModel.ip"
+                    prop="ips">
+        <el-input v-model="formModel.ips"
                   class="width-350" />
       </el-form-item>
       <el-form-item :label="$t('manage.Node Shard') + ':'"
@@ -20,21 +20,22 @@
 </template>
 <script>
 import { ClusterApi } from "@/apis";
+import { lineFeed, getCirdOrRangeIps } from "@/helpers";
 export default {
   props: ["numberRange"],
   data() {
     return {
       formModel: {
-        ip: "",
+        ips: "",
         shard: 1,
       },
     };
   },
   methods: {
     async onOk() {
-      const { ip, shard } = this.formModel;
+      const { ips, shard } = this.formModel;
       await ClusterApi.addClusterNode(this.$route.params.id, {
-        ip,
+        ips: getCirdOrRangeIps(lineFeed(ips)),
         shard: +shard,
       });
     },
