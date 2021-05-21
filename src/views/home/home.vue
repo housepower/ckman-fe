@@ -53,7 +53,7 @@
                    @click.prevent="toCluster(row)"
                    :to="'/clusters/' + row.cluster">{{$t('home.Go to cluster')}}</el-link>
           <i class="fa fa-trash pointer fs-18 ml-15"
-             v-tooltip="'Delete'"
+             v-tooltip="$t('common.Delete')"
              @click="remove(row)" />
         </el-table-column>
       </el-table>
@@ -123,7 +123,7 @@ export default {
       delete this.$root.clusterBench.count;
     },
     async remove(item) {
-      await this.$confirm("Confirm whether to delete ?", "Tip", {
+      await this.$confirm(this.$t("common.Confirm Delete"), this.$t("common.tips"), {
         confirmButtonText: this.$t("common.Delete"),
         cancelButtonText: this.$t("common.Cancel"),
         text: "warning",
