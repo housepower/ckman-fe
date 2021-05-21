@@ -213,7 +213,7 @@ export default {
             zkPort: +zkPort,
             zkStatusPort: +zkStatusPort,
           },
-          hosts: lineFeed(hosts),
+          hosts: getCirdOrRangeIps(lineFeed(hosts)),
           password: sshPassword,
           user: sshUser,
           sshPort: +sshPort,
