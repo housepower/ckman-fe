@@ -91,9 +91,6 @@ export default {
   computed: {
     title() {
       return this.$t('layout.ClickHouse Management Console');
-    },
-    version() {
-      return this.version
     }
   },
 };
