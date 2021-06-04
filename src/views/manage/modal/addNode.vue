@@ -5,7 +5,8 @@
              label-width="150px">
       <el-form-item :label="$t('manage.New Node IP') + ':'"
                     prop="ips">
-        <el-input v-model="formModel.ips"
+        <el-input type="textarea" v-model="formModel.ips"
+                  :placeholder="$t('common.placeholderIp')"
                   class="width-350" />
       </el-form-item>
       <el-form-item :label="$t('manage.Node Shard') + ':'"
