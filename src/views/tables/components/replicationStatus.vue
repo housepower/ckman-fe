@@ -4,7 +4,7 @@
       <span class="fs-20 font-bold">{{$t('tables.Table Replication Status')}}</span>
     </div>
     <el-table class="tb-edit"
-              :data="tableData"
+              :data="tableData.slice((currentPage - 1)*pageSize, currentPage*pageSize)"
               :header-cell-style="mergeTableHeader"
               border
               style="width: 100%">
@@ -25,6 +25,18 @@
         </template>
       </el-table-column>
     </el-table>
+    <!-- 前端分页 -->
+    <div class="text-center">
+      <el-pagination v-if="tableData.length > 0"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="currentPage"
+        :page-sizes="[5, 10, 20, 40]"
+        :page-size="pageSize"
+        layout="sizes, prev, pager, next, jumper"
+        :total="tableData.length">
+      </el-pagination>
+    </div>
   </div>
 </template>
 <script>
@@ -38,6 +50,8 @@ export default {
       headerData: [],
       timeFilter: null,
       refresh: null,
+      currentPage: 1,
+      pageSize: 10,
     };
   },
   mounted() {
@@ -105,6 +119,13 @@ export default {
     },
     timeFilterRefresh() {
       this.fetchData();
+    },
+    // 前端分页
+    handleSizeChange(size) {
+      this.pageSize = size;
+    },
+    handleCurrentChange(currentPage) {
+      this.currentPage = currentPage;
     },
   },
 };
