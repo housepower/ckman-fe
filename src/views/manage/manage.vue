@@ -82,7 +82,7 @@
                            align="center">
             <template>
               <i class="fa fa-trash pointer fs-18"
-                 v-tooltip="'Delete'"
+                 v-tooltip="$t('common.Delete')"
                  @click="remove(row)" />
             </template>
           </el-table-column>
@@ -191,7 +191,7 @@ export default {
     },
     async remove(item) {
       console.log(item);
-      await this.$confirm("Confirm whether to delete ?", "Tip", {
+      await this.$confirm(this.$t("common.Confirm Delete"),  this.$t("common.tips"), {
         confirmButtonText: this.$t("common.Delete"),
         cancelButtonText: this.$t("common.Cancel"),
         text: "warning",
@@ -199,7 +199,7 @@ export default {
       await ClusterApi.deleteClusterNode(this.$route.params.id, {
         ip: item.ip,
       });
-      this.$message.success("删除成功");
+      this.$message.success(this.$t("common.Delete") + this.$t("common.Success"));
       this.fetchData();
     },
     async clusterOptation(type) {
