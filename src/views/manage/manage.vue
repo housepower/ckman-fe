@@ -72,10 +72,22 @@
                            show-overflow-tooltip
                            :label="$t('manage.replica number')"
                            align="center" />
+          <el-table-column prop="disk"
+                           show-overflow-tooltip
+                           :label="$t('manage.Disk(Used/Total)')"
+                           align="center">
+            <template slot-scope="scope">
+              {{ scope.row.disk }}
+            </template>
+          </el-table-column>
           <el-table-column prop="status"
                            show-overflow-tooltip
                            :label="$t('manage.Node Status')"
-                           align="center" />
+                           align="center">
+            <template slot-scope="scope">
+              <span class="dot mr-5" :class="scope.row.status"></span>{{scope.row.status}}
+            </template>
+          </el-table-column>
           <el-table-column :label="$t('home.Actions')"
                            v-if="mode === 'deploy'"
                            #default="{ row }"
@@ -121,7 +133,6 @@ export default {
     this.clusterStatus = Object.keys(ClusterStatus)
       .filter((item) => item !== "upgrade")
       .map((v) => upperFirst(v));
-    this.fetchModeData();
     this.fetchVersionData();
     this.fetchData();
   },
@@ -131,6 +142,7 @@ export default {
         data: { entity },
       } = await ClusterApi.getClusterInfo(this.$route.params.id);
       this.list = entity;
+      this.mode = entity.mode;
     },
     async fetchVersionData() {
       const {
@@ -141,16 +153,6 @@ export default {
         label: item,
         disabled: item === this.list.version,
       }));
-    },
-    async fetchModeData() {
-      const {
-        data: { entity },
-      } = await ClusterApi.getCluster();
-      Object.entries(entity).forEach(([name, item]) => {
-        if (item.cluster === this.$route.params.id)
-          this.mode = item.mode;
-      });
-      console.log("mode:", this.mode)
     },
     isStatusDisable(item) {
       if ( this.mode === "import")
@@ -233,5 +235,18 @@ export default {
 <style lang="scss" scoped>
 .uprade {
   border-bottom: 1px solid #eaeef4;
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  &.green {
+    background-color: #1ac51a;
+  }
+
+  &.red {
+    background-color: #f50600;
+  }
 }
 </style>
