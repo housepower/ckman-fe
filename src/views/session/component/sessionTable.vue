@@ -12,7 +12,7 @@
     <el-table-column prop="queryDuration"
                      show-overflow-tooltip
                      :label="$t('session.Query Duration')"
-                     width="120"
+                     width="140"
                      align="center" />
     <el-table-column prop="query"
                      show-overflow-tooltip

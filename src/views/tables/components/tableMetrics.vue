@@ -52,8 +52,7 @@ export default {
           failedQueries,
           parts,
           queryCost: Object.values(queryCost)
-            .map((v) => `${(v / 1000).toFixed(2)}s`)
-            .join(","),
+            .join(", "),
         });
       });
     },
