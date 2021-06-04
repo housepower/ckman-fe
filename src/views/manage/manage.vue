@@ -186,7 +186,7 @@ export default {
           numberRange: this.numberRange(),
         },
       });
-      this.$message.success("node节点添加成功");
+      this.$message.success(this.$t("manage.Add Node") + this.$t("common.Success"));
       this.fetchData();
     },
     async remove(item) {
