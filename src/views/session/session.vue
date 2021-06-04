@@ -7,10 +7,6 @@
           <span class="fs-28 font-bold">36</span>
           <span class="fs-18 font-bold">Total Open Sessions</span>
         </div> -->
-        <div class="right">
-          <time-filter :refreshDuration.sync="refresh"
-                       @on-refresh="timeFilterRefresh" />
-        </div>
       </div>
       <div class="tables">
         <h3 class="mb-10">{{$t('session.Open Sessions')}}</h3>

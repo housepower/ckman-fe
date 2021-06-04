@@ -2,10 +2,6 @@
   <div class="zkTable">
     <div class="title flex flex-between flex-vcenter ptb-10">
       <span class="fs-20 font-bold">{{$t('tables.Zookeeper Status')}}</span>
-      <time-filter v-model="timeFilter"
-                   :refreshDuration.sync="refresh"
-                   @input="timeFilterChange"
-                   @on-refresh="timeFilterRefresh" />
     </div>
     <el-table class="tb-edit"
               :data="tableData"
