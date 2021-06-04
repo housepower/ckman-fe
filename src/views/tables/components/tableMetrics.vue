@@ -3,9 +3,7 @@
     <div class="title flex flex-between flex-vcenter ptb-10">
       <span class="fs-20 font-bold">{{$t('tables.Table Metrics')}}</span>
     </div>
-    <el-table :data="tableData"
-              cneter
-              border>
+    <el-table :data="tableData.slice((currentPage - 1)*pageSize, currentPage*pageSize)" center border>
       <template v-for="{ prop, label } of columns">
         <el-table-column :prop="prop"
                          :label="label"
@@ -14,6 +12,18 @@
       </template>
 
     </el-table>
+    <!-- 前端分页 -->
+    <div class="text-center">
+      <el-pagination v-if="tableData.length > 0"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="currentPage"
+        :page-sizes="[5, 10, 20, 40]"
+        :page-size="pageSize"
+        layout="sizes, prev, pager, next, jumper"
+        :total="tableData.length">
+      </el-pagination>
+    </div>
   </div>
 
 </template>
@@ -23,6 +33,8 @@ export default {
   data() {
     return {
       tableData: [],
+      currentPage: 1,
+      pageSize: 10,
     };
   },
   mounted() {
@@ -55,6 +67,13 @@ export default {
             .join(", "),
         });
       });
+    },
+    // 前端分页
+    handleSizeChange(size) {
+      this.pageSize = size;
+    },
+    handleCurrentChange(currentPage) {
+      this.currentPage = currentPage;
     },
   },
   computed: {

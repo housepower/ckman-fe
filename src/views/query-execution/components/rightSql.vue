@@ -44,13 +44,13 @@
       </el-table>
       <!-- 前端分页 -->
       <el-pagination v-if="tableData.length > 0"
-                     @size-change="handleSizeChange"
-                     @current-change="handleCurrentChange"
-                     :current-page="currentPage"
-                     :page-sizes="[5, 10, 20, 40]"
-                     :page-size="pageSize"
-                     layout="sizes, prev, pager, next, jumper"
-                     :total="tableData.length">
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="currentPage"
+        :page-sizes="[5, 10, 20, 40]"
+        :page-size="pageSize"
+        layout="sizes, prev, pager, next, jumper"
+        :total="tableData.length">
       </el-pagination>
     </section>
   </main>
