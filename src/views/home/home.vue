@@ -129,7 +129,7 @@ export default {
         text: "warning",
       });
       await ClusterApi.deleteCluster(`${item.cluster}`);
-      this.$message.success(`${item.cluster} Cluster 已${ this.$t("common.Delete") }`);
+      this.$message.success(`${item.cluster} Cluster ${ this.$t("common.Delete") }${ this.$t("common.Success") }`);
       this.fetchData();
     },
   },
