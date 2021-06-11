@@ -1,10 +1,10 @@
 <template>
   <main class="settings">
-    <breadcrumb :data="['Clusters', $route.params.id, 'settings']"></breadcrumb>
+    <breadcrumb :data="['Clusters', $route.params.id, 'settings']" class="mb-30"></breadcrumb>
     <el-form ref="Form"
              :model="formModel"
              label-width="150px">
-      <el-form-item :label="$t('home.Replica')">
+      <!-- <el-form-item :label="$t('home.Replica')">
         <el-switch v-model="formModel.isReplica"></el-switch>
       </el-form-item>
       <el-form-item :label="$t('home.Zookeeper Node List') + ':'"
@@ -19,7 +19,7 @@
                     prop="path">
         <el-input v-model="formModel.path"
                   class="width-350" />
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item :label="$t('home.Cluster Username') + ':'"
                     prop="user">
         <el-input v-model="formModel.user"
@@ -33,7 +33,7 @@
     </el-form>
     <el-button type="primary"
                class="ml-200"
-               @click="save">{{$t('common.Save Reboot')}}</el-button>
+               @click="save" disabled>{{$t('common.Save Reboot')}}</el-button>
   </main>
 </template>
 <script>
