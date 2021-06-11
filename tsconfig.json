@@ -17,6 +17,7 @@
     "types": [
       "webpack-env"
     ],
+    "allowJs": true,
     "paths": {
       "@/*": ["src/*"],
       "@images/*": ["src/assets/images/*"],
