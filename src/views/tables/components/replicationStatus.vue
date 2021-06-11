@@ -21,7 +21,7 @@
         </template>
         <template slot-scope="{ row, column }">
           <span v-if="index === 0">{{ Object.keys(row)[0] === "Table Name" ? $t('common.' + Object.keys(row)[0]) : Object.keys(row)[0] }}</span>
-          <span v-else>{{ Object.values(row)[0][column.property] }}</span>
+          <div v-else :class="getClassName(row, column.property)">{{ Object.values(row)[0][column.property] }}</div>
         </template>
       </el-table-column>
     </el-table>
@@ -127,6 +127,23 @@ export default {
     handleCurrentChange(currentPage) {
       this.currentPage = currentPage;
     },
+    getClassName(row, property) {
+      const [ name, order ] = property.split('_');
+      const values = Object.values(row)[0];
+      const value = values[property];
+      let nextOrder = order === '0' ? '1' : '0';
+      const nextValue = values[name + '_' + nextOrder];
+      if (!nextValue) return;
+      if (name.indexOf('F') === '-1') {
+        return;
+      }
+      const num = parseInt(value.replace('F', ''), 10);
+      if (!nextValue) return;
+      const nextNum = parseInt(nextValue.replace('L', ''), 10);
+      if (num < nextNum) {
+        return 'yellow'
+      }
+    }
   },
 };
 </script>
@@ -134,5 +151,10 @@ export default {
 <style lang="scss" scoped>
 .replication-status {
   border-bottom: 1px solid var(--color-gray);
+}
+
+.yellow {
+  color: #fff;
+  background: #d4b433;
 }
 </style>
