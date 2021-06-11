@@ -88,6 +88,7 @@ const messages = {
       'Add Node': 'Add Node',
       'New Node IP': 'New Node IP',
       'Node Shard': 'Node Shard',
+      'Disk(Used/Total)': 'Disk(Used/Total)',
     },
     tables: {
       'Table Metrics': 'Table Metrics',
@@ -229,6 +230,7 @@ const messages = {
       'Add Node': '增加节点',
       'New Node IP': '节点IP',
       'Node Shard': '分片编号',
+      'Disk(Used/Total)': '磁盘(已用/总计)',
     },
     tables: {
       'Table Metrics': '表指标',
