@@ -123,7 +123,7 @@ const messages = {
       'ClickHouse RPMs': 'ClickHouse RPMs',
     },
     ClickHouseEcharts: {
-      'ClickHouse Table KPIs': 'ClickHouse Table KPIs',
+      'ClickHouse Table KPIs': 'ClickHouse Database KPIs',
       'clickhouse Query': 'clickhouse.Query',
       'ClickHouse Node KPIs': 'ClickHouse Node KPIs',
       'cpu usage': 'cpu usage',
@@ -265,7 +265,7 @@ const messages = {
       'ClickHouse RPMs': 'ClickHouse RPM包管理',
     },
     ClickHouseEcharts: {
-      'ClickHouse Table KPIs': 'ClickHouse表性能指标',
+      'ClickHouse Table KPIs': 'ClickHouse 数据库性能指标',
       'clickhouse Query': 'SQL查询指标',
       'ClickHouse Node KPIs': 'ClickHouse节点性能指标',
       'cpu usage': 'CPU占用',
