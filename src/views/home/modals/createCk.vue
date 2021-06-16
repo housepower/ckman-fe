@@ -8,7 +8,6 @@
                     v-if="type"
                     required>
         <el-select v-model="formModel.packageVersion"
-                   size="small"
                    clearable
                    filterable
                    class="width-350">
@@ -25,6 +24,11 @@
         <el-input v-model="formModel.cluster"
                   class="width-350" />
       </el-form-item>
+
+      <el-form-item :label="$t('home.Logic Name') + ':'" prop="logic_cluster">
+        <el-input v-model="formModel.logic_cluster" class="width-350" />
+      </el-form-item>
+
       <el-form-item :label="$t('home.ClickHouse Node IP') + ':'"
                     prop="hosts"
                     v-if="!type"
@@ -174,6 +178,7 @@ export default {
       const {
         packageVersion,
         cluster,
+        logic_cluster,
         hosts,
         zkNodes,
         user,
@@ -190,6 +195,7 @@ export default {
       if (!this.type) {
         await ClusterApi.importCluster({
           cluster,
+          logic_cluster,
           hosts: getCirdOrRangeIps(lineFeed(hosts)),
           port: +port,
           user,
@@ -204,6 +210,7 @@ export default {
           clickhouse: {
             ckTcpPort: +port,
             clusterName: cluster,
+            logic_cluster,
             shards,
             packageVersion,
             password,
@@ -225,4 +232,11 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss">
+  .create-cluster-modal {
+    .el-dialog__body {
+      height: 500px;
+      overflow-y: auto;
+    }
+  }
+</style>

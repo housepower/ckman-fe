@@ -31,6 +31,9 @@
         <el-table-column prop="cluster"
                          show-overflow-tooltip
                          :label="$t('home.Cluster Name')" />
+        <el-table-column prop="logic_cluster"
+                         show-overflow-tooltip
+                         :label="$t('home.Belongs to Logic')" />
         <el-table-column prop="mode"
                          show-overflow-tooltip
                          :label="$t('home.Mode')" />
@@ -106,6 +109,7 @@ export default {
             ? this.$t("home.Create a ClickHouse Cluster")
             : this.$t("home.Import a ClickHouse Cluster"),
           width: 600,
+          customClass: 'create-cluster-modal',
           cancelText: this.$t("common.Cancel"),
           okText: type ? this.$t("common.Create") : this.$t("common.Import"),
         },

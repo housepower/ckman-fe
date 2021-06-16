@@ -44,6 +44,8 @@ const messages = {
     home: {
       'Create or import a ClickHouse Cluster': 'Create or import a ClickHouse Cluster',
       'Create a ClickHouse Cluster': 'Create a ClickHouse Cluster',
+      'Logic Name': 'Logic Name',
+      'Belongs to Logic': 'Belongs to Logic',
       'Cluster Name': 'Cluster Name',
       'ClickHouse TCP Port': 'ClickHouse TCP Port',
       'ClickHouse Node List': 'ClickHouse Node List',
@@ -186,6 +188,8 @@ const messages = {
     home: {
       'Create or import a ClickHouse Cluster': '创建或导入集群',
       'Create a ClickHouse Cluster': '创建集群',
+      'Logic Name': '逻辑名称',
+      'Belongs to Logic': '逻辑集群',
       'Cluster Name': '集群名称',
       'ClickHouse TCP Port': 'TCP端口',
       'ClickHouse Node List': '集群列表',
