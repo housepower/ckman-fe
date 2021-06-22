@@ -1,0 +1,68 @@
+:root.theme-black {
+  /* 主题色反色 */
+  --color-primary-7: var(--color-primary-light-9);
+  --color-primary-6: var(--color-primary-light-6);
+  --color-primary-5: var(--color-primary-light-3);
+  --color-primary-4: var(--color-primary);
+  --color-primary-3: var(--color-primary-dark-4);
+  --color-primary-2: var(--color-primary-dark-6);
+  --color-primary-1: var(--color-primary-dark-8);
+
+  /*  灰度相关  */
+  --color-neutrals-11: #fafafa;
+  --color-neutrals-10: #f0f0f0;
+  --color-neutrals-9: #e6e6e6;
+  --color-neutrals-8: #dbdbdb;
+  --color-neutrals-7: #cccccc;
+  --color-neutrals-6: #adadad;
+  --color-neutrals-5: #8f8f8f;
+  --color-neutrals-4: #707070;
+  --color-neutrals-3: #525252;
+  --color-neutrals-2: #383838;
+  --color-neutrals-1: #242424;
+
+  /* 灰度反转补充色 */
+  --color-neutrals-add-1: #2e2e2e;
+  --color-neutrals-add-2: #333333;
+
+  /* 所有阴影(待修改) */
+  --box-shadow-2px: 0 1px 2px 0 rgba(0, 0, 0, 0.1), 0 0.1px 0.4px 0 rgba(0, 0, 0, 0.15);
+  --box-shadow-4px: 0 1.6px 3.6px 0 rgba(0, 0, 0, 0.14), 0 0.3px 0.9px 0 rgba(0, 0, 0, 0.15);
+  --box-shadow-6px: 0 2.4px 5.2px 0 rgba(0, 0, 0, 0.17), 0 0.45px 1.2px 0 rgba(0, 0, 0, 0.15);
+  --box-shadow-8px: 0 3.2px 7.2px 0 rgba(0, 0, 0, 0.17), 0 0.6px 1.8px 0 rgba(0, 0, 0, 0.15);
+  --box-shadow-16px: 0 25px 57px 0 rgba(0, 0, 0, 0.17), 0 4.8px 14.4px 0 rgba(0, 0, 0, 0.15);
+  --box-shadow-24px: 0 50px 100px 0 rgba(0, 0, 0, 0.17), 0 9px 28px 0 rgba(0, 0, 0, 0.15);
+
+  --color-body-background: var(--color-neutrals-1);
+  --color-window-background: var(--color-neutrals-2);
+
+  /* 特殊组件颜色 */
+  --color-code-operators-and-standard: #365E8D;
+  --color-code-operators-or-standard: #4D7112;
+  --color-code-operators-and-dark: #193453;
+  --color-code-operators-or-dark: #38520D;
+
+  /****************** ant-design-vue变量 *******************/
+  --color-component-background: var(--color-neutrals-add-1);
+  --color-component-background-disabled: var(--color-neutrals-2);
+  --color-component-color-disabled: var(--color-neutrals-4);
+  --color-component-border-disabled: var(--color-neutrals-3);
+
+  --color-input-background: var(--color-neutrals-add-1);
+  --color-input-border: var(--color-neutrals-3);
+  --color-input-border-hover: var(--color-neutrals-5);
+  --color-input-background-disabled: var(--color-neutrals-5);
+
+  --color-switch-background: var(--color-neutrals-add-1);
+  --color-switch-background-checked: var(--color-neutrals-1);
+  --color-switch-inner-background: var(--color-neutrals-3);
+  --color-switch-inner-background-checked: var(--color-primary);
+
+  --color-select-item-background-selected: var(--color-primary);
+
+  --color-checkbox-inner-border-indeterminate: var(--color-primary);
+  --color-checkbox-border-hover: var(--color-neutrals-7);
+
+  --table-body-background: var(--color-neutrals-2);
+  --table-header-background: var(--color-neutrals-add-2);
+}
