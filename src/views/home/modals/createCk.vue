@@ -25,7 +25,7 @@
                   class="width-350" />
       </el-form-item>
 
-      <el-form-item :label="$t('home.Logic Name') + ':'" prop="logic_cluster">
+      <el-form-item :label="$t('home.Logic Name') + ':'" prop="logic_cluster" v-if="type">
         <el-input v-model="formModel.logic_cluster" class="width-350" />
       </el-form-item>
 
