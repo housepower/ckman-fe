@@ -1,0 +1,117 @@
+:root {
+  /************************* 全局不变的颜色 *********************/
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  --color-constants-neutrals-1: #fafafa;
+  --color-constants-neutrals-2: #f0f0f0;
+  --color-constants-neutrals-3: #e6e6e6;
+  --color-constants-neutrals-4: #dbdbdb;
+  --color-constants-neutrals-5: #cccccc;
+  --color-constants-neutrals-6: #adadad;
+  --color-constants-neutrals-7: #8f8f8f;
+  --color-constants-neutrals-8: #707070;
+  --color-constants-neutrals-9: #525252;
+  --color-constants-neutrals-10: #383838;
+  --color-constants-neutrals-11: #242424;
+
+  /* group color */
+  /* standard */
+  --color-group-1: #df9595;
+  --color-group-2: #d5b28e;
+  --color-group-3: #d5c58e;
+  --color-group-4: #ebd17b;
+  --color-group-5: #dbdc8f;
+  --color-group-6: #bcc896;
+  --color-group-7: #9cc896;
+  --color-group-8: #96c8bc;
+  --color-group-9: #96bfc8;
+  --color-group-10: #96aec8;
+  --color-group-11: #969fc8;
+  --color-group-12: #b296c8;
+  --color-group-13: #c795d1;
+  --color-group-14: #dc94c8;
+  --color-group-15: #e29cb9;
+  /* light */
+  --color-group-1-light: #eab9b9;
+  --color-group-2-light: #e3ccb5;
+  --color-group-3-light: #e3d9b5;
+  --color-group-4-light: #f1e1a9;
+  --color-group-5-light: #e7e8b6;
+  --color-group-6-light: #c7dbba;
+  --color-group-7-light: #bedbba;
+  --color-group-8-light: #badbd3;
+  --color-group-9-light: #bad5db;
+  --color-group-10-light: #bacadb;
+  --color-group-11-light: #bac0db;
+  --color-group-12-light: #ccbadb;
+  --color-group-13-light: #dab9e1;
+  --color-group-14-light: #e8b9db;
+  --color-group-15-light: #ecbed1;
+  /* dark */
+  --color-group-1-dark: #bd7e7e;
+  --color-group-2-dark: #b59778;
+  --color-group-3-dark: #b5a778;
+  --color-group-4-dark: #c7b168;
+  --color-group-5-dark: #babb79;
+  --color-group-6-dark: #90aa7f;
+  --color-group-7-dark: #84aa7f;
+  --color-group-8-dark: #7faa9f;
+  --color-group-9-dark: #7fa2aa;
+  --color-group-10-dark: #7f94aa;
+  --color-group-11-dark: #7f87aa;
+  --color-group-12-dark: #977faa;
+  --color-group-13-dark: #a97eb1;
+  --color-group-14-dark: #bb7daa;
+  --color-group-15-dark: #c0849d;
+
+  /* 状态色 */
+  /* -state- Functional Color */
+  --color-success-light: #70cf92;
+  --color-success-standard: #5fb07c;
+  --color-success-dark: #4e9065;
+
+  --color-caution-light: #f1d235;
+  --color-caution-standard: #cdb22d;
+  --color-caution-dark: #a89225;
+
+  --color-warning-light: #e19a4e;
+  --color-warning-standard: #bf8342;
+  --color-warning-dark: #9d6b36;
+
+  --color-danger-light: #ce5f5f;
+  --color-danger-standard: #af5050;
+  --color-danger-dark: #8f4242;
+
+  --color-ready-light: #5cb2d1;
+  --color-ready-standard: #4e97b1;
+  --color-ready-dark: #407c91;
+
+  --color-info-light: #bfbcbf;
+  --color-info-standard: #a29fa2;
+  --color-info-dark: #858385;
+
+  --color-success-lighter: rgba(245 ,255, 248, 0.8);
+  --color-caution-lighter: rgba(255 ,251, 232, 0.8);
+  --color-warning-lighter: rgba(255 ,249, 242, 0.8);
+  --color-danger-lighter: rgba(255, 243, 243, 0.8);
+  --color-info-lighter: rgba(245, 245, 245, 0.8);
+  --color-ready-lighter: rgba(239 ,251, 255, 0.8);
+
+  --color-success-alpha: rgba(89, 178, 120, 0.15);
+  --color-caution-alpha: rgba(205, 178, 45, 0.15);
+  --color-warning-alpha: rgba(181, 126, 68, 0.15);
+  --color-danger-alpha: rgba(175, 80, 80, 0.15);
+  --color-info-alpha: rgba(78, 151, 177, 0.15);
+  --color-ready-alpha: rgba(92, 178, 209, 0.15);
+
+  /* 状态色边框 */
+  --border-color-primary-light: #82aab9;
+  --border-color-caution-light: #f8e89a;
+  --border-color-highlight-light: #f7c38c;
+  --border-color-success-light: #b7e7c8;
+  --border-color-warning-light: #f0cca6;
+  --border-color-danger-light: #e6afaf;
+  --border-color-info-light: #dfdddf;
+  --border-color-ready-light: #add8e8;
+}
