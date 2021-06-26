@@ -104,6 +104,9 @@ const messages = {
       'Last 7 days info': 'Queries cost(0.5,0.99,max)in last 7 days(ms)',
       'Table Replication Status': 'Table Replication Status',
       'Zookeeper Status': 'Zookeeper Status',
+      'Schema': 'Schema',
+      'Delete': 'Delete',
+      'Action': 'Action',
     },
     session: {
       'Open Sessions': 'Open Sessions',
@@ -249,6 +252,9 @@ const messages = {
       'Last 7 days info': '过去7天（0.5,0.99,max）SQL耗时(ms)',
       'Table Replication Status': '复制表状态',
       'Zookeeper Status': 'Zookeeper状态',
+      'Schema': '查看建表语句',
+      'Delete': '删除',
+      'Action': '操作',
     },
     session: {
       'Open Sessions': '正在执行的SQL会话',

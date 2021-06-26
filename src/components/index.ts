@@ -6,6 +6,7 @@ export * from '@/common/components';
 import { TimeFilter } from './time-filter';
 import { default as Breadcrumb } from './breadcrumb.vue';
 import { default as OverviewBase } from './overview-base/overview-base.vue';
+import { default as SqlCodeMirror } from './sql-code-mirror/sql-code-mirror.vue';
 
 Object.entries({
   TimeFilter,
@@ -17,4 +18,5 @@ export {
   TimeFilter,
   Breadcrumb,
   OverviewBase,
+  SqlCodeMirror,
 };

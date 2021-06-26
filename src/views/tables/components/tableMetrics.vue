@@ -10,7 +10,15 @@
                          :key="prop"
                          show-overflow-tooltip />
       </template>
-
+      <el-table-column
+        fixed="right"
+        :label="$t('tables.Action')"
+        width="140">
+        <template slot-scope="scope">
+          <el-button @click="viewSql(scope.row.tableName)" type="text" size="small">{{ $t('tables.Schema') }}</el-button>
+          <el-button type="text" size="small" @click="onDelete(scope.row.tableName)">{{ $t('tables.Delete') }}</el-button>
+        </template>
+      </el-table-column>
     </el-table>
     <!-- 前端分页 -->
     <div class="text-center">
@@ -29,6 +37,8 @@
 </template>
 <script>
 import { TablesApi } from "@/apis";
+import { $modal } from "@/services";
+import { SqlCodeMirror } from '@/components/';
 export default {
   data() {
     return {
@@ -75,6 +85,47 @@ export default {
     handleCurrentChange(currentPage) {
       this.currentPage = currentPage;
     },
+
+    // 删除
+    async onDelete(key) {
+      await this.$confirm(this.$t("common.Confirm Delete"), this.$t("common.tips"), {
+        confirmButtonText: this.$t("common.Delete"),
+        cancelButtonText: this.$t("common.Cancel"),
+        text: "warning",
+      });
+      const [ database, tableName ] = key.split('.');
+      const { id } = this.$route.params;
+      await TablesApi.deleteTable(id, {
+        database,
+        tableName,
+      });
+      this.$message.success(`Table ${ key } ${ this.$t("common.Delete") }${ this.$t("common.Success") }`);
+      this.fetchData();
+    },
+
+    // 查看SQL
+    async viewSql(key) {
+      const [ database, tableName ] = key.split('.');
+      const { id } = this.$route.params;
+      const { data: { entity: { create_table_query } } } = await TablesApi.viewTableCreateSql(id, {
+        database,
+        tableName,
+      });
+
+      await $modal({
+        component: SqlCodeMirror,
+        props: {
+          title: this.$t("tables.Schema"),
+          width: 600,
+          customClass: 'create-cluster-modal',
+          cancelText: this.$t("common.Cancel"),
+          okText: this.$t("common.Confirm"),
+        },
+        data: {
+          sql: create_table_query,
+        },
+      });
+    }
   },
   computed: {
     columns() {
