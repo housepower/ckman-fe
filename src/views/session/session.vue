@@ -11,7 +11,17 @@
       <div class="tables">
         <h3 class="mb-10">{{$t('session.Open Sessions')}}</h3>
         <session-table :list="openList" />
-        <h3 class="mb-10 mt-50">{{$t('session.Slow Sessions')}}</h3>
+        <div class="mb-10 mt-50" style="overflow: hidden;">
+          <div class="fs-18 font-bold pull-left">{{$t('session.Slow Sessions')}}</div>
+          <div class="pull-right">
+            <time-filter v-model="timeFilter"
+              :refreshDuration.sync="refresh"
+              @input="timeFilterChange"
+              @on-refresh="timeFilterRefresh" />
+            <label class="ml-20">{{$t('session.Limit Count')}}</label>
+            <el-input-number class="ml-10" placeholder="查询条数" @change="timeFilterRefresh" v-model="limit" size="small" :min="5" style="width:100px;"/>
+          </div>
+        </div>
         <session-table :list="closeList" />
       </div>
     </section>
@@ -20,32 +30,53 @@
 <script>
 import SessionTable from "./component/sessionTable";
 import { SessionApi } from "@/apis";
+import { convertTimeBounds } from "@/helpers";
 export default {
   data() {
     return {
+      id: '',
       refresh: null,
       openList: [],
       closeList: [],
+      timeFilter: ["now-7d", "now"],
+      limit: 10,
     };
+  },
+  created() {
+    this.id = this.$route.params.id;
   },
   mounted() {
     this.fetchData();
   },
   methods: {
     async fetchData() {
-      const id = this.$route.params.id;
+      const { id } = this;
       const {
         data: { entity: openList },
       } = await SessionApi.open(id);
+      
+      this.openList = openList;
+
+      this.getSlowSessionList();
+    },
+    async getSlowSessionList() {
+      const { min, max } = convertTimeBounds(this.timeFilter);
+      const { limit, id } = this;
       const {
         data: { entity: closeList },
-      } = await SessionApi.close(id);
-      this.openList = openList;
+      } = await SessionApi.close(id, {
+        limit,
+        start: parseInt(min / 1000),
+        end: parseInt(max / 1000),
+      });
       this.closeList = closeList;
     },
     timeFilterRefresh() {
-      this.fetchData();
+      this.getSlowSessionList();
     },
+    timeFilterChange() {
+
+    }
   },
   components: { SessionTable },
 };

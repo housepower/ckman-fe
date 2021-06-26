@@ -108,6 +108,7 @@ const messages = {
     session: {
       'Open Sessions': 'Open Sessions',
       'Slow Sessions': 'Slow Sessions',
+      'Limit Count': 'Limit Count',
       'Query Start Time': 'Query Start Time',
       'Query Duration': 'Query Duration(ms)',
       'Query': 'Query',
@@ -252,6 +253,7 @@ const messages = {
     session: {
       'Open Sessions': '正在执行的SQL会话',
       'Slow Sessions': '慢SQL查询',
+      'Limit Count': '查询条数',
       'Query Start Time': 'SQL开始时间',
       'Query Duration': 'SQL持续时间(ms)',
       'Query': 'SQL语句',
