@@ -19,22 +19,22 @@ export const ClusterApi = {
   deleteCluster(id) {
     return axios.delete(`${url}/cluster/${id}`);
   },
-  manageCluster(type, params) {
+  manageCluster(type, params, password?) {
     const { clusterName, packageVersion } = params;
     if(!packageVersion) {
-      return axios.put(`${url}/${type}/${clusterName}`);
+      return axios.put(`${url}/${type}/${clusterName}?password=${ password || '' }`);
     } else {
-      return axios.put(`${url}/${type}/${clusterName}`,{ packageVersion });
+      return axios.put(`${url}/${type}/${clusterName}?password=${ password || '' }`,{ packageVersion });
     }
   },
   getClusterInfo(id) {
     return axios.get(`${url}/get/${id}`);
   },
-  addClusterNode(id, params) {
-    return axios.post(`${url}/node/${id}`, params);
+  addClusterNode(id, params, password?) {
+    return axios.post(`${url}/node/${id}?password=${password || ''}`, params);
   },
-  deleteClusterNode(id, params) {
-    return axios.delete(`${url}/node/${id}`, { params });
+  deleteClusterNode(id, params, password?) {
+    return axios.delete(`${url}/node/${id}?password=${ password || '' }`, { params });
   },
   onlineClusterNode(clusterName, ip) {
     return axios.put(`${url}/node/start/${clusterName}?ip=${ ip }`);

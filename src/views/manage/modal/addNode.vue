@@ -23,7 +23,7 @@
 import { ClusterApi } from "@/apis";
 import { lineFeed, getCirdOrRangeIps } from "@/helpers";
 export default {
-  props: ["numberRange"],
+  props: ["numberRange", "password"],
   data() {
     return {
       formModel: {
@@ -38,7 +38,7 @@ export default {
       await ClusterApi.addClusterNode(this.$route.params.id, {
         ips: getCirdOrRangeIps(lineFeed(ips)),
         shard: +shard,
-      });
+      }, this.password);
     },
   },
 };
