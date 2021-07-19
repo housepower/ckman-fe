@@ -118,8 +118,8 @@ export default {
         component: SqlCodeMirror,
         props: {
           title: this.$t("tables.Schema"),
-          width: 600,
-          customClass: 'create-cluster-modal',
+          width: 800,
+          customClass: 'sql-code-mirror-modal',
           cancelText: this.$t("common.Cancel"),
           okText: this.$t("common.Confirm"),
         },
@@ -175,8 +175,16 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .table-metric {
   border-bottom: 1px solid var(--color-gray);
+}
+
+.sql-code-mirror-modal .el-dialog__body {
+  padding: 0 5px 8px 5px !important;
+
+  .CodeMirror {
+    height: 400px;
+  }
 }
 </style>

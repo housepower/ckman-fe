@@ -31,7 +31,10 @@ export default {
   },
 
   created() {
-    this.code = format(this.sql);
+    this.code = format(this.sql, {
+      language: 'mysql',
+      indent: '  ',
+    });
   },
 
   mounted() {
@@ -44,6 +47,7 @@ export default {
       matchBrackets : true,
       autofocus: true,
       readOnly: true,
+      height: 500,
     });
     editor.setValue(this.code);
   },
