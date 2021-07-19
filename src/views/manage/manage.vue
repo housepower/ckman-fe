@@ -93,7 +93,9 @@
                            #default="{ row }"
                            align="center">
             <template>
-              <i class="fa fa-trash pointer fs-18"
+              <el-button type="text" :disabled="row.status === 'green'" @click="onlineClusterNode(row)" :loading="row.onlineLoading">{{ $t('manage.Online') }}</el-button>
+              <el-button type="text" :disabled="row.status === 'red'" @click="offlineClusterNode(row)" :loading="row.offlineLoading">{{ $t('manage.Offline') }}</el-button>
+              <i class="fa fa-trash pointer fs-18 ml-10"
                  v-tooltip="$t('common.Delete')"
                  @click="remove(row)" />
             </template>
@@ -227,6 +229,26 @@ export default {
       }
       this.fetchData();
     },
+
+    // 集群node上线
+    async onlineClusterNode(row) {
+      this.$set(row, 'onlineLoading', true);
+      const { id: clusterName } = this.$route.params;
+      await ClusterApi.onlineClusterNode(clusterName, row.ip);
+      this.$message.success(`${this.$t('manage.Online')}` + ` ${this.$t('common.' + 'Success')}`);
+      this.fetchData();
+      this.$set(row, 'onlineLoading', false);
+    },
+
+    // 集群node下线
+    async offlineClusterNode(row) {
+      this.$set(row, 'offlineLoading', true);
+      const { id: clusterName } = this.$route.params;
+      await ClusterApi.offlineClusterNode(clusterName, row.ip);
+      this.$message.success(`${this.$t('manage.Offline')}` + ` ${this.$t('common.' + 'Success')}`);
+      this.fetchData();
+      this.$set(row, 'offlineLoading', false);
+    }
   },
   components: {},
 };
