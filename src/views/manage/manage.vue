@@ -140,7 +140,7 @@ export default {
       clusterStatus: [],
       packageVersion: "",
       skip: true,
-      policy: 'Rolling',
+      policy: 'Full',
       needPassword: false,
       password: '',
     };
