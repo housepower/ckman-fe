@@ -8,7 +8,7 @@
                    v-for="item of clusterStatus"
                    :key="item"
                    :disabled="isStatusDisable(item)"
-                   @click="clusterOptation(item)">{{$t('manage.' + item + ' Cluster')}}</el-button>
+                   @click="clusterOperation(item)">{{$t('manage.' + item + ' Cluster')}}</el-button>
       </template>
     </breadcrumb>
     <section class="container">
@@ -35,7 +35,7 @@
                      size="mini"
                      class="fs-16"
                      :disabled="!packageVersion"
-                     @click="clusterOptation('upgrade')">{{$t('common.Upgrade')}}</el-button>
+                     @click="clusterOperation('upgrade')">{{$t('common.Upgrade')}}</el-button>
         </div>
       </div>
       <div class="node-list">
@@ -108,6 +108,7 @@
 <script>
 import { upperFirst, lowerFirst, cloneDeep, head, last } from "lodash-es";
 import AddNode from "./modal/addNode";
+import InputPassword from "./modal/inputPassword";
 import { $modal, $loading } from "@/services";
 import { ClusterStatus, ClusterTypeStatus } from "@/constants";
 import { ClusterApi, PackageApi } from "@/apis";
@@ -129,6 +130,8 @@ export default {
       },
       clusterStatus: [],
       packageVersion: "",
+      needPassword: false,
+      password: '',
     };
   },
   mounted() {
@@ -145,6 +148,7 @@ export default {
       } = await ClusterApi.getClusterInfo(this.$route.params.id);
       this.list = entity;
       this.mode = entity.mode;
+      this.needPassword = entity.needPassword;
     },
     async fetchVersionData() {
       const {
@@ -177,7 +181,37 @@ export default {
           : [head(nodes).shardNumber, last(nodes).shardNumber + 1];
       return range;
     },
+
+    async openPasswordDialog() {
+      const password = await $modal({
+        component: InputPassword,
+        props: {
+          title: this.$t("home.SSH Password"),
+          width: 300,
+          cancelText: this.$t("common.Cancel"),
+          okText: this.$t("common.Confirm"),
+        },
+        data: {
+          password: this.password,
+        }
+      }).then(password => {
+        return password;
+      });
+
+      return password;
+    },
+
     async addNode() {
+      let password = '';
+      if (this.needPassword) {
+        // 已经输入过密码，并且校验通过后，不再输入密码
+        if (this.password) {
+          password = this.password;
+        } else {
+          password = await this.openPasswordDialog();
+        }
+      }
+
       await $modal({
         component: AddNode,
         props: {
@@ -188,13 +222,26 @@ export default {
         },
         data: {
           numberRange: this.numberRange(),
+          password,
         },
       });
       this.$message.success(this.$t("manage.Add Node") + this.$t("common.Success"));
       this.fetchData();
+      // 密码校验通过，设置缓存密码，下次不用再输入。
+      if (this.needPassword) {
+        this.password = password;
+      }
     },
     async remove(item) {
-      console.log(item);
+      let password = '';
+      if (this.needPassword) {
+        // 已经输入过密码，并且校验通过后，不再输入密码
+        if (this.password) {
+          password = this.password;
+        } else {
+          password = await this.openPasswordDialog();
+        }
+      }
       await this.$confirm(this.$t("common.Confirm Delete"),  this.$t("common.tips"), {
         confirmButtonText: this.$t("common.Delete"),
         cancelButtonText: this.$t("common.Cancel"),
@@ -202,11 +249,24 @@ export default {
       });
       await ClusterApi.deleteClusterNode(this.$route.params.id, {
         ip: item.ip,
-      });
+      }, password);
       this.$message.success(this.$t("common.Delete") + this.$t("common.Success"));
       this.fetchData();
+      // 密码校验通过，设置缓存密码，下次不用再输入。
+      if (this.needPassword) {
+        this.password = password;
+      }
     },
-    async clusterOptation(type) {
+    async clusterOperation(type) {
+      let password = '';
+      if (this.needPassword) {
+        // 已经输入过密码，并且校验通过后，不再输入密码
+        if (this.password) {
+          password = this.password;
+        } else {
+          password = await this.openPasswordDialog();
+        }
+      }
       type = lowerFirst(type);
       await this.$confirm(this.$t('common.' + ClusterStatus[type]), this.$t('common.tips'), {
         confirmButtonText: this.$t("common.Confirm"),
@@ -219,7 +279,7 @@ export default {
       if (type === "upgrade") {
         params = Object.assign(params, { packageVersion: this.packageVersion });
       }
-      await ClusterApi.manageCluster(type, params).finally(() =>
+      await ClusterApi.manageCluster(type, params, password).finally(() =>
         $loading.decrease()
       );
       this.$message.success(`${this.$t('manage.' + upperFirst(type) + ' Cluster')}` + ` ${this.$t('common.' + 'Success')}`);
@@ -228,6 +288,10 @@ export default {
         return;
       }
       this.fetchData();
+      // 密码校验通过，设置缓存密码，下次不用再输入。
+      if (this.needPassword) {
+        this.password = password;
+      }
     },
 
     // 集群node上线

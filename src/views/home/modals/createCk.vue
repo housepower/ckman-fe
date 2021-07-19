@@ -104,6 +104,7 @@
                   class="width-350" />
       </el-form-item>
 
+      <!-- SSH用户名 -->
       <el-form-item :label="$t('home.SSH Username') + ':'"
                     prop="sshUser"
                     v-if="type"
@@ -111,22 +112,27 @@
         <el-input v-model="formModel.sshUser"
                   class="width-350" />
       </el-form-item>
-      <el-form-item :label="$t('home.SSH Password') + ':'"
-                    prop="sshPassword"
-                    v-if="type"
-                    required>
-        <el-input v-model="formModel.sshPassword"
-                  type="password"
-                  show-password
-                  autocomplete="new-password"
-                  class="width-350" />
+      <!-- SSH用户名 -->
+
+      <!-- 使用公钥 -->
+      <el-form-item :label="$t('home.Public Key') + ':'" prop="usePubkey" v-if="type">
+        <el-switch v-model="formModel.usePubkey" :active-value="true" :inactive-value="false"></el-switch>
       </el-form-item>
-      <el-form-item :label="$t('home.SSH Port') + ':'"
-                    prop="sshPort"
-                    v-if="type"
-                    required>
-        <el-input v-model="formModel.sshPort"
-                  class="width-350" />
+       <!-- 使用公钥 -->
+
+       <!-- SSH密码 -->
+      <el-form-item :label="$t('home.SSH Password') + ':'" prop="sshPassword" v-if="type && !formModel.usePubkey">
+        <el-input v-model="formModel.sshPassword"
+          type="password"
+          show-password
+          autocomplete="new-password"
+          class="width-350" />
+          <el-checkbox v-model="formModel.savePassword">{{ $t('home.Save Password') }}?</el-checkbox>
+      </el-form-item>
+      <!-- SSH密码 -->
+
+      <el-form-item :label="$t('home.SSH Port') + ':'" prop="sshPort" v-if="type" required>
+        <el-input v-model="formModel.sshPort" class="width-350" />
       </el-form-item>
     </el-form>
   </section>
@@ -154,6 +160,8 @@ export default {
         zkPort: 2181,
         zkStatusPort:8080,
         path: "",
+        savePassword: false,
+        usePubkey: false,
       },
     };
   },
@@ -191,6 +199,8 @@ export default {
         zkPort,
         zkStatusPort,
         path,
+        savePassword,
+        usePubkey,
       } = this.formModel;
       if (!this.type) {
         await ClusterApi.importCluster({
@@ -221,9 +231,11 @@ export default {
             zkStatusPort: +zkStatusPort,
           },
           hosts: getCirdOrRangeIps(lineFeed(hosts)),
-          password: sshPassword,
           user: sshUser,
           sshPort: +sshPort,
+          usePubkey,
+          password: usePubkey ? null : sshPassword, // usePubkey为true, sshPassword才有效
+          savePassword: usePubkey ? null : savePassword, // usePubkey为true, savePassword才有效
         });
       }
     },
