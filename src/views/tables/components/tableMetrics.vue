@@ -64,6 +64,7 @@ export default {
           failedQueries,
           parts,
           queryCost,
+          readwrite_status,
         } = values;
         this.tableData.push({
           tableName: key,
@@ -73,6 +74,7 @@ export default {
           completedQueries,
           failedQueries,
           parts,
+          readwrite_status: readwrite_status.toString().toUpperCase(),
           queryCost: Object.values(queryCost)
             .join(", "),
         });
@@ -149,6 +151,10 @@ export default {
         {
           prop: "space",
           label: this.$t('tables.Disk Space'),
+        },
+        {
+          prop: "readwrite_status",
+          label: this.$t('tables.RWStatus'),
         },
         {
           prop: "completedQueries",
