@@ -83,6 +83,8 @@ const messages = {
       'shard number': 'shard number',
       'replica number': 'replica number',
       'Node Status': 'Node Status' ,
+      'Online': 'Online',
+      'Offline': 'Offline',
       'Start Cluster': 'Start Cluste',
       'Stop Cluster': 'Stop Cluster',
       'Destroy Cluster': 'Destroy Cluster',
@@ -232,6 +234,8 @@ const messages = {
       'shard number': '分片编号',
       'replica number': '副本编号',
       'Node Status': '节点状态' , // （green-健康 red-离线  yellow-亚健康）
+      'Online': '上线',
+      'Offline': '下线',
       'Start Cluster': '开启集群',
       'Stop Cluster': '停止集群',
       'Destroy Cluster': '销毁集群',

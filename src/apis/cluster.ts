@@ -36,4 +36,10 @@ export const ClusterApi = {
   deleteClusterNode(id, params) {
     return axios.delete(`${url}/node/${id}`, { params });
   },
+  onlineClusterNode(clusterName, ip) {
+    return axios.put(`${url}/node/start/${clusterName}?ip=${ ip }`);
+  },
+  offlineClusterNode(clusterName, ip) {
+    return axios.put(`${url}/node/stop/${clusterName}?ip=${ ip }`);
+  },
 };
