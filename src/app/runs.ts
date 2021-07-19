@@ -19,8 +19,8 @@ axios.interceptors.request.use((config: AxiosRequestConfig) => {
 axios.interceptors.response.use((value: AxiosResponse) => {
   if (value.config.url.startsWith(`/api`)) {
     if(value.data) {
-      if(value.data.retCode) {
-        if (InvalidTokenCode.includes(+value.data.retCode)) {
+      if(value.data.retCode !== '0000') {
+        if (InvalidTokenCode.includes(value.data.retCode)) {
           if ($router.currentRoute.name !== 'Login') {
             setTimeout(() => {
               $router.push({
