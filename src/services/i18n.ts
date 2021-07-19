@@ -107,6 +107,7 @@ const messages = {
       'Schema': 'Schema',
       'Delete': 'Delete',
       'Action': 'Action',
+      'RWStatus': 'RWStatus',
     },
     session: {
       'Open Sessions': 'Open Sessions',
@@ -255,6 +256,7 @@ const messages = {
       'Schema': '查看建表语句',
       'Delete': '删除',
       'Action': '操作',
+      'RWStatus': '读写状态',
     },
     session: {
       'Open Sessions': '正在执行的SQL会话',
