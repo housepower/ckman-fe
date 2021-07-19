@@ -20,11 +20,11 @@ export const ClusterApi = {
     return axios.delete(`${url}/cluster/${id}`);
   },
   manageCluster(type, params, password?) {
-    const { clusterName, packageVersion } = params;
+    const { clusterName, packageVersion, skip, policy } = params;
     if(!packageVersion) {
       return axios.put(`${url}/${type}/${clusterName}?password=${ password || '' }`);
     } else {
-      return axios.put(`${url}/${type}/${clusterName}?password=${ password || '' }`,{ packageVersion });
+      return axios.put(`${url}/${type}/${clusterName}?password=${ password || '' }`,{ packageVersion, skip, policy });
     }
   },
   getClusterInfo(id) {

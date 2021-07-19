@@ -16,26 +16,35 @@
         <span class="fs-18 font-bold mb-15 inline-block">{{$t('manage.Upgrade Cluster')}}</span>
         <div class="">
           <span class="fs-14 font-bold">{{$t('home.ClickHouse Version')}}: {{ list.version }}</span>
-          <span v-if="mode === 'deploy'" class="fs-14 font-bold ml-50">{{$t('manage.Upgrade to')}}:</span>
-          <el-select v-model="packageVersion"
-                     v-if="mode === 'deploy'"
-                     size="small"
-                     clearable
-                     filterable
-                     class="ml-10 mr-50">
-            <el-option v-for="item in versionOptions"
-                       v-if="mode === 'deploy'"
-                       :key="item.value"
-                       :label="item.label"
-                       :value="item.value">
-            </el-option>
-          </el-select>
-          <el-button type="primary"
-                     v-if="mode === 'deploy'"
-                     size="mini"
-                     class="fs-16"
-                     :disabled="!packageVersion"
-                     @click="clusterOperation('upgrade')">{{$t('common.Upgrade')}}</el-button>
+          <template v-if="mode === 'deploy'">
+            <span class="fs-14 font-bold ml-30">{{$t('manage.Upgrade to')}}:</span>
+            <el-select v-model="packageVersion"
+              size="small"
+              clearable
+              filterable
+              class="ml-10 mr-10">
+              <el-option v-for="item in versionOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+            <span class="fs-14 font-bold ml-0">{{$t('manage.Policy')}}:</span>
+            <el-select v-model="policy"
+              size="small"
+              clearable
+              filterable
+              class="ml-10 mr-20">
+              <el-option :label="$t('manage.Full')" value="Full"></el-option>
+              <el-option :label="$t('manage.Rolling')" value="Rolling"></el-option>
+            </el-select>
+            <el-checkbox v-model="skip" class="mr-50">{{$t('manage.skip same version')}}</el-checkbox>
+            <el-button type="primary"
+              size="mini"
+              class="fs-16"
+              :disabled="!packageVersion"
+              @click="clusterOperation('upgrade')">{{$t('common.Upgrade')}}</el-button>
+          </template>
         </div>
       </div>
       <div class="node-list">
@@ -130,6 +139,8 @@ export default {
       },
       clusterStatus: [],
       packageVersion: "",
+      skip: true,
+      policy: 'Rolling',
       needPassword: false,
       password: '',
     };
@@ -276,8 +287,10 @@ export default {
       let params = {
         clusterName: this.$route.params.id,
       };
+      debugger;
       if (type === "upgrade") {
-        params = Object.assign(params, { packageVersion: this.packageVersion });
+        const { packageVersion, policy, skip } = this;
+        params = Object.assign(params, { packageVersion, policy, skip });
       }
       await ClusterApi.manageCluster(type, params, password).finally(() =>
         $loading.decrease()

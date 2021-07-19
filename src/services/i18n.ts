@@ -80,6 +80,10 @@ const messages = {
     manage: {
       'Upgrade Cluster': 'Upgrade Cluster',
       'Upgrade to': 'Upgrade to',
+      'Policy': 'Policy',
+      'Full': 'Full',
+      'Rolling': 'Rolling',
+      'skip same version': 'skip same version',
       'Node IP': 'Node IP',
       'Node Name': 'Node Name',
       'shard number': 'shard number',
@@ -233,6 +237,10 @@ const messages = {
     manage: {
       'Upgrade Cluster': '升级集群',
       'Upgrade to': '升级至',
+      'Policy': '升级策略',
+      'Full': '全量升级',
+      'Rolling': '滚动升级',
+      'skip same version': '是否跳过相同版本',
       'Node IP': '节点IP',
       'Node Name': '节点名称',
       'shard number': '分片编号',
