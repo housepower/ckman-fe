@@ -296,22 +296,48 @@ export default {
 
     // 集群node上线
     async onlineClusterNode(row) {
+      let password = '';
+      if (this.needPassword) {
+        // 已经输入过密码，并且校验通过后，不再输入密码
+        if (this.password) {
+          password = this.password;
+        } else {
+          password = await this.openPasswordDialog();
+        }
+      }
       this.$set(row, 'onlineLoading', true);
       const { id: clusterName } = this.$route.params;
       await ClusterApi.onlineClusterNode(clusterName, row.ip);
       this.$message.success(`${this.$t('manage.Online')}` + ` ${this.$t('common.' + 'Success')}`);
       this.fetchData();
       this.$set(row, 'onlineLoading', false);
+      // 密码校验通过，设置缓存密码，下次不用再输入。
+      if (this.needPassword) {
+        this.password = password;
+      }
     },
 
     // 集群node下线
     async offlineClusterNode(row) {
+      let password = '';
+      if (this.needPassword) {
+        // 已经输入过密码，并且校验通过后，不再输入密码
+        if (this.password) {
+          password = this.password;
+        } else {
+          password = await this.openPasswordDialog();
+        }
+      }
       this.$set(row, 'offlineLoading', true);
       const { id: clusterName } = this.$route.params;
       await ClusterApi.offlineClusterNode(clusterName, row.ip);
       this.$message.success(`${this.$t('manage.Offline')}` + ` ${this.$t('common.' + 'Success')}`);
       this.fetchData();
       this.$set(row, 'offlineLoading', false);
+      // 密码校验通过，设置缓存密码，下次不用再输入。
+      if (this.needPassword) {
+        this.password = password;
+      }
     }
   },
   components: {},
