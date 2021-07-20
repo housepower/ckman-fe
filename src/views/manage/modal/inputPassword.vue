@@ -2,7 +2,7 @@
   <section class="add-node">
     <el-form ref="Form" :model="formModel">
       <el-form-item prop="password" required>
-        <el-input v-model="formModel.password" :placeholder="$t('home.SSH Password')" show-password />
+        <el-input v-model="formModel.password" :placeholder="$t('home.SSH Password')" show-password autocomplete="new-password" />
       </el-form-item>
     </el-form>
   </section>

@@ -36,10 +36,10 @@ export const ClusterApi = {
   deleteClusterNode(id, params, password?) {
     return axios.delete(`${url}/node/${id}?password=${ password || '' }`, { params });
   },
-  onlineClusterNode(clusterName, ip) {
-    return axios.put(`${url}/node/start/${clusterName}?ip=${ ip }`);
+  onlineClusterNode(clusterName, ip, password?) {
+    return axios.put(`${url}/node/start/${clusterName}?ip=${ ip }&password=${ password || ''}`);
   },
-  offlineClusterNode(clusterName, ip) {
-    return axios.put(`${url}/node/stop/${clusterName}?ip=${ ip }`);
+  offlineClusterNode(clusterName, ip, password?) {
+    return axios.put(`${url}/node/stop/${clusterName}?ip=${ ip }&password=${ password || ''}`);
   },
 };
