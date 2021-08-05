@@ -7,6 +7,8 @@ import { TimeFilter } from './time-filter';
 import { default as Breadcrumb } from './breadcrumb.vue';
 import { default as OverviewBase } from './overview-base/overview-base.vue';
 import { default as SqlCodeMirror } from './sql-code-mirror/sql-code-mirror.vue';
+import { default as DForm } from './d-form/d-form.vue';
+console.log(DForm);
 
 Object.entries({
   TimeFilter,
@@ -19,4 +21,5 @@ export {
   Breadcrumb,
   OverviewBase,
   SqlCodeMirror,
+  DForm,
 };
