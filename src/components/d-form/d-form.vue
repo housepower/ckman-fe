@@ -1,6 +1,5 @@
 <template>
   <el-form :model="formData" ref="form" style="line-height: 40px;">
-    {{formData}}
     <DFormItem
       v-for="(item, key) in schema"
       :key="key"
@@ -10,15 +9,16 @@
       v-model="formData">
     </DFormItem>
     <el-form-item class="sticky-bottom">
-      <el-button @click="submit">提交</el-button>
-      <el-button @click="reset">重置</el-button>
+      <el-button @click="submit" type="primary">{{$t("common.Create")}}</el-button>
+      <el-button @click="cancel">{{$t("common.Cancel")}}</el-button>
     </el-form-item>
   </el-form>
 </template>
 <script>
 import DFormItem from './d-form-item.vue';
 import { getDefaultFormData, getPostData } from './util';
-import { cloneDeep } from 'lodash-es';
+import { cloneDeep, isEqual } from 'lodash-es';
+
 export default {
   name: 'DForm',
   components: {
@@ -49,31 +49,65 @@ export default {
     this.formData = getDefaultFormData(formModel, schema, formData);
   },
 
-  mounted() {
-
-  },
-
   methods: {
     submit() {
-      const { schema, formData } = this;
-      const data = getPostData(cloneDeep(formData), schema);
-      console.log('postData: ', data);
-      this.$refs.form.validate((valid) => {
-        if (valid) {
-          const { schema, formData } = this;
-          const data = getPostData(cloneDeep(formData), schema);
-          console.log('postData: ', data);
-        } else {
-          console.log('error submit');
-          return false;
-        }
-      });
-      console.log(this.formData)
-    }, //
+      const form = this.$refs.form;
+      form.clearValidate();
+      try {
+        form.validate((valid) => {
+          if (valid) {
+            const { schema, formData } = this;
+            const data = getPostData(cloneDeep(formData), schema);
+            this.$emit('submit', data);
+          } else {
+            const fields = form.fields.filter(item => item.validateState === 'error');
+            const field = form.fields.find(item => item.validateState === 'error');
+            // 展开错误第一层
+            fields.forEach(field => {
+              field.isSlideUp = true;
+              let temp = field;
+              do {
+                const parent = temp.$parent;
+                temp = parent;
+                if (temp.$el.className.indexOf('el-form-item') !== -1) {
+                  temp.isSlideUp = true;
+                }
+              } while(temp.$el.nodeName !== 'FORM');
+            });
 
-    reset() {
+            // 从子到父，展开父标签，直到el-form
+            let collapseNum = 0;
+            if (field) {
+              field.isSlideUp = true;
+              let temp = field;
+              
+              do {
+                const parent = temp.$parent;
+                temp = parent;
+                if (temp.collapse && !isEqual(temp.collapse.activeNames, [temp.name])) {
+                  temp.collapse.activeNames = [temp.name];
+                  collapseNum += 1;
+                }
+                if (temp.$el.className.indexOf('el-form-item') !== -1) {
+                  temp.isSlideUp = true;
+                }
+              } while(temp.$el.nodeName !== 'FORM');
+              
+              setTimeout(() => {
+                field.$el.scrollIntoView();
+              }, collapseNum * 300);
+            }
+            return false;
+          }
+        });
+      } catch(e) {
+        console.log(e);
+      }
+    },
 
-    }
+    cancel() {
+      this.$router.go(-1);
+    },
   }
 }
 </script>

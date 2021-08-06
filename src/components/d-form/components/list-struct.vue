@@ -75,13 +75,6 @@ export default {
     }
   },
 
-  created() {
-  },
-
-  mounted() {
-
-  },
-
   methods: {
     addItem() {
       const { schema } = this;
@@ -110,7 +103,6 @@ export default {
 ::v-deep .el-collapse-item__header {
   background: rgba(0, 0, 0, 0.05);
   height: 40px;
-  // border-color: rgba(0, 0, 0, 0.05);
 }
 ::v-deep .el-collapse-item__content {
   padding: 20px;
@@ -118,11 +110,6 @@ export default {
   border-style: solid;
   border-color: rgba(0, 0, 0, 0.05);
 }
-
-// ::v-deep .el-collapse-item__wrap {
-//  border-color: rgba(0, 0, 0, 0.05);
-// }
-
 .list-struct-list-struct {
   ::v-deep .error-message {
     top: 3px !important;

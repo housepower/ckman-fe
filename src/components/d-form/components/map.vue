@@ -1,10 +1,9 @@
 <template>
   <div class="ml-10">
-    <!-- <i class="fa fa-plus pointer ml-10" @click.stop="addItem"></i> -->
     <div v-for="(item, index) in formData" :key="index" class="flex flex-vcenter mb-10">
-      <el-input size="medium" class="flex-1" v-model="item.key" @change="onChange" />
+      <el-input size="medium" style="flex: 1;" v-model="item.key" @change="onChange" />
       <span class="pl-5 pr-5">:</span>
-      <el-input size="medium" class="flex-1" v-model="item.value" @change="onChange" />
+      <el-input size="medium" style="flex: 2;" v-model="item.value" @change="onChange" />
       <i class="fa fa-trash pointer fs-16 fc-red ml-10" @click="deleteItem(index)"></i>
     </div>
   </div>

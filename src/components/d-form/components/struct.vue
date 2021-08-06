@@ -1,6 +1,5 @@
 <template>
   <div class="flex flex-column" style="line-height: 34px;">
-    <!-- struct: {{formData}} {{schema}} -->
     <div class="pt-15 pr-20 pb-5 struct">
       <DFormItem v-model="formModel" v-for="(item, key) in schema" :key="key" :schema="item" :origin-name="key" :prop-name="`${PropName}.${key}`">
       </DFormItem>
@@ -56,9 +55,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss">
-.struct {
-  //background-color: rgba(0, 0, 0, .05);
-}
-</style>

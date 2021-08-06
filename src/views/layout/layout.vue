@@ -1,5 +1,5 @@
 <template>
-  <div class="layout">
+  <div class="layout flex flex-column overflow-hidden">
     <header class="flex-between flex-vcenter plr-20">
       <router-link to="/" class="fs-18 font-bold">{{title}}  {{version}}</router-link>
       <div class="header-right">
@@ -21,8 +21,8 @@
       </div>
     </header>
 
-    <main class="plr-20 pt-10"
-          style="padding-bottom: 85px">
+    <main class="plr-20 pt-10 flex-1"
+          style="overflow: auto;">
       <router-view />
     </main>
     <transition name="el-fade-in-linear"
@@ -103,6 +103,7 @@ export default {
 }
 header {
   position: sticky;
+  width: 100%;
   top: 0;
   z-index: 100;
   height: 50px;
@@ -115,11 +116,12 @@ header {
   }
 }
 footer {
-  position: fixed;
+  position: sticky;
+  width: 100%;
   bottom: 0px;
-  left: 50%;
+  left: 0;
   z-index: 100;
-  transform: translateX(-50%);
+  //transform: translateX(-50%);
   margin: 0 auto;
   background-color: #eaeef4;
   .list-content {
