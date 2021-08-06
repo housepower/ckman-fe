@@ -1,8 +1,6 @@
 <template>
-  <div class="flex flex-column list-string mb-20 ml-10" v-if="formData.length > 0" style="line-height: 30px;">
-    <!-- {{formModel}} -->
-    <!-- <i class="fa fa-plus pointer ml-10" @click.stop="addItem"></i> -->
-    <div class="content pt-10 pr-10 pb-0 pl-10">
+  <div class="flex flex-column list-string mb-20 ml-10" v-if="formData.length > 0" style="line-height: 30px; margin-top: -10px;">
+    <div class="content">
       <div v-for="(item, index) in formData" :key="item.$$id" class="flex flex-vcenter mb-10">
         <el-input size="medium" v-model="item.value" class="width-350" @change="onChange"></el-input>
         <i class="fa fa-trash pointer fs-16 fc-red ml-10" @click="deleteItem(index)"></i>
@@ -76,11 +74,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss">
-.list-string {
-  .content {
-    background-color: rgba(0, 0, 0, 0.05);
-  }
-}  
-</style>

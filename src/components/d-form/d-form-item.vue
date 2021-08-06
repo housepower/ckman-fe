@@ -1,7 +1,7 @@
 <template>
   <el-form-item :prop="propName" v-if="isVisible" :class="className" :rules="rules" class="mb-0">
-    <div slot="label" class="width-250 text-left relative">
-      <span @click="isSlideUp = !isSlideUp" class="pointer text-ellipsis" style="display: inline-block;">
+    <div slot="label" class="width-full text-left relative" @click="isSlideUp = !isSlideUp">
+      <div class="pointer text-ellipsis" style="display: inline-block; width: 250px;">
         <i v-if="isShowCaret" class="fa" :class="{ 'fa-caret-right': !isSlideUp, 'fa-caret-down': isSlideUp }"></i>
         {{schema['label_' + lang] || schema['label_' + lang] || originName}}
         <el-tooltip class="item" effect="dark" placement="top">
@@ -14,7 +14,7 @@
         <span>：</span>
         <i v-if="isShowAddIcon" class="fa fa-plus pointer absolute el-link--primary" @click.stop="addItem" :style="{ 'left': isCascade ? '300px' : '270px' }" style="left: 270px; margin-top: 12px;"></i>
         <span class="fc-red absolute error-message">{{errorMessage}}</span>
-      </span>
+      </div>
     </div>
     <!-- {{propName}} -->
     <!-- {{ originName }} -->
@@ -30,16 +30,15 @@
     <template v-else>
       <template v-if="schema.type === 'string'">
         <!-- 单行文本 -->
-        <el-input class="width-350" size="medium" v-model="formModel[originName]" :placeholder="$t('common.Please fill out')" v-if="schema.input_type === 'text'" @change="onChange"></el-input>
+        <el-input class="width-350" size="medium" v-model="formModel[originName]" :placeholder="$t('common.Please fill out')" v-if="schema.input_type === 'text'"></el-input>
         <!-- 多行文本 -->
-        <el-input class="width-350" size="medium" type="textarea" v-model="formModel[originName]" :placeholder="$t('common.Please fill out')" v-if="schema.input_type === 'textarea'" @change="onChange"></el-input>
+        <el-input class="width-350" size="medium" type="textarea" v-model="formModel[originName]" :placeholder="$t('common.Please fill out')" v-if="schema.input_type === 'textarea'"></el-input>
         <!-- 密码 -->
-        <el-input class="width-350" size="medium" v-model="formModel[originName]" :placeholder="$t('common.Please fill out')" v-if="schema.input_type === 'password'" show-password @change="onChange"></el-input>
+        <el-input class="width-350" size="medium" autocomplete="new-password" v-model="formModel[originName]" :placeholder="$t('common.Please fill out')" v-if="schema.input_type === 'password'" show-password></el-input>
       </template>
       
-      
       <!-- switch -->
-      <el-switch v-model="formModel[originName]" size="medium" v-if="schema.type === 'bool'" @change="onChange"></el-switch>
+      <el-switch v-model="formModel[originName]" size="medium" v-if="schema.type === 'bool'"></el-switch>
       <!-- 数字输入-整数 -->
       <el-input-number
         class="width-350"
@@ -50,8 +49,7 @@
         :min="(schema.range && schema.range.min) || -Infinity"
         :max="(schema.range && schema.range.max) || Infinity"
         :step="(schema.range && schema.range.step) || 1"
-        v-if="schema.type === 'int'"
-        @change="onChange">
+        v-if="schema.type === 'int'">
       </el-input-number>
       <!-- 数字输入-小数 -->
       <el-input-number
@@ -63,13 +61,10 @@
         :min="(schema.range && schema.range.min) || -Infinity"
         :max="(schema.range && schema.range.max) || Infinity"
         :step="(schema.range && schema.range.step) || 1"
-        v-if="schema.type === 'float'"
-        @change="onChange">
+        v-if="schema.type === 'float'">
       </el-input-number>
       <!-- 结构体 -->
       <struct v-show="isSlideUp" :schema="schema.struct" :prop-name="`${ propName }`" v-model="formModel[originName]" v-if="schema.type === 'struct'"></struct>
-      <!-- 结构体map -->
-      <!-- <map-struct :schema="schema.struct" :prop-name="`${ propName }.${originName}`" :origin-name="originName" :form-model="formModel[originName]" v-if="schema.type === 'map-struct'"></map-struct> -->
       <!-- 列表 -->
       <list-struct
         v-show="isSlideUp"
@@ -102,7 +97,6 @@ export default {
   name: 'dFormItem',
   components: {
     Struct: () => import('./components/struct.vue'),
-    // MapStruct: () => import('./components/map-struct.vue'),
     ListStruct: () => import('./components/list-struct.vue'),
     ListString: () => import('./components/list-string.vue'),
     Map: () => import('./components/map.vue'),
@@ -143,12 +137,6 @@ export default {
   computed: {
     lang() {
       return this.$i18n.locale;
-      // const local = localStorage.getItem('locale')
-      // if(['zh', 'en'].includes(local)) {
-      //   return local;
-      // } else {
-      //   return 'zh';
-      // }
     },
     isShowAddIcon() {
       return ['list-struct', 'list-string', 'map'].includes(this.schema.type);
@@ -209,7 +197,7 @@ export default {
         `name: ${originName || ''}`,
         `${this.$t('common.Field Type')}：${type || ''}`,
         `${this.$t('common.Defaults')}：${defaultValue || this.$t('common.Null')}`,
-        `${this.$t('common.Is it required')}：${(!required) ? this.$t('common.Yes') : this.$t('common.No')}`,
+        `${this.$t('common.Is it required')}：${(required) ? this.$t('common.Yes') : this.$t('common.No')}`,
         `${this.$t('common.Description')}：${schema['description_' + lang] || ''}`,
       ];
       if (['int', 'float'].includes(type)) {
@@ -227,32 +215,47 @@ export default {
       const { range, regex, type, struct } = schema;
       const dataTypes = [null, '', undefined];
       return {
-        trigger: 'blur',
+        trigger: ['blur', 'change'],
         validator: (rule, value) => {
-          switch(type) {
-            case 'list-string':
-              if (value.length === 0) {
-                this.errorMessage = this.$t('common.Please fill out') + schema['label_' + lang];
+          if (isRequired == true) {
+            switch(type) {
+              case 'list-string':
+                if (value.length === 0) {
+                  this.isSlideUp = true;
+                  return new Error(this.$t('common.Required'));
+                } else {
+                  this.errorMessage = '';
+                  return true;
+                }
+              case 'struct': {
+                const data = getPostData(cloneDeep(value), schema);
+                if (isEqual(data, null)) {
+                  this.isSlideUp = true;
+                  return new Error(this.$t('common.Required'));
+                } else {
+                  this.errorMessage = '';
+                  return true;
+                }
               }
-            case 'struct': {
-              const data = getPostData(cloneDeep(value), struct);
-              if (isEqual(data, {})) {
-                this.errorMessage = this.$t('common.Please fill out') + schema['label_' + lang];
+              case 'list-struct': {
+                if (value.length === 0) {
+                  return new Error(this.$t('common.Required'));
+                } else {
+                  return true;
+                }
               }
-            }
-            case 'list-struct': {
-              const data = getPostData(cloneDeep(value), struct);
-              if (isEqual(data, [])) {
-                this.errorMessage = this.$t('common.Please fill out') + schema['label_' + lang];
-              }
-            }
-            case 'map': {
-              const data = getPostData(cloneDeep(value), struct);
-              if (isEqual(data, {})) {
-                this.errorMessage = this.$t('common.Please fill out') + schema['label_' + lang];
+              case 'map': {
+                const data = getPostData(cloneDeep(value), schema);
+                if (isEqual(data, null)) {
+                  this.isSlideUp = true;
+                  return new Error(this.$t('common.Required'));
+                } else {
+                  return true;
+                }
               }
             }
           }
+          
           if (isRequired && dataTypes.includes(value)) {
             return new Error(this.$t('common.Required'));
           }
@@ -281,14 +284,6 @@ export default {
   },
 
   methods: {
-    onChange(val) {
-      // console.log('val', val);
-      // this.formModel[this.originName] = val;
-      // console.log(this.formModel[this.originName]);
-      // console.log(this.formModel);
-      // this.$emit('change', this.formModel);
-    },
-
     addItem() {
       this.isSlideUp = true;
       const { schema } = this;
@@ -368,6 +363,10 @@ export default {
     ::v-deep > .el-form-item__content {
       padding-left: 20px;
     }
+  }
+
+  &.list-string ::v-deep >.el-form-item__content {
+    padding-left: 250px;
   }
 }
 

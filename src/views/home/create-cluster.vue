@@ -1,9 +1,13 @@
 <template>
-  <d-form v-if="schema" :schema="schema" :form-model="formModel"></d-form>
+  <div>
+    <h3 class="fs-18 mb-20">{{$t("home.Create a ClickHouse Cluster")}}</h3>
+    <d-form v-if="schema" :schema="schema" :form-model="formModel" @submit="onSubmit"></d-form>
+  </div>
+  
 </template>
 <script>
 import { DForm } from '@/components/';
-import mockData from '@/components/d-form/mock/data.json';
+// import mockData from '@/components/d-form/mock/data.json';
 import { ClusterApi } from '@/apis';
 export default {
   name: 'test',
@@ -38,6 +42,10 @@ export default {
       } catch (e) {
 
       }
+    },
+
+    onSubmit(data) {
+      ClusterApi.createCluster(data);
     }
   }
 }

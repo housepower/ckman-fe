@@ -113,7 +113,7 @@ export function getDefaultFormData(formModel, schema) {
  * @returns 
  */
 export function getPostData(formModel, schema) {
-  const formData = {};
+  let formData = {};
 
   function cacadeFormat(formData, schema, prev) {
     Object.entries(schema).forEach(([name, config]) => {
@@ -135,7 +135,7 @@ export function getPostData(formModel, schema) {
 
       const propsName = prev ? `${prev}.${name}` : name;
       const fieldValue = get(formModel, propsName);
-      console.log(propsName, fieldValue);
+      // console.log(propsName, fieldValue);
 
       if (typeof fieldValue === 'undefined' || fieldValue === null || fieldValue === '') {
         delete formData[name];
@@ -182,8 +182,11 @@ export function getPostData(formModel, schema) {
       }
     })
   }
-  cacadeFormat(formData, schema, '');
-  // console.log(formData);
+  
+  cacadeFormat(formData, schema.struct || schema, '');
+  if (isEqual(formData, {})) {
+    return null;
+  }
   return formData;
 }
 

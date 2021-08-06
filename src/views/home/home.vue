@@ -102,6 +102,12 @@ export default {
       }));
     },
     async importCk(type) {
+      if (type === 1) {
+        this.$router.push({
+          name: 'createCluster'
+        });
+        return;
+      }
       await $modal({
         component: CreateCk,
         props: {
