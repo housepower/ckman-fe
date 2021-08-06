@@ -12,7 +12,9 @@
         </el-tooltip>
         <span class="fc-red bold ml-5" v-if="isRequired">*</span>
         <span>：</span>
-        <i v-if="isShowAddIcon" class="fa fa-plus pointer absolute el-link--primary" @click.stop="addItem" :style="{ 'left': isCascade ? '300px' : '270px' }" style="left: 270px; margin-top: 12px;"></i>
+        <el-button v-if="isShowAddIcon" @click.stop="addItem" size="mini" class="absolute" :style="{ 'left': isCascade ? '300px' : '260px' }">
+          <i class="fa fa-plus pointer el-link--primary"></i>
+        </el-button>
         <span class="fc-red absolute error-message">{{errorMessage}}</span>
       </div>
     </div>
@@ -330,7 +332,7 @@ export default {
 
   &.list-string, &.list-struct, &.struct, &.map {
     ::v-deep .el-form-item__error {
-      top: -48px;
+      top: -50px;
       left: 356px;
     }
   }
