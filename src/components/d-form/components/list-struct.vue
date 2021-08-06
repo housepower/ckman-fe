@@ -2,10 +2,10 @@
   <div class="list-struct ml-10" v-if="formModel.length > 0">
     <el-collapse v-model="activeName" accordion v-if="!isCascade" class="mb-20">
       <el-collapse-item v-for="(item, index) in formModel" :key="item.$$id" :name="item.$$id" size="medium">
-        <div slot="title" class="flex flex-vcenter pl-10">
-          <span class="flex-1">{{`${formModel[index].Name || originName}`}}</span>
+        <template slot="title" class="flex flex-vcenter pl-10">
+          <span class="flex-1 pl-10">{{`${formModel[index].Name || originName}[${index}]`}}</span>
           <i class="fa fa-trash pointer fs-16 fc-red ml-10" style="margin: 8px 10px 8px auto;" @click.stop="deleteItem(index)"></i>
-        </div>
+        </template>
         <div v-for="(child, key) in schema.struct" :key="key" style="line-height: 40px;">
           <DFormItem v-model="formModel[index]" :schema="child" :origin-name="key" :prop-name="`${PropName}.${index}.${key}`">
           </DFormItem>
@@ -97,12 +97,27 @@ export default {
   .el-collapse-item:last-child {
     .el-collapse-item__header {
       border: none;
+      &:after {
+        display: none;
+      }
     }
   }
 }
 ::v-deep .el-collapse-item__header {
   background: rgba(0, 0, 0, 0.05);
+  border-bottom-color: rgba(0, 0, 0, 0.1);
   height: 40px;
+  position: relative;
+  &:after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    display: block;
+    width: 100%;
+    height: 1px;
+    background-color: #fff;
+    z-index: 2;
+  }
 }
 ::v-deep .el-collapse-item__content {
   padding: 20px;
