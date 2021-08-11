@@ -214,7 +214,7 @@ export default {
     },
     rules() {
       const { isRequired, schema, lang, $t } = this;
-      const { range, regex, type, struct } = schema;
+      const { range, regexp, type, struct } = schema;
       const dataTypes = [null, '', undefined];
       return {
         trigger: ['blur', 'change'],
@@ -262,7 +262,7 @@ export default {
             return new Error(this.$t('common.Required'));
           }
 
-          if (regex && !dataTypes.includes(value) && !new RegExp(regex.slice(1, -1)).test(value)) {
+          if (regexp && !dataTypes.includes(value) && !new RegExp(regexp.slice(1, -1)).test(value)) {
             return new Error(this.$t('common.Input error, please check the rules and re-enter'));
           }
 

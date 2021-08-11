@@ -44,8 +44,9 @@ export default {
       }
     },
 
-    onSubmit(data) {
-      ClusterApi.createCluster(data);
+    async onSubmit(data) {
+      await ClusterApi.createCluster(data);
+      this.$router.go(-1);
     }
   }
 }
