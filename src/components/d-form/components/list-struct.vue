@@ -82,7 +82,6 @@ export default {
         $$id: +new Date(),
       };
       Object.assign(item, getDefaultFormData(item, schema.struct));
-      console.log(schema.struct, item);
       this.formModel.push(item);
     },
 

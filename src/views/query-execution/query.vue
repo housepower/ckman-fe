@@ -36,7 +36,6 @@ export default {
     },
     updateData(addSql) {
       this.list.unshift(addSql);
-      console.log(this.list);
       this.list = uniqBy(this.list, "value");
       localStorage.setItem(
         "sqlHisToryData",

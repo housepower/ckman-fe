@@ -8,7 +8,7 @@ export const ClusterApi = {
     return axios.get(`${url}/cluster`);
   },
   getClusterCreateFormSchema() {
-    return axios.get(`/api/v1/ui/schema?type=create`);
+    return axios.get(`/api/v1/ui/schema?type=deploy`);
   },
   importCluster(params) {
     return axios.post(`${url}/cluster`, params);

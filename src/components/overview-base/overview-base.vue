@@ -63,7 +63,6 @@ export default {
         }),
       };
     });
-    console.log(this.chartMetrics);
     this.fetchData();
   },
   methods: {
