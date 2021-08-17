@@ -178,7 +178,7 @@ export function getPostData(formModel, schema) {
           }
           break;
         default:
-          formData[name] = fieldValue || defaultValue;
+          formData[name] = [null, undefined, ''].includes(fieldValue) ? defaultValue : fieldValue;
       }
     })
   }
