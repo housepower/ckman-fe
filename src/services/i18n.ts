@@ -91,6 +91,7 @@ const messages = {
       'Session': 'Session',
       'Query Execution': 'Query Execution',
       'Settings': 'Settings',
+      'The imported cluster does not support editing': 'The imported cluster does not support editing',
     },
     manage: {
       'Upgrade Cluster': 'Upgrade Cluster',
@@ -263,6 +264,7 @@ const messages = {
       'Session': '会话管理',
       'Query Execution': '查询管理',
       'Settings': '设置',
+      'The imported cluster does not support editing': '导入的集群不支持编辑',
     },
     manage: {
       'Upgrade Cluster': '升级集群',
