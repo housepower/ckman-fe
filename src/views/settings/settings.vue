@@ -1,89 +1,68 @@
 <template>
-  <main class="settings">
-    <breadcrumb :data="['Clusters', $route.params.id, 'settings']" class="mb-30"></breadcrumb>
-    <el-form ref="Form"
-             :model="formModel"
-             label-width="150px">
-      <!-- <el-form-item :label="$t('home.Replica')">
-        <el-switch v-model="formModel.isReplica"></el-switch>
-      </el-form-item>
-      <el-form-item :label="$t('home.Zookeeper Node List') + ':'"
-                    prop="zkNodes">
-        <el-input type="textarea"
-                  :autosize="{ minRows: 2 }"
-                  v-model="formModel.zkNodes"
-                  :placeholder="$t('common.placeholderIp')"
-                  class="width-350" />
-      </el-form-item>
-      <el-form-item :label="$t('home.Data path') + ':'"
-                    prop="path">
-        <el-input v-model="formModel.path"
-                  class="width-350" />
-      </el-form-item> -->
-      <el-form-item :label="$t('home.Cluster Username') + ':'"
-                    prop="user">
-        <el-input v-model="formModel.user"
-                  class="width-350" />
-      </el-form-item>
-      <el-form-item :label="$t('home.Cluster Password') + ':'"
-                    prop="password">
-        <el-input v-model="formModel.password"
-                  class="width-350" />
-      </el-form-item>
-    </el-form>
-    <el-button type="primary"
-               class="ml-200"
-               @click="save" disabled>{{$t('common.Save Reboot')}}</el-button>
-  </main>
+  <div class="flex flex-column height-full" v-if="mode">
+    <breadcrumb :data="breadcrumbInfo"></breadcrumb>
+    <div class="flex-1 flex" v-if="mode === 'import'">
+      <div class="fs-20" style="margin: 20px auto;">{{$t("home.The imported cluster does not support editing")}}</div>
+    </div>
+    <div v-else>
+      <d-form class="mt-30" v-if="schema" :schema="schema" :form-model="formModel" @submit="onSubmit" :is-show-cancel="false" :submit-text="$t('common.Save')"></d-form>
+    </div>
+  </div>
+  
 </template>
 <script>
-import { ClusterApi } from "@/apis";
-import { isNull } from "lodash-es";
-import { lineFeed } from "@/helpers";
-
+import { DForm } from '@/components/';
+import { ClusterApi } from '@/apis';
 export default {
+  name: 'test',
+  components: {
+    DForm,
+  },
+
+  props: {},
+
   data() {
     return {
-      formModel: {
-        zkNodes: "",
-        user: "",
-        path: "",
-        password: "",
-        isReplica: false,
-      },
-    };
+      schema: null,
+      formModel: {},
+      breadcrumbInfo: ["Clusters", this.$t("home.Settings")],
+      mode: '',
+    }
   },
+
+  created() {
+    this.getFormSchema();
+    this.getCluster();
+  },
+
   mounted() {
-    this.fetchData();
   },
+
   methods: {
-    async fetchData() {
+    async getCluster() {
       const clusterName = this.$route.params.id;
-      if (isNull(this.$root.clusterBench)) {
-        const {
-          data: { entity },
-        } = await ClusterApi.getCluster();
-        this.formModel = entity[`${clusterName}`];
-      } else {
-        this.formModel = this.$root.clusterBench;
+      const { data: { entity } } = await ClusterApi.getClusterConfig(clusterName);
+      this.mode = entity.mode;
+      const data = (new Function("return " + entity.config))();
+      console.log(data);
+      this.formModel = data;
+    },
+
+    async getFormSchema() {
+      const { data: { entity } } = await ClusterApi.getClusterUpdateFormSchema();
+      try {
+        const schema = (new Function("return " + entity))();
+        console.log(schema);
+        this.schema = schema;
+      } catch (e) {
+
       }
     },
-    async save() {
-      await ClusterApi.updateCluster(
-        Object.assign({}, this.formModel, {
-          zkNodes: lineFeed(this.formModel.zkNodes),
-          hosts: lineFeed(this.formModel.hosts),
-        })
-      );
-      this.$message.success("更新成功");
-    },
-  },
-  components: {},
-};
-</script>
 
-<style lang="scss" scoped>
-.ml-200 {
-  margin-left: 200px;
+    async onSubmit(data) {
+      const clusterName = this.$route.params.id;
+      await ClusterApi.saveClusterConfig(clusterName, data);
+    }
+  }
 }
-</style>
+</script>

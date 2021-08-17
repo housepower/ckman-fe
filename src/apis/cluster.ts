@@ -7,8 +7,17 @@ export const ClusterApi = {
   getCluster() {
     return axios.get(`${url}/cluster`);
   },
+  getClusterConfig(clusterName: string) {
+    return axios.get(`${url}/config/${clusterName}`);
+  },
+  saveClusterConfig(clusterName: string, data) {
+    return axios.post(`${url}/config/${clusterName}`, data);
+  },
   getClusterCreateFormSchema() {
     return axios.get(`/api/v1/ui/schema?type=deploy`);
+  },
+  getClusterUpdateFormSchema() {
+    return axios.get(`/api/v1/ui/schema?type=config`);
   },
   importCluster(params) {
     return axios.post(`${url}/cluster`, params);
