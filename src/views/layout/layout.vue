@@ -28,15 +28,13 @@
     <transition name="el-fade-in-linear"
                 appear>
       <footer class="flex-center width-full"
-              v-show="$route.params.id">
+              v-if="$route.params.id">
         <div class="flex-center list-content width-1000">
-          <router-link class="flex flex-1 flex-center height-full pointer list-item"
-                       :to="{ path: item.path }"
-                       exact-active-class="router-active"
-                       v-for="item of menus"
-                       :key="item.name">
+          <a href="javascript:void(0)" class="flex flex-1 flex-center height-full pointer"
+            :class="{ 'router-active': currentMenu === item.name, 'list-item': item.name !== 'Settings' || mode === 'deploy' }"
+            @click="handleMenuClick(item, $event)" v-for="item of menus" :key="item.name">
             <span class="fs-20">{{$t('home.' + item.name) }}</span>
-          </router-link>
+          </a>
         </div>
       </footer>
     </transition>
@@ -44,7 +42,7 @@
 </template>
 <script>
 import { Menus, LoaderMenus } from "@/constants";
-import { PackageApi } from "@/apis";
+import { PackageApi, ClusterApi } from "@/apis";
 
 export default {
   name: "Layout",
@@ -53,15 +51,42 @@ export default {
       menus: Menus,
       user: "",
       version: "",
+      mode: '',
+      currentMenu: '',
     };
   },
   mounted() {
     this.user = JSON.parse(localStorage.getItem("user") || "{}").username;
     this.fetchVersion();
   },
+
+  created() {
+    this.onChangeCluster();
+  },
+
   methods: {
-    handleMenuClick(e) {
-      console.log(e);
+    async onChangeCluster() {
+      const { name } = this.$route;
+      this.currentMenu = name;
+      const clusterName = this.$route.params.id;
+      if (!clusterName) return false;
+      const { data: { entity } } = await ClusterApi.getCluster();
+      const { mode } = entity[clusterName];
+
+      this.mode = mode;
+    },
+    async handleMenuClick(item) {
+      if (item.name === 'Settings') {
+
+        if (this.mode === 'import') {
+          this.$message.warning(this.$t("home.The imported cluster does not support editing"));
+          return;
+        }
+      }
+      if (this.$route.name != item.name) {
+        this.$router.push({ path: item.path });
+        this.currentMenu = item.name;
+      }
     },
     logout() {
       localStorage.removeItem("user");
@@ -73,12 +98,13 @@ export default {
         data: { entity },
       } = await PackageApi.getVersion();
       this.version = entity;
-    },
+    }
   },
   watch: {
     $route: {
       handler(route, prevRoute) {
         this.menus = route.meta === "loader" ? LoaderMenus : Menus;
+        this.onChangeCluster();
       },
       immediate: true,
     },

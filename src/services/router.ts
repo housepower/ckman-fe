@@ -3,6 +3,11 @@ import Router, { Route } from 'vue-router';
 
 import { ChildViewHolder } from '@/common/components/child-view-holder';
 
+const originalPush = Router.prototype.push;
+Router.prototype.push = function push(location) {
+  return originalPush.call(this, location).catch(err => err);
+};
+
 Vue.use(Router);
 
 export const $router = new Router({
