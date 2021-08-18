@@ -5,7 +5,7 @@
       <div class="fs-20" style="margin: 20px auto;">{{$t("home.The imported cluster does not support editing")}}</div>
     </div>
     <div v-else>
-      <d-form class="mt-30" v-if="schema" :schema="schema" :form-model="formModel" @submit="onSubmit" :is-show-cancel="false" :submit-text="$t('common.Save')"></d-form>
+      <d-form class="mt-30" :loading="loading" v-if="schema" :schema="schema" :form-model="formModel" @submit="onSubmit" :is-show-cancel="false" :submit-text="$t('common.Save')"></d-form>
     </div>
   </div>
   
@@ -27,6 +27,7 @@ export default {
       formModel: {},
       breadcrumbInfo: ["Clusters", this.$t("home.Settings")],
       mode: '',
+      loading: false,
     }
   },
 
@@ -60,8 +61,10 @@ export default {
     },
 
     async onSubmit(data) {
+      this.loading = true;
       const clusterName = this.$route.params.id;
-      await ClusterApi.saveClusterConfig(clusterName, data);
+      await ClusterApi.saveClusterConfig(clusterName, data).finally(() => this.loading = false);
+      this.$message.success(`${clusterName} Cluster ${ this.$t("common.Save") }${ this.$t("common.Success") }`);
     }
   }
 }

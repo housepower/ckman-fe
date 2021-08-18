@@ -75,6 +75,15 @@ export default {
     }
   },
 
+  created() {
+    this.formModel.forEach(item => {
+      item.$$id = + new Date();
+    });
+    if (this.formModel.length > 0) {
+      this.activeName = this.formModel[0].$$id;
+    }
+  },
+
   methods: {
     addItem() {
       const { schema } = this;
@@ -83,6 +92,7 @@ export default {
       };
       Object.assign(item, getDefaultFormData(item, schema.struct));
       this.formModel.push(item);
+      this.activeName = item.$$id;
     },
 
     deleteItem(index) {

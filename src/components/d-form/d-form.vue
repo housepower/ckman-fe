@@ -9,7 +9,7 @@
       v-model="formData">
     </DFormItem>
     <el-form-item class="sticky-bottom">
-      <el-button v-if="isShowSubmit" @click="submit" type="primary">{{ submitText || $t("common.Create")}}</el-button>
+      <el-button v-if="isShowSubmit" :loading="loading" @click="submit" type="primary">{{ submitText || $t("common.Create")}}</el-button>
       <el-button v-if="isShowCancel" @click="cancel">{{ cancelText || $t("common.Cancel")}}</el-button>
     </el-form-item>
   </el-form>
@@ -51,12 +51,13 @@ export default {
     cancelText: {
       type: String,
       default: '',
-    }
+    },
+    loading: Boolean,
   },
 
   data() {
     return {
-      formData: {},
+      formData: {}
     }
   },
 

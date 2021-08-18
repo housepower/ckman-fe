@@ -280,7 +280,7 @@ export default {
   data() {
     return {
       label: '',
-      isSlideUp: false,
+      isSlideUp: true,
       errorMessage: '',
     }
   },

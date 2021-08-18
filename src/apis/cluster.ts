@@ -7,6 +7,9 @@ export const ClusterApi = {
   getCluster() {
     return axios.get(`${url}/cluster`);
   },
+  getClusterByName(clusterName: string) {
+    return axios.get(`${url}/cluster/${ clusterName }`);
+  },
   getClusterConfig(clusterName: string) {
     return axios.get(`${url}/config/${clusterName}`);
   },
