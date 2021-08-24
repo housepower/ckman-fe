@@ -11,7 +11,7 @@
 import RpmList from "./component/rpms";
 
 export default {
-    name: "HomeSetting",
+    name: "homePackage",
   data() {
     return {
       formModel: {},
