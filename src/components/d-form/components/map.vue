@@ -69,6 +69,7 @@ export default {
     },
     deleteItem(index) {
       this.formData.splice(index, 1);
+      this.onChange();
     },
     // 根据数组模型，转换成map对象模型
     onChange() {

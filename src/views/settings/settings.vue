@@ -25,7 +25,7 @@ export default {
     return {
       schema: null,
       formModel: {},
-      breadcrumbInfo: ["Clusters", this.$t("home.Settings")],
+      breadcrumbInfo: ["Clusters", this.$route.params.id, this.$t("home.Settings")],
       mode: '',
       loading: false,
     }
