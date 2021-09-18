@@ -95,8 +95,7 @@
                   class="width-350" />
       </el-form-item>
       <el-form-item :label="$t('home.Cluster Password') + ':'"
-                    prop="password"
-                    required>
+                    prop="password">
         <el-input v-model="formModel.password"
                   type="password"
                   show-password
