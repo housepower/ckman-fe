@@ -8,6 +8,7 @@ import { default as Breadcrumb } from './breadcrumb.vue';
 import { default as OverviewBase } from './overview-base/overview-base.vue';
 import { default as SqlCodeMirror } from './sql-code-mirror/sql-code-mirror.vue';
 import { default as DForm } from './d-form/d-form.vue';
+import { default as FilterPanel } from './filter-panel.vue';
 Object.entries({
   TimeFilter,
   Breadcrumb,
@@ -20,4 +21,5 @@ export {
   OverviewBase,
   SqlCodeMirror,
   DForm,
+  FilterPanel,
 };

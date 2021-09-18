@@ -52,6 +52,9 @@ const messages = {
       'Null': 'Null',
       'Please enter a value greater than {min}': 'Please enter a value greater than {min}',
       'Please enter a value less than or equal to {max}': 'Please enter a value less than or equal to {max}',
+      'Filter': 'Filter',
+      'Reset': 'Reset',
+      'keyword search': 'keyword search',
     },
     layout: {
       'ClickHouse Management Console': 'ClickHouse Management Console',
@@ -225,6 +228,9 @@ const messages = {
       'Null': '无',
       'Please enter a value greater than {min}': '请输入大于 {min} 的值',
       'Please enter a value less than or equal to {max}': '请输入小于等于 {max} 的值',
+      'Filter': '筛选',
+      'Reset': '重置',
+      'keyword search': '关键字搜索',
     },
     layout: {
       'ClickHouse Management Console': 'ckman管理平台',
