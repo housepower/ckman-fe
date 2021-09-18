@@ -2,13 +2,21 @@
   <div class="table-metric pb-20">
     <div class="title flex flex-between flex-vcenter ptb-10">
       <span class="fs-20 font-bold">{{$t('tables.Table Metrics')}}</span>
+      <el-input size="medium" :placeholder="$t('common.keyword search')" v-model="searchKey" class="width-250"></el-input>
     </div>
-    <el-table :data="tableData.slice((currentPage - 1)*pageSize, currentPage*pageSize)" center border>
+
+    <el-table :data="listData" center border>
       <template v-for="{ prop, label } of columns">
         <el-table-column :prop="prop"
-                         :label="label"
-                         :key="prop"
-                         show-overflow-tooltip />
+          :label="label"
+          :key="prop"
+          :sortable="filters[prop].sortable"
+          show-overflow-tooltip>
+          <template slot="header" slot-scope="scope">
+            <span>{{prop}}</span>
+            <filter-panel v-if="filters[prop].filter" :prop="prop" :tableData="tableData" @change="onChangeFilter"></filter-panel>
+          </template>
+        </el-table-column>
       </template>
       <el-table-column
         fixed="right"
@@ -29,7 +37,7 @@
         :page-sizes="[5, 10, 20, 40]"
         :page-size="pageSize"
         layout="sizes, prev, pager, next, jumper"
-        :total="tableData.length">
+        :total="listData.length">
       </el-pagination>
     </div>
   </div>
@@ -38,14 +46,139 @@
 <script>
 import { TablesApi } from "@/apis";
 import { $modal } from "@/services";
-import { SqlCodeMirror } from '@/components/';
+import { SqlCodeMirror, FilterPanel } from '@/components/';
 export default {
+  components: {
+    FilterPanel
+  },
   data() {
     return {
       tableData: [],
       currentPage: 1,
       pageSize: 10,
+      searchKey: '',
+      filters: {
+        tableName: {
+          type: 'string',
+          filter: true,
+          value: [],
+          search: true,
+          sortable: true,
+        },
+        columns: {
+          type: 'number',
+          filter: null,
+          value: [],
+          sortable: true,
+        },
+        rows: {
+          type: 'number',
+          filter: null,
+          value: [],
+          sortable: true,
+        },
+        parts: {
+          type: 'number',
+          filter: null,
+          value: [],
+          sortable: true,
+        },
+        space: {
+          type: 'number',
+          filter: null,
+          value: [],
+          sortable: false
+        },
+        readwrite_status: {
+          type: 'number',
+          filter: null,
+          value: [],
+          sortable: true,
+        },
+        completedQueries: {
+          type: 'number',
+          filter: null,
+          value: [],
+          sortable: true,
+        },
+        failedQueries: {
+          type: 'number',
+          filter: null,
+          value: [],
+          sortable: true,
+        },
+        queryCost: {
+          type: 'number',
+          filter: null,
+          value: [],
+          sortable: true,
+        },
+      },
     };
+  },
+  computed: {
+    columns() {
+      let columns = [
+        {
+          prop: "tableName",
+          label: this.$t('tables.Table Name'),
+        },
+        {
+          prop: "columns",
+          label: this.$t('tables.Columns'),
+        },
+        {
+          prop: "rows",
+          label: this.$t('tables.Rows'),
+        },
+        {
+          prop: "parts",
+          label: this.$t('tables.Parts'),
+        },
+        {
+          prop: "space",
+          label: this.$t('tables.Disk Space'),
+        },
+        {
+          prop: "readwrite_status",
+          label: this.$t('tables.RWStatus'),
+          filters: [
+            {text: 'TRUE', value: 'TRUE'},
+            {text: 'FALSE', value: 'FALSE'}
+          ]
+        },
+        {
+          prop: "completedQueries",
+          label: this.$t('tables.Completed Queries in last 24h'),
+        },
+        {
+          prop: "failedQueries",
+          label: this.$t('tables.Failed Queries in last 24h'),
+        },
+        {
+          prop: "queryCost",
+          label: this.$t('tables.Last 7 days info'),
+        },
+      ];
+      return columns
+    },
+    listData() {
+      const { searchKey, currentPage, pageSize, filters } = this;
+      return this.tableData
+        .filter(x => {
+          let flag = true;
+          if (!x.tableName?.includes(searchKey)) {
+            flag = false;
+          }
+          Object.entries(filters).forEach(([key, item]) => {
+            if (item.filter && item.value.length > 0 && !item.value.includes(x[key])) {
+              flag = false;
+            }
+          });
+          return flag;
+        })
+        .slice((currentPage - 1)*pageSize, currentPage*pageSize);
+    },
   },
   mounted() {
     this.fetchData();
@@ -127,51 +260,15 @@ export default {
           sql: create_table_query,
         },
       });
-    }
+    },
+
+    onChangeFilter({ prop, value }) {
+      console.log(prop, value);
+      this.$nextTick(() => {
+        this.filters[prop].value = value;
+      });
+    },
   },
-  computed: {
-    columns() {
-      let columns = [
-        {
-          prop: "tableName",
-          label: this.$t('tables.Table Name'),
-        },
-        {
-          prop: "columns",
-          label: this.$t('tables.Columns'),
-        },
-        {
-          prop: "rows",
-          label: this.$t('tables.Rows'),
-        },
-        {
-          prop: "parts",
-          label: this.$t('tables.Parts'),
-        },
-        {
-          prop: "space",
-          label: this.$t('tables.Disk Space'),
-        },
-        {
-          prop: "readwrite_status",
-          label: this.$t('tables.RWStatus'),
-        },
-        {
-          prop: "completedQueries",
-          label: this.$t('tables.Completed Queries in last 24h'),
-        },
-        {
-          prop: "failedQueries",
-          label: this.$t('tables.Failed Queries in last 24h'),
-        },
-        {
-          prop: "queryCost",
-          label: this.$t('tables.Last 7 days info'),
-        },
-      ];
-      return columns
-    }
-  }
 };
 </script>
 

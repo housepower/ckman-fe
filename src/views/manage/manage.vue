@@ -54,6 +54,7 @@
                     placeholder="search"
                     autocomplete="false"
                     clearable
+                    size="medium"
                     class="width-300"></el-input>
           <el-button type="primary"
                      v-if="mode === 'deploy'"
@@ -63,7 +64,7 @@
         </div>
 
         <el-table class="mt-10"
-                  :data="list.nodes"
+                  :data="nodesList"
                   border>
           <el-table-column prop="ip"
                            show-overflow-tooltip
@@ -144,6 +145,18 @@ export default {
       needPassword: false,
       password: '',
     };
+  },
+  computed: {
+    nodesList() {
+      const { list: { nodes }, input } = this;
+      return nodes.filter(x => {
+        for (let pro in x) {
+          if (String(x[pro]).search(input) !== -1) {
+            return true;
+          }
+        }
+      });
+    }
   },
   mounted() {
     this.clusterStatus = Object.keys(ClusterStatus)
