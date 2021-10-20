@@ -22,7 +22,7 @@ const messages = {
       'tables': 'tables',
       'session': 'session',
       'query-execution': 'query-execution',
-      'settings': 'settings',
+      'package': 'package manage',
       'Upgrade': 'Upgrade',
       'Save': 'Save',
       'Table Name': 'Table Name',
@@ -152,7 +152,7 @@ const messages = {
       'Query History': 'Query History',
       'Execute Query': 'Execute Query',
     },
-    homeSetting: {
+    homePackage: {
       'Upload RPMs': 'Upload RPMs',
       'ClickHouse RPMs': 'ClickHouse RPMs',
     },
@@ -198,7 +198,7 @@ const messages = {
       'tables': '表管理',
       'session': '会话管理',
       'query-execution': '查询管理',
-      'settings': '设置',
+      'package': '安装包管理',
       'Upgrade': '升级',
       'Save': '保存',
       'Table Name': '表名',
@@ -328,7 +328,7 @@ const messages = {
       'Query History': '查询历史',
       'Execute Query': '执行查询',
     },
-    homeSetting: {
+    homePackage: {
       'Upload RPMs': '上传RPM包',
       'ClickHouse RPMs': 'ClickHouse RPM包管理',
     },
