@@ -2,7 +2,7 @@
   <section class="rpms text-right">
     <el-button type="primary"
                class="mb-15"
-               @click="chooseFile">{{$t('homeSetting.Upload RPMs')}}</el-button>
+               @click="chooseFile">{{$t('homePackage.Upload RPMs')}}</el-button>
     <el-table :data="list"
               border>
       <el-table-column prop="version"
@@ -12,7 +12,7 @@
       <el-table-column prop="files"
                        show-overflow-tooltip
                        :label="$t('common.Files')"
-                       align="center"
+                       align="left"
                        min-width="500" />
       <el-table-column :label="$t('common.Action')"
                        #default="{ row }"
