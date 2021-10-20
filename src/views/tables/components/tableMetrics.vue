@@ -87,31 +87,31 @@ export default {
           type: 'number',
           filter: null,
           value: [],
-          sortable: false
+          sortable: true,
         },
         readwrite_status: {
           type: 'number',
           filter: null,
           value: [],
-          sortable: true,
+          sortable: false,
         },
         completedQueries: {
           type: 'number',
           filter: null,
           value: [],
-          sortable: true,
+          sortable: false,
         },
         failedQueries: {
           type: 'number',
           filter: null,
           value: [],
-          sortable: true,
+          sortable: false,
         },
         queryCost: {
           type: 'number',
           filter: null,
           value: [],
-          sortable: true,
+          sortable: false,
         },
       },
     };
