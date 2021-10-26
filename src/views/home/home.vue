@@ -24,27 +24,42 @@
     </section>
 
     <div class="list mt-50">
-      <p class="font-bold mb-10 fs-18">{{$t('home.All ClickHouse Clusters')}}</p>
-      <el-table :data="list"
+      <div class="font-bold mb-10 fs-18 overflow-hidden">{{$t('home.All ClickHouse Clusters')}}
+        
+        <el-input v-model="key"
+          :placeholder="$t('common.keyword search')"
+          autocomplete="false"
+          clearable
+          size="medium"
+          class="width-300 pull-right"></el-input>
+      </div>
+      <el-table :data="queryList"
                 border
                 header-cell-class-name="header-cell-class-name">
         <el-table-column prop="cluster"
                          show-overflow-tooltip
+                         sortable
                          :label="$t('home.Cluster Name')" />
         <el-table-column prop="logic_cluster"
                          show-overflow-tooltip
+                         sortable
                          :label="$t('home.Belongs to Logic')" />
         <el-table-column prop="mode"
                          show-overflow-tooltip
+                         :filters="[{ text: 'deploy', value: 'deploy' }, { text: 'import', value: 'import' }]"
+                         :filter-method="filterHandler"
                          :label="$t('home.Mode')" />
         <el-table-column prop="isReplica"
                          show-overflow-tooltip
+                         :filters="[{ text: 'true', value: true }, { text: 'false', value: false }]"
+                         :filter-method="filterHandler"
                          :label="$t('home.Replica')" />
         <el-table-column prop="hosts"
                          show-overflow-tooltip
                          :label="$t('home.ClickHouse Node IP')" />
         <el-table-column prop="count"
                          show-overflow-tooltip
+                         sortable
                          :label="$t('home.ClickHouse Node Count')" />
         <el-table-column prop="zkNodes"
                          show-overflow-tooltip
@@ -73,7 +88,20 @@ export default {
     return {
       list: [],
       versionOptions: [],
+      key: '',
     };
+  },
+  computed: {
+    queryList() {
+      const { list, key } = this;
+      return list.filter(item => {
+        return item.cluster.includes(key)
+          || item.mode.includes(key)
+          || item.logic_cluster?.includes(key)
+          || item.hosts.includes(key)
+          || item.zkNodes.includes(key);
+      });
+    }
   },
   mounted() {
     this.fetchVersionData();
@@ -142,6 +170,11 @@ export default {
       this.$message.success(`${item.cluster} Cluster ${ this.$t("common.Delete") }${ this.$t("common.Success") }`);
       this.fetchData();
     },
+
+    filterHandler(value, row, column) {
+      const property = column['property'];
+      return row[property] === value;
+    }
   },
 };
 </script>
@@ -157,9 +190,9 @@ export default {
     height: 42px;
   }
 }
-.list {
-  ::v-deep .header-cell-class-name {
-    background: var(--primary-color);
-  }
-}
+// .list {
+//   ::v-deep .header-cell-class-name {
+//     background: var(--primary-color);
+//   }
+// }
 </style>
