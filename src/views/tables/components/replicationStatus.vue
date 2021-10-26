@@ -2,39 +2,45 @@
   <div class="replication-status pb-20">
     <div class="title flex flex-between flex-vcenter ptb-10">
       <span class="fs-20 font-bold">{{$t('tables.Table Replication Status')}}</span>
+      <el-input size="medium" :placeholder="$t('common.keyword search')" v-model="searchKey" class="width-250"></el-input>
     </div>
     <el-table class="tb-edit"
-              :data="tableData.slice((currentPage - 1)*pageSize, currentPage*pageSize)"
-              :header-cell-style="mergeTableHeader"
-              border
-              style="width: 100%">
+      v-loading="loading"
+      :data="queryList.slice((currentPage - 1)*pageSize, currentPage*pageSize)"
+      border
+      style="width: 100%">
       <el-table-column v-for="(col, index) in cols"
-                       :key="index"
-                       :label="col.label"
-                       :prop="col.prop"
-                       ref="tableColumn"
-                       width="auto"
-                       align="center">
-        <template slot="header"
-                  slot-scope="{ column }">
-          <span>{{ column.label }}</span>
-        </template>
-        <template slot-scope="{ row, column }">
-          <span v-if="index === 0">{{ Object.keys(row)[0] === "Table Name" ? $t('common.' + Object.keys(row)[0]) : Object.keys(row)[0] }}</span>
-          <div v-else :class="getClassName(row, column.property)">{{ Object.values(row)[0][column.property] }}</div>
-        </template>
+        :key="index"
+        :label="col.label"
+        :prop="col.prop || null"
+        ref="tableColumn"
+        width="auto"
+        :sortable="!!col.prop"
+        align="center">
+        <el-table-column
+          v-for="(subItem, subItemIndex) in col.children"
+          :label="subItem.label"
+          :prop="subItem.prop"
+          width="auto"
+          align="center"
+          sortable
+          :key="subItemIndex">
+          <template slot-scope="{ row, column }">
+            <div :class="getClassName(row, column.property)">{{ row[column.property] }}</div>
+          </template>
+        </el-table-column>
       </el-table-column>
     </el-table>
     <!-- 前端分页 -->
     <div class="text-center">
-      <el-pagination v-if="tableData.length > 0"
+      <el-pagination v-if="queryList.length > 0"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page="currentPage"
         :page-sizes="[5, 10, 20, 40]"
         :page-size="pageSize"
         layout="sizes, prev, pager, next, jumper"
-        :total="tableData.length">
+        :total="queryList.length">
       </el-pagination>
     </div>
   </div>
@@ -52,67 +58,66 @@ export default {
       refresh: null,
       currentPage: 1,
       pageSize: 10,
+      loading: false,
+      searchKey: '',
     };
+  },
+  computed: {
+    queryList() {
+      const { searchKey, tableData } = this;
+      this.currentPage = 1;
+      return tableData.filter(row => {
+        return row.name.includes(searchKey)
+          || row.shard1_0.includes(searchKey)
+          || row.shard1_1.includes(searchKey)
+          || row.shard2_0.includes(searchKey)
+          || row.shard2_1.includes(searchKey);
+      });
+    }
   },
   mounted() {
     this.fetchData();
   },
   methods: {
     async fetchData() {
+      this.loading = true;
       const {
         data: {
           entity: { header = [], tables = [] },
         },
-      } = await TablesApi.replicationStatus(this.$route.params.id);
-      this.cols = [{ prop: "", label: "" }];
+      } = await TablesApi.replicationStatus(this.$route.params.id)
+        .finally(() => this.loading = false);
+      const cols = [{ prop: "name", label: "表名", children: [] }];
       this.headerData = cloneDeep(header);
       this.tableData = [];
-      let tableNameItem = {};
       header.forEach((item, index) => {
         const shard = `shard${index + 1}`;
-        item.forEach((v, index) => {
-          tableNameItem[`${shard}_${index}`] = v;
-          this.cols.push({
-            prop: `${shard}_${index}`,
-            label: shard,
-          });
-        });
+        const col = {
+          label: shard,
+          children: item.map((v, index) => {
+            return {
+              prop: `${shard}_${index}`,
+              label: v,
+            };
+          })
+        };
+        cols.push(col);
       });
-      this.tableData.push({
-        ["Table Name"]: tableNameItem,
-      });
+      this.cols = cols;
+      const tableData = [];
       tables.forEach(({ name, values }) => {
-        let tableItem = {};
+        let tableItem = {
+          name
+        };
         values.forEach((val, index) => {
           const shard = `shard${index + 1}`;
           val.forEach((v, index) => {
             tableItem[`${shard}_${index}`] = v;
           });
         });
-        this.tableData.push({
-          [name]: tableItem,
-        });
-        this.tableData = uniqWith(this.tableData, isEqual);
+        tableData.push(tableItem);
       });
-    },
-    mergeTableHeader({ row, column, rowIndex, columnIndex }) {
-      const [len] = new Set(this.headerData.map((item) => item.length));
-      if (rowIndex === 0) {
-        if (columnIndex != 0) {
-          if (columnIndex % len === 0) {
-            return {
-              display: "none",
-            };
-          } else {
-            this.$nextTick(() => {
-              const trList = document.querySelector(
-                ".replication-status thead>tr"
-              ).children;
-              trList[columnIndex] && (trList[columnIndex].colSpan = 2);
-            });
-          }
-        }
-      }
+      this.tableData = uniqWith(tableData, isEqual);
     },
     timeFilterChange() {
       this.fetchData();
@@ -129,10 +134,9 @@ export default {
     },
     getClassName(row, property) {
       const [ name, order ] = property.split('_');
-      const values = Object.values(row)[0];
-      const value = values[property];
+      const value = row[property];
       let nextOrder = order === '0' ? '1' : '0';
-      const nextValue = values[name + '_' + nextOrder];
+      const nextValue = row[name + '_' + nextOrder];
       if (!nextValue) return;
       if (name.indexOf('F') === '-1') {
         return;
