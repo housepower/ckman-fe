@@ -1,21 +1,17 @@
 <template>
-  <main class="query">
+  <main class="query flex flex-column height-full pb-20">
     <breadcrumb :data="['Clusters', $route.params.id, 'query-execution']" />
-    <left-aside :list="list"
-                @selectSql="selectSql" />
-    <section class="container custom-scrollbar">
-      <tags :list="list"
-            :selectSql="selectedSql"
-            @updateData="updateData" />
-    </section>
+    <SqlSelectTool class="flex-1"></SqlSelectTool>
   </main>
 </template>
 <script>
 import { isNull, uniqBy } from "lodash-es";
-import LeftAside from "./components/leftAside";
-import Tags from "./components/rightSql";
+import SqlSelectTool from '@/components/sql-select-tool/index.vue';
 
 export default {
+  components: {
+    SqlSelectTool,
+  },
   data() {
     return {
       list: [],
@@ -44,7 +40,6 @@ export default {
       this.fetchData();
     },
   },
-  components: { LeftAside, Tags },
 };
 </script>
 

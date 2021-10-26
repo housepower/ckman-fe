@@ -217,7 +217,7 @@ export default {
       const { range, regexp, type, struct } = schema;
       const dataTypes = [null, '', undefined];
       return {
-        trigger: ['blur', 'change'],
+        trigger: ['blur'],
         validator: (rule, value) => {
           if (isRequired == true) {
             switch(type) {

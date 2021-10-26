@@ -31,9 +31,9 @@
               v-if="$route.params.id">
         <div class="flex-center list-content width-1000">
           <a href="javascript:void(0)" class="flex flex-1 flex-center height-full pointer"
-            :class="{ 'router-active': currentMenu === item.name, 'list-item': item.name !== 'Settings' || mode === 'deploy' }"
+            :class="{ 'router-active': currentMenu === item.path, 'list-item': item.name !== 'Settings' || mode === 'deploy' }"
             @click="handleMenuClick(item, $event)" v-for="item of menus" :key="item.name">
-            <span class="fs-20">{{$t('home.' + item.name) }}</span>
+            <span class="fs-20">{{$t('home.' + item.name) }}<span style="display: none">{{currentMenu}} {{item.path}}</span></span>
           </a>
         </div>
       </footer>
@@ -66,8 +66,8 @@ export default {
 
   methods: {
     async onChangeCluster() {
-      const { name } = this.$route;
-      this.currentMenu = name;
+      const { path } = this.$route;
+      this.currentMenu = path.split('/').lastItem;
       const clusterName = this.$route.params.id;
       if (!clusterName) return false;
       const { data: { entity } } = await ClusterApi.getCluster();
@@ -85,7 +85,7 @@ export default {
       }
       if (this.$route.name != item.name) {
         this.$router.push({ path: item.path });
-        this.currentMenu = item.name;
+        this.currentMenu = item.path.split('/').lastItem;
       }
     },
     logout() {

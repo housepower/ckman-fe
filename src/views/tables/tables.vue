@@ -1,7 +1,7 @@
 <template>
   <main class="settings">
     <breadcrumb :data="['Clusters', $route.params.id, 'tables']"></breadcrumb>
-    <section>
+    <section class="mb-20">
       <table-metric />
       <replication-table />
       <zk-table />

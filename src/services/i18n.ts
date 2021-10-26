@@ -152,6 +152,16 @@ const messages = {
     queryExecution: {
       'Query History': 'Query History',
       'Execute Query': 'Execute Query',
+      'Execute Explain': 'Execute Explain',
+      "Format": 'Format',
+      'Database': 'Database',
+      'SQL Console': 'SQL Console',
+      'Result': 'Result',
+      'SQL': 'SQL',
+      'CreateTime': 'CreateTime',
+      'Copy Success': 'Copy Success',
+      'Copy': 'Copy',
+      'No Data': 'No Data',
     },
     homePackage: {
       'Upload RPMs': 'Upload RPMs',
@@ -329,6 +339,16 @@ const messages = {
     queryExecution: {
       'Query History': '查询历史',
       'Execute Query': '执行查询',
+      'Execute Explain': '执行计划',
+      "Format": '格式化',
+      'Database': '数据库',
+      'SQL Console': '控制台',
+      'Result': '执行结果',
+      'SQL': '查询语句',
+      'CreateTime': '创建时间',
+      'Copy Success': '复制成功',
+      'Copy': '复制',
+      'No Data': '暂无数据',
     },
     homePackage: {
       'Upload RPMs': '上传RPM包',
