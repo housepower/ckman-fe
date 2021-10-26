@@ -4,8 +4,7 @@
       <span class="fs-20 font-bold">{{$t('tables.Table Metrics')}}</span>
       <el-input size="medium" :placeholder="$t('common.keyword search')" v-model="searchKey" class="width-250"></el-input>
     </div>
-
-    <el-table :data="listData" center border>
+    <el-table :data="currentPageData" center border>
       <template v-for="{ prop, label } of columns">
         <el-table-column :prop="prop"
           :label="label"
@@ -13,7 +12,7 @@
           :sortable="filters[prop].sortable"
           show-overflow-tooltip>
           <template slot="header" slot-scope="scope">
-            <span>{{prop}}</span>
+            <span>{{label}}</span>
             <filter-panel v-if="filters[prop].filter" :prop="prop" :tableData="tableData" @change="onChangeFilter"></filter-panel>
           </template>
         </el-table-column>
@@ -30,7 +29,7 @@
     </el-table>
     <!-- 前端分页 -->
     <div class="text-center">
-      <el-pagination v-if="tableData.length > 0"
+      <el-pagination v-if="listData.length > 0"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page="currentPage"
@@ -163,7 +162,7 @@ export default {
       return columns
     },
     listData() {
-      const { searchKey, currentPage, pageSize, filters } = this;
+      const { searchKey, filters } = this;
       return this.tableData
         .filter(x => {
           let flag = true;
@@ -177,8 +176,11 @@ export default {
           });
           return flag;
         })
-        .slice((currentPage - 1)*pageSize, currentPage*pageSize);
     },
+    currentPageData() {
+      const { currentPage, pageSize } = this;
+      return this.listData?.slice((currentPage - 1)*pageSize, currentPage*pageSize);
+    }
   },
   mounted() {
     this.fetchData();
@@ -263,7 +265,6 @@ export default {
     },
 
     onChangeFilter({ prop, value }) {
-      console.log(prop, value);
       this.$nextTick(() => {
         this.filters[prop].value = value;
       });

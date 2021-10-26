@@ -1,9 +1,15 @@
 import axios from 'axios';
 
-const url = '/api/v1/ck/query';
+const url = '/api/v1/ck';
 
 export const SqlQuery =  {
   query(params) {
-    return axios.get(`${url}/${params.clusterName}`, { params });
+    return axios.get(`${url}/query/${params.clusterName}`, { params });
+  },
+  getTableLists(clusterName) {
+    return axios.get(`${url}/table_lists/${clusterName}`);
+  },
+  queryExplain(params) {
+    return axios.get(`${url}/query_explain/${params.clusterName}`, { params });
   },
 };

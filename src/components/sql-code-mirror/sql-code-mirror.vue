@@ -1,5 +1,5 @@
 <template>
-  <textarea id="code" name="code" style="border: none;"></textarea>
+  <textarea ref="code" name="code" style="border: none;"></textarea>
 </template>
 <script>
 import CodeMirror from 'codemirror';
@@ -13,7 +13,10 @@ import "codemirror/addon/hint/show-hint.css";
 import 'codemirror/mode/sql/sql';
 import 'codemirror/addon/hint/show-hint';
 import 'codemirror/addon/hint/sql-hint';
+import 'codemirror/addon/comment/comment';
+import 'codemirror/keymap/sublime';
 import { format } from 'sql-formatter';
+import { trim } from 'lodash-es';
 
 export default {
   name: 'SqlCodeMirror',
@@ -21,7 +24,20 @@ export default {
     CodeMirror,
   },
 
-  props: ["sql"],
+  model: {
+    prop: 'sql',
+    event: 'change'
+  },
+
+  props: {
+    sql: {
+      type: String
+    },
+    readOnly: {
+      type: Boolean,
+      default: true
+    }
+  },
 
   data() {
     return {
@@ -38,21 +54,53 @@ export default {
   },
 
   mounted() {
-    const editor = this.sqlEditor = CodeMirror.fromTextArea(document.getElementById('code'), {
+    const editor = this.sqlEditor = CodeMirror.fromTextArea(this.$refs.code, {
       mode: 'sql',
       theme: 'darcula',
+      // indentWithTabs: true,
+      // smartIndent: true,
+      // lineNumbers: true,
+      // matchBrackets : true,
+      // autofocus: true,
+      // readOnly: this.readOnly,
+      // height: 500,
+      // theme: 'default',
       indentWithTabs: true,
       smartIndent: true,
       lineNumbers: true,
       matchBrackets : true,
+      keyMap: 'sublime',
       autofocus: true,
-      readOnly: true,
-      height: 500,
+      hintOptions: {
+        completeSingle: false,
+      },
     });
+
+    // 但输入字符后，显示提示信息
+    editor.on('keypress', (e) => {
+      editor.showHint();
+    });
+
+    editor.on('change', (instance) => {
+      this.$emit('change', trim(instance.getValue()));
+    });
+    
     editor.setValue(this.code);
   },
 
-  onOk() {
+  methods: {
+    format() {
+      const { sql, sqlEditor } = this;
+      this.code = format(sql, {
+        language: 'mysql',
+        indent: '  ',
+      });
+      sqlEditor.setValue(this.code);
+    },
+
+    onOk() {
+      //
+    }
   }
 }
 </script>

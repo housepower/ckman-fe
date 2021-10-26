@@ -47,7 +47,9 @@ export default {
       const data = options.filter(x => {
         return x.includes(searchKey);
       });
-      this.selectedOption = data;
+      if (this.selectedOption.length === 0) {
+        this.selectedOption = data;
+      }
       return data;
     }
   },
