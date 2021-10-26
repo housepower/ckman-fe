@@ -35,7 +35,7 @@ $--font-path: '~element-ui/lib/theme-chalk/fonts';
   border: 1px solid #E8EAEC;
   border-bottom: none;
 
-  th {
+  thead.is-group th, th {
     background: #F8F8F9;
     padding: 3px 0 2px;
     color: #4E4E4E;

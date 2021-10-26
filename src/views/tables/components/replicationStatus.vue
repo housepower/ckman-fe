@@ -87,7 +87,7 @@ export default {
         },
       } = await TablesApi.replicationStatus(this.$route.params.id)
         .finally(() => this.loading = false);
-      const cols = [{ prop: "name", label: "表名", children: [] }];
+      const cols = [{ prop: "name", label: this.$t('tables.Table Name'), children: [] }];
       this.headerData = cloneDeep(header);
       this.tableData = [];
       header.forEach((item, index) => {
