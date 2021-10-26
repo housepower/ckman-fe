@@ -163,6 +163,7 @@ export default {
     },
     listData() {
       const { searchKey, filters } = this;
+      this.currentPage = 1;
       return this.tableData
         .filter(x => {
           let flag = true;
