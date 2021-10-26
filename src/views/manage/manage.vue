@@ -51,7 +51,7 @@
         <h3 class="mt-15 mb-30">{{$t('home.ClickHouse Node List')}}</h3>
         <div class="search flex flex-between">
           <el-input v-model="input"
-                    placeholder="search"
+                    :placeholder="$t('common.keyword search')"
                     autocomplete="false"
                     clearable
                     class="width-300"></el-input>
@@ -63,23 +63,27 @@
         </div>
 
         <el-table class="mt-10"
-                  :data="list.nodes"
+                  :data="queryList"
                   border>
           <el-table-column prop="ip"
                            show-overflow-tooltip
                            :label="$t('manage.Node IP')"
+                           sortable
                            align="center" />
           <el-table-column prop="hostname"
                            show-overflow-tooltip
                            :label="$t('manage.Node Name')"
+                           sortable
                            align="center" />
           <el-table-column prop="shardNumber"
                            show-overflow-tooltip
                            :label="$t('manage.shard number')"
+                           sortable
                            align="center" />
           <el-table-column prop="replicaNumber"
                            show-overflow-tooltip
                            :label="$t('manage.replica number')"
+                           sortable
                            align="center" />
           <el-table-column prop="disk"
                            show-overflow-tooltip
@@ -92,6 +96,8 @@
           <el-table-column prop="status"
                            show-overflow-tooltip
                            :label="$t('manage.Node Status')"
+                           :filters="[{ 'text': 'green', 'value': 'green' }, { 'text': 'red', 'value': 'red' }]"
+                           :filter-method="filterHandler"
                            align="center">
             <template slot-scope="scope">
               <span class="dot mr-5" :class="scope.row.status"></span>{{scope.row.status}}
@@ -144,6 +150,14 @@ export default {
       needPassword: false,
       password: '',
     };
+  },
+  computed: {
+    queryList() {
+      const { list, input } = this;
+      return list.nodes.filter(node => {
+        return node.hostname.includes(input) || node.ip.includes(input) || node.status.includes(input);
+      });
+    }
   },
   mounted() {
     this.clusterStatus = Object.keys(ClusterStatus)
@@ -305,9 +319,13 @@ export default {
       this.$message.success(`${this.$t('manage.Offline')}` + ` ${this.$t('common.' + 'Success')}`);
       this.fetchData();
       this.$set(row, 'offlineLoading', false);
+    },
+
+    filterHandler(value, row, column) {
+      const property = column['property'];
+      return row[property] === value;
     }
   },
-  components: {},
 };
 </script>
 
