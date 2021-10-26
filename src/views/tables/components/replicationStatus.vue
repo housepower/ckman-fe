@@ -51,7 +51,6 @@ import { TablesApi } from "@/apis";
 export default {
   data() {
     return {
-      cols: [],
       tableData: [],
       headerData: [],
       timeFilter: null,
@@ -73,6 +72,24 @@ export default {
           || row.shard2_0.includes(searchKey)
           || row.shard2_1.includes(searchKey);
       });
+    },
+    cols() {
+      const cols = [{ prop: "name", label: this.$t('tables.Table Name'), children: [] }];
+      const { headerData } = this;
+      headerData.forEach((item, index) => {
+        const shard = `shard${index + 1}`;
+        const col = {
+          label: shard,
+          children: item.map((v, index) => {
+            return {
+              prop: `${shard}_${index}`,
+              label: v,
+            };
+          })
+        };
+        cols.push(col);
+      });
+      return cols;
     }
   },
   mounted() {
@@ -87,23 +104,8 @@ export default {
         },
       } = await TablesApi.replicationStatus(this.$route.params.id)
         .finally(() => this.loading = false);
-      const cols = [{ prop: "name", label: this.$t('tables.Table Name'), children: [] }];
+      
       this.headerData = cloneDeep(header);
-      this.tableData = [];
-      header.forEach((item, index) => {
-        const shard = `shard${index + 1}`;
-        const col = {
-          label: shard,
-          children: item.map((v, index) => {
-            return {
-              prop: `${shard}_${index}`,
-              label: v,
-            };
-          })
-        };
-        cols.push(col);
-      });
-      this.cols = cols;
       const tableData = [];
       tables.forEach(({ name, values }) => {
         let tableItem = {
