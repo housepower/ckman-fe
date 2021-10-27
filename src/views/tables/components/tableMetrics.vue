@@ -13,7 +13,10 @@
           show-overflow-tooltip>
           <template slot="header" slot-scope="scope">
             <span>{{label}}</span>
-            <filter-panel v-if="filters[prop].filter" :prop="prop" :tableData="tableData" @change="onChangeFilter"></filter-panel>
+          </template>
+          <template slot-scope="{ row, column }">
+            <span v-if="column.property.endsWith('compressed')">{{ byteConvert(row[column.property]) }}</span>
+            <span v-else>{{ row[column.property] }}</span>
           </template>
         </el-table-column>
       </template>
@@ -45,11 +48,9 @@
 <script>
 import { TablesApi } from "@/apis";
 import { $modal } from "@/services";
-import { SqlCodeMirror, FilterPanel } from '@/components/';
+import { SqlCodeMirror } from '@/components/';
+import { byteConvert } from '@/helpers/';
 export default {
-  components: {
-    FilterPanel
-  },
   data() {
     return {
       tableData: [],
@@ -59,56 +60,57 @@ export default {
       filters: {
         tableName: {
           type: 'string',
-          filter: true,
           value: [],
           search: true,
           sortable: true,
         },
         columns: {
           type: 'number',
-          filter: null,
           value: [],
           sortable: true,
         },
         rows: {
           type: 'number',
-          filter: null,
+          value: [],
+          sortable: true,
+        },
+        partitions: {
+          type: 'number',
           value: [],
           sortable: true,
         },
         parts: {
           type: 'number',
-          filter: null,
           value: [],
           sortable: true,
         },
-        space: {
+        uncompressed: {
           type: 'number',
-          filter: null,
+          value: [],
+          sortable: true,
+        },
+        compressed: {
+          type: 'number',
           value: [],
           sortable: true,
         },
         readwrite_status: {
           type: 'number',
-          filter: null,
           value: [],
           sortable: false,
         },
         completedQueries: {
           type: 'number',
-          filter: null,
           value: [],
-          sortable: false,
+          sortable: true,
         },
         failedQueries: {
           type: 'number',
-          filter: null,
           value: [],
-          sortable: false,
+          sortable: true,
         },
         queryCost: {
           type: 'number',
-          filter: null,
           value: [],
           sortable: false,
         },
@@ -131,12 +133,20 @@ export default {
           label: this.$t('tables.Rows'),
         },
         {
+          prop: "partitions",
+          label: this.$t('tables.Partitions'),
+        },
+        {
           prop: "parts",
           label: this.$t('tables.Parts'),
         },
         {
-          prop: "space",
-          label: this.$t('tables.Disk Space'),
+          prop: "uncompressed",
+          label: this.$t('tables.UnCompressed'),
+        },
+        {
+          prop: "compressed",
+          label: this.$t('tables.Compressed'),
         },
         {
           prop: "readwrite_status",
@@ -187,33 +197,16 @@ export default {
     this.fetchData();
   },
   methods: {
+    byteConvert: byteConvert,
     async fetchData() {
       const {
         data: { entity },
       } = await TablesApi.tableMetrics(this.$route.params.id);
-      Object.entries(entity).forEach(([key, values]) => {
-        const {
-          columns,
-          rows,
-          space,
-          completedQueries,
-          failedQueries,
-          parts,
-          queryCost,
-          readwrite_status,
-        } = values;
-        this.tableData.push({
-          tableName: key,
-          columns,
-          rows,
-          space,
-          completedQueries,
-          failedQueries,
-          parts,
-          readwrite_status: readwrite_status.toString().toUpperCase(),
-          queryCost: Object.values(queryCost)
-            .join(", "),
-        });
+      this.tableData =  Object.entries(entity).map(([key, values]) => {
+        values.readwrite_status = values.readwrite_status.toString().toUpperCase();
+        values.queryCost = Object.values(values.queryCost).join(',');
+        values.tableName = key;
+        return values;
       });
     },
     // 前端分页
@@ -262,12 +255,6 @@ export default {
         data: {
           sql: create_table_query,
         },
-      });
-    },
-
-    onChangeFilter({ prop, value }) {
-      this.$nextTick(() => {
-        this.filters[prop].value = value;
       });
     },
   },

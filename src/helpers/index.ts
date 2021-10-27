@@ -6,3 +6,4 @@ export * from './stringifyObjectProps';
 export * from './parseDuration';
 export * from './parseTime';
 export * from './lineFeed';
+export * from './byteConvert';
