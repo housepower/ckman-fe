@@ -36,7 +36,6 @@ export default {
   methods: {
     async getFormSchema() {
       const { data: { entity } } = await ClusterApi.getClusterCreateFormSchema();
-      // console.log(data);
       try {
         const schema = (new Function("return " + entity))();
         this.schema = schema;

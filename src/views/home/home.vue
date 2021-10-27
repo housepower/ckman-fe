@@ -14,11 +14,11 @@
           <el-button type="primary"
                      size="large"
                      class="mb-20 fs-18"
-                     @click="importCk(1)">{{$t('home.Create a ClickHouse Cluster')}}</el-button>
+                     @click="createCk">{{$t('home.Create a ClickHouse Cluster')}}</el-button>
           <el-button type="primary"
                      size="large"
                      class="fs-18"
-                     @click="importCk(0)">{{$t('home.Import a ClickHouse Cluster')}}</el-button>
+                     @click="importCk">{{$t('home.Import a ClickHouse Cluster')}}</el-button>
         </div>
       </div>
     </section>
@@ -79,7 +79,7 @@
   </section>
 </template>
 <script>
-import CreateCk from "./modals/createCk";
+import ImportCk from "./modals/importCk";
 import { $modal } from "@/services";
 import { ClusterApi, PackageApi } from "@/apis";
 export default {
@@ -129,30 +129,26 @@ export default {
         label: item,
       }));
     },
-    async importCk(type) {
-      if (type === 1) {
-        this.$router.push({
-          name: 'createCluster'
-        });
-        return;
-      }
+    createCk() {
+      this.$router.push({
+        name: 'createCluster'
+      });
+    },
+    async importCk() {
       await $modal({
-        component: CreateCk,
+        component: ImportCk,
         props: {
-          title: type
-            ? this.$t("home.Create a ClickHouse Cluster")
-            : this.$t("home.Import a ClickHouse Cluster"),
+          title: this.$t("home.Import a ClickHouse Cluster"),
           width: 600,
           customClass: 'create-cluster-modal',
           cancelText: this.$t("common.Cancel"),
-          okText: type ? this.$t("common.Create") : this.$t("common.Import"),
+          okText: this.$t("common.Import"),
         },
         data: {
-          type,
           versionOptions: this.versionOptions,
         },
       });
-      const tip = this.type ? "创建成功" : "导入成功";
+      const tip = this.$t('common.Import') + this.$t('common.Success');
       this.$message.success(`${tip}`);
       this.fetchData();
     },
