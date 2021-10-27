@@ -166,6 +166,7 @@ const messages = {
       'Copy Success': 'Copy Success',
       'Copy': 'Copy',
       'No Data': 'No Data',
+      'No Sql': 'No Sql',
     },
     homePackage: {
       'Upload RPMs': 'Upload RPMs',
@@ -357,6 +358,7 @@ const messages = {
       'Copy Success': '复制成功',
       'Copy': '复制',
       'No Data': '暂无数据',
+      'No Sql': '请输入sql语句',
     },
     homePackage: {
       'Upload RPMs': '上传RPM包',

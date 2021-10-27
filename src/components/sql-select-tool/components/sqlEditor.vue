@@ -15,6 +15,7 @@ import { SqlCodeMirror } from '@/components/';
 import { SqlQuery } from '@/apis';
 import store from '@/store';
 import moment from 'moment';
+import { $message } from '@/services';
 export default {
   components: {
     SqlCodeMirror
@@ -40,11 +41,15 @@ export default {
 
   methods: {
     async run(type) {
-      this.$emit('startRun');
-      store.commit('sqlSelect/setStatus', 'loading');
       const selectSql = this.$refs.sqlCodeEditor.sqlEditor.getSelection();
       const { id: clusterName } = this.$route.params;
       const { sql } = this;
+      if (!selectSql || !sql) {
+        $message.warning(this.$t('queryExecution.No Sql'));
+        return;
+      }
+      this.$emit('startRun');
+      store.commit('sqlSelect/setStatus', 'loading');
       store.commit('sqlSelect/addHistory', {
         createTime: moment().format('YYYY-MM-DD HH:mm:ss'),
         sql: selectSql || sql,
