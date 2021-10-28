@@ -1,9 +1,12 @@
 import Vue from 'vue';
 import VueI18n from 'vue-i18n';
+import zhCN from 'vxe-table/lib/locale/lang/zh-CN';
+import enUS from 'vxe-table/lib/locale/lang/en-US';
 Vue.use(VueI18n);
 
 const messages = {
   en: {
+    ...enUS,
     common: {
       'Success': 'Success',
       'Create': 'Create',
@@ -196,6 +199,7 @@ const messages = {
     },
   },
   zh: {
+    ...zhCN,
     common: {
       'Success': '成功',
       'Create': '创建',
