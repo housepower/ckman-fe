@@ -1,47 +1,58 @@
 <template>
   <div class="table-metric pb-20">
-    <div class="title flex flex-between flex-vcenter ptb-10">
+    <div class="title flex flex-between flex-vcenter ptb-10 pull-left">
       <span class="fs-20 font-bold">{{$t('tables.Table Metrics')}}</span>
-      <el-input size="medium" :placeholder="$t('common.keyword search')" v-model="searchKey" class="width-250"></el-input>
     </div>
-    <el-table :data="currentPageData" center border>
-      <template v-for="{ prop, label } of columns">
-        <el-table-column :prop="prop"
-          :label="label"
-          :key="prop"
-          :sortable="filters[prop].sortable"
-          show-overflow-tooltip>
-          <template slot="header" slot-scope="scope">
-            <span>{{label}}</span>
-          </template>
-          <template slot-scope="{ row, column }">
-            <span v-if="column.property.endsWith('compressed')">{{ byteConvert(row[column.property]) }}</span>
-            <span v-else>{{ row[column.property] }}</span>
-          </template>
-        </el-table-column>
+
+    <vxe-toolbar zoom custom class="pull-right">
+      <template #buttons>
+        <el-input size="medium" :placeholder="$t('common.keyword search')" v-model="searchKey" class="width-250 mr-10" suffix-icon="el-icon-search"></el-input>
       </template>
-      <el-table-column
+    </vxe-toolbar>
+
+    <vxe-table
+      style="clear: both;"
+      ref="xTable"
+      v-bind="gridOptions"
+      :loading="loading"
+      :columns="columns"
+      :data="currentPageData"
+      @sort-change="sortChangeEvent"
+    >
+      <vxe-column
+        v-for="{ prop, label, minWidth, fixed } of columns"
+        :key="prop"
+        :fixed="fixed"
+        sortable
+        :field="prop"
+        :title="label"
+        :min-width="minWidth || 140">
+        
+        <template slot-scope="{ row, column }">
+          <span v-if="column.property.endsWith('compressed')">{{ byteConvert(row[column.property]) }}</span>
+          <span v-else>{{ row[column.property] }}</span>
+        </template>
+      </vxe-column>
+      <vxe-column
         fixed="right"
-        :label="$t('tables.Action')"
+        align="center"
+        :title="$t('tables.Action')"
         width="140">
         <template slot-scope="scope">
           <el-button @click="viewSql(scope.row.tableName)" type="text" size="small">{{ $t('tables.Schema') }}</el-button>
           <el-button type="text" size="small" @click="onDelete(scope.row.tableName)">{{ $t('tables.Delete') }}</el-button>
         </template>
-      </el-table-column>
-    </el-table>
-    <!-- 前端分页 -->
-    <div class="text-center">
-      <el-pagination v-if="listData.length > 0"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :current-page="currentPage"
-        :page-sizes="[5, 10, 20, 40]"
-        :page-size="pageSize"
-        layout="sizes, prev, pager, next, jumper"
-        :total="listData.length">
-      </el-pagination>
-    </div>
+      </vxe-column>
+    </vxe-table>
+
+    <vxe-pager
+      :current-page="pagination.currentPage"
+      :page-size.sync="pagination.pageSize"
+      :page-sizes="pagination.pageSizes"
+      :total="pagination.total"
+      :layouts="['PrevPage', 'JumpNumber', 'NextPage', 'FullJump', 'Sizes', 'Total']"
+      @page-change="handlePageChange">
+    </vxe-pager>
   </div>
 
 </template>
@@ -53,68 +64,34 @@ import { byteConvert } from '@/helpers/';
 export default {
   data() {
     return {
+      loading: false,
       tableData: [],
-      currentPage: 1,
-      pageSize: 10,
       searchKey: '',
-      filters: {
-        tableName: {
-          type: 'string',
-          value: [],
-          search: true,
-          sortable: true,
-        },
-        columns: {
-          type: 'number',
-          value: [],
-          sortable: true,
-        },
-        rows: {
-          type: 'number',
-          value: [],
-          sortable: true,
-        },
-        partitions: {
-          type: 'number',
-          value: [],
-          sortable: true,
-        },
-        parts: {
-          type: 'number',
-          value: [],
-          sortable: true,
-        },
-        uncompressed: {
-          type: 'number',
-          value: [],
-          sortable: true,
-        },
-        compressed: {
-          type: 'number',
-          value: [],
-          sortable: true,
-        },
-        readwrite_status: {
-          type: 'number',
-          value: [],
-          sortable: false,
-        },
-        completedQueries: {
-          type: 'number',
-          value: [],
-          sortable: true,
-        },
-        failedQueries: {
-          type: 'number',
-          value: [],
-          sortable: true,
-        },
-        queryCost: {
-          type: 'number',
-          value: [],
-          sortable: false,
-        },
+      sort: {},
+      pagination: {
+        total: 0,
+        pageSize: 10,
+        pageSizes: [10, 15, 20, 50, 100, 200, 500, 1000],
+        currentPage: 1
       },
+      gridOptions: {
+        border: true,
+        resizable: true,
+        showHeaderOverflow: true,
+        showOverflow: true,
+        highlightHoverRow: true,
+        height: 550,
+        rowId: 'tableName',
+        toolbarConfig: {
+          zoom: true,
+          custom: true
+        },
+        sortConfig: {
+          trigger: 'cell',
+        },
+        filterConfig: {
+        },
+      }
     };
   },
   computed: {
@@ -123,77 +100,119 @@ export default {
         {
           prop: "tableName",
           label: this.$t('tables.Table Name'),
+          minWidth: 250,
+          fixed: 'left',
+          sortable: true
         },
         {
           prop: "columns",
           label: this.$t('tables.Columns'),
+          width: 140,
+          sortable: true
         },
         {
           prop: "rows",
           label: this.$t('tables.Rows'),
+          width: 140,
+          sortable: true
         },
         {
           prop: "partitions",
           label: this.$t('tables.Partitions'),
+          width: 140,
+          sortable: true
         },
         {
           prop: "parts",
           label: this.$t('tables.Parts'),
+          width: 140,
+          sortable: true
         },
         {
           prop: "uncompressed",
           label: this.$t('tables.UnCompressed'),
+          minWidth: 220,
+          sortable: true
         },
         {
           prop: "compressed",
           label: this.$t('tables.Compressed'),
+          minWidth: 200,
+          sortable: true
         },
         {
           prop: "readwrite_status",
           label: this.$t('tables.RWStatus'),
           filters: [
-            {text: 'TRUE', value: 'TRUE'},
-            {text: 'FALSE', value: 'FALSE'}
-          ]
+            {label: 'TRUE', value: 'TRUE'},
+            {label: 'FALSE', value: 'FALSE'}
+          ],
+          minWidth: 120,
+          sortable: true
         },
         {
           prop: "completedQueries",
           label: this.$t('tables.Completed Queries in last 24h'),
+          minWidth: 250,
+          sortable: true
         },
         {
           prop: "failedQueries",
           label: this.$t('tables.Failed Queries in last 24h'),
+          minWidth: 220,
+          sortable: true
         },
         {
           prop: "queryCost",
           label: this.$t('tables.Last 7 days info'),
+          minWidth: 340,
+          sortable: true
         },
       ];
       return columns
     },
     listData() {
-      const { searchKey, filters } = this;
-      this.currentPage = 1;
-      return this.tableData
+      const { searchKey, sort: { property, order } } = this;
+      this.pagination.currentPage = 1;
+      const result = this.tableData
         .filter(x => {
           let flag = true;
           if (!x.tableName?.includes(searchKey)) {
             flag = false;
           }
-          Object.entries(filters).forEach(([key, item]) => {
-            if (item.filter && item.value.length > 0 && !item.value.includes(x[key])) {
-              flag = false;
-            }
-          });
           return flag;
+        }).sort((prev, next) => {
+          const type = typeof prev[property];
+          if (type === 'number') {
+            const flag = prev[property] - next[property];
+            if (order === 'asc') {
+              return flag;
+            } else if (order === 'desc') {
+              return -flag;
+            }
+          } else if (type === 'string') {
+            let flag;
+            if(prev[property].length === next[property].length){
+              flag = prev[property].localeCompare(next[property]);
+            } else{
+              flag = prev[property].length - next[property].length;
+            }
+            if (order === 'asc') {
+              return flag;
+            } else if (order === 'desc') {
+              return -flag;
+            }
+          }
         })
+      this.pagination.total = result.length;
+      return result;
     },
     currentPageData() {
-      const { currentPage, pageSize } = this;
+      const { pagination: { currentPage, pageSize } } = this;
       return this.listData?.slice((currentPage - 1)*pageSize, currentPage*pageSize);
     }
   },
-  mounted() {
+  created() {
     this.fetchData();
   },
   methods: {
@@ -202,19 +221,25 @@ export default {
       const {
         data: { entity },
       } = await TablesApi.tableMetrics(this.$route.params.id);
-      this.tableData =  Object.entries(entity).map(([key, values]) => {
+      this.tableData =  Object.freeze(Object.entries(entity).map(([key, values]) => {
         values.readwrite_status = values.readwrite_status.toString().toUpperCase();
         values.queryCost = Object.values(values.queryCost).join(',');
         values.tableName = key;
         return values;
-      });
+      }));
+      this.pagination.total = this.tableData.length;
     },
-    // 前端分页
-    handleSizeChange(size) {
-      this.pageSize = size;
+
+    sortChangeEvent(ctx) {
+      const { property, order } = ctx;
+      this.sort = {
+        property,
+        order
+      };
     },
-    handleCurrentChange(currentPage) {
-      this.currentPage = currentPage;
+
+    handlePageChange(pager) {
+      this.pagination.currentPage = pager.currentPage;
     },
 
     // 删除
