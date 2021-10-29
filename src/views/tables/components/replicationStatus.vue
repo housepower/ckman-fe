@@ -14,7 +14,7 @@
       style="clear: both;"
       ref="xTable"
       v-bind="gridOptions"
-      :loading="loading"
+      v-loading="loading"
       :columns="cols"
       :data="currentPageData"
       @sort-change="sortChangeEvent"

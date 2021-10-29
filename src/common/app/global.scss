@@ -251,6 +251,10 @@ body {
   justify-content: space-between;
 }
 
+.flex-reverse {
+  flex-flow: row-reverse;
+}
+
 .flex-wrap {
   @extend .flex;
   flex-wrap: wrap;

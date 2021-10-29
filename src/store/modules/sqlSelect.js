@@ -4,6 +4,7 @@ export const sqlSelect = {
   state: () => ({
     result: [],
     pagination: {
+      pageSizes: [10, 15, 20, 50, 100, 200, 500, 1000],
       pageSize: 100,
       total: 0,
       currentPage: 1,
@@ -64,22 +65,19 @@ export const sqlSelect = {
       });
     },
     getResultData: state => {
-      const { result, pagination: { total, currentPage, pageSize } } = state;
+      const { result } = state;
       if (result.length <= 1) return [];
       const rows = [];
       const columns = result[0];
-      const len = currentPage * pageSize;
-      let i = (currentPage - 1) * pageSize + 1;
-      while(i <= len) {
-        if (result[i]) {
+      result.forEach((x, index) => {
+        if (index > 0) {
           const item = {};
           columns.forEach((column, index) => {
-            item[column] = result[i][index];
-          })
+            item[column] = x[index];
+          });
           rows.push(item);
         }
-        i++;
-      }
+      })
       return rows;
     }
   }

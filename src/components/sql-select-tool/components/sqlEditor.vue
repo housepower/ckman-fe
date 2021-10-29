@@ -44,7 +44,7 @@ export default {
       const selectSql = this.$refs.sqlCodeEditor.sqlEditor.getSelection();
       const { id: clusterName } = this.$route.params;
       const { sql } = this;
-      if (!selectSql || !sql) {
+      if (!selectSql && !sql) {
         $message.warning(this.$t('queryExecution.No Sql'));
         return;
       }
