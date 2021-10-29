@@ -3,38 +3,56 @@
     <div class="title flex flex-between flex-vcenter ptb-10">
       <span class="fs-20 font-bold">{{$t('tables.Zookeeper Status')}}</span>
     </div>
-    <el-table class="tb-edit"
-              :data="tableData"
-              border
-              style="width: 100%">
-      <el-table-column v-for="(col, index) in cols"
-                       :key="index"
-                       :label="col"
-                       align="center">
-        <template slot="header"
-                  slot-scope="{ column }">
-          <span>{{ column.label }}</span>
+
+    <table cellspacing="0" class="el-table width-full reverse-table el-table--border el-table--enable-row-hover el-table--enable-row-transition">
+      <tr>
+        <th></th>
+        <th class="pl-10 pt-10 pb-10 is-center" v-for="item in columns" :key="item.field">{{item.label}}</th>
+      </tr>
+      <tr v-for="field in fields">
+        <td class="pl-10 is-center">{{field}}</td>
+        <template v-for="column in columns">
+         <td class="pl-10 is-center">{{data[column.field][field]}}</td>
         </template>
-        <template slot-scope="{ row, column }">
-          <span v-if="index === 0">{{ Object.keys(row)[0] }}</span>
-          <span v-else>{{ Object.values(row)[0][column.label] }}</span>
-        </template>
-      </el-table-column>
-    </el-table>
+      </tr>
+    </table>
   </div>
 </template>
 <script>
-import { cloneDeep, pull, uniq } from "lodash-es";
+import { pull } from "lodash-es";
 import { TablesApi } from "@/apis";
 export default {
   data() {
     return {
-      cols: [""],
-      keys: [""],
       tableData: [],
-      timeFilter: null,
-      refresh: null,
     };
+  },
+  computed: {
+    data() {
+      const { tableData } = this;
+      const newData = {};
+      tableData.forEach((item) => {
+        newData[item.host] = item;
+      });
+      return newData;
+    },
+    fields() {
+      const { tableData } = this;
+      if (tableData.length > 0) {
+        return pull(Object.keys(tableData[0]), "host");
+      }
+    },
+    columns() {
+      const { tableData } = this;
+      const cols = [];
+      tableData.forEach(({ host }) => {
+        cols.push({
+          field: host,
+          label: host
+        })
+      });
+      return cols;
+    },
   },
   mounted() {
     this.fetchData();
@@ -44,32 +62,14 @@ export default {
       const {
         data: { entity },
       } = await TablesApi.zkStatus(this.$route.params.id);
-      this.cols = [""];
-      this.keys = [""];
-      this.tableData = [];
-      entity.forEach((item) => {
-        this.cols.push(item.host);
-        this.keys = pull(Object.keys(item), "host");
-      });
-      this.keys.forEach((key) => {
-        let tableItem = {
-          [key]: {},
-        };
-        entity.forEach((item) => {
-          tableItem[key][item["host"]] = item[key];
-          this.tableData.push(tableItem);
-        });
-        this.tableData = uniq(this.tableData);
-      });
-    },
-    timeFilterChange() {
-      this.fetchData();
-    },
-    timeFilterRefresh() {
-      this.fetchData();
+      this.tableData = Object.freeze(entity);
     },
   },
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+ .reverse-table tr td:first-child {
+    background-color: #f8f8f9;
+  }
+</style>
