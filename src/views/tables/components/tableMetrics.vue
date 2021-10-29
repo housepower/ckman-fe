@@ -20,12 +20,13 @@
       @sort-change="sortChangeEvent"
     >
       <vxe-column
-        v-for="{ prop, label, minWidth, fixed } of columns"
+        v-for="{ prop, label, minWidth, fixed, filters } of columns"
         :key="prop"
         :fixed="fixed"
         sortable
         :field="prop"
         :title="label"
+        :filters="filters || null"
         :min-width="minWidth || 140">
         
         <template slot-scope="{ row, column }">

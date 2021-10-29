@@ -49,28 +49,45 @@
       </div>
       <div class="node-list">
         <h3 class="mt-15 mb-30">{{$t('home.ClickHouse Node List')}}</h3>
-        <div class="search flex flex-between">
-          <el-input v-model="input"
-                    :placeholder="$t('common.keyword search')"
-                    autocomplete="false"
-                    clearable
-                    class="width-300"></el-input>
+        <div class="search flex flex-between pull-left">
           <el-button type="primary"
-                     v-if="mode === 'deploy'"
-                     size="mini"
-                     class="fs-16"
-                     @click="addNode">{{$t('manage.Add Node')}}</el-button>
+            v-if="mode === 'deploy'"
+            size="medium"
+            class="fs-16"
+            @click="addNode">{{$t('manage.Add Node')}}</el-button>
         </div>
 
-        <el-table class="mt-10"
-                  :data="queryList"
-                  border>
-          <el-table-column prop="ip"
-                           show-overflow-tooltip
-                           :label="$t('manage.Node IP')"
-                           sortable
-                           align="center" />
-          <el-table-column prop="hostname"
+        <vxe-toolbar zoom custom class="pull-right">
+          <template #buttons>
+            <el-input v-model="input"
+              :placeholder="$t('common.keyword search')"
+              autocomplete="false"
+              clearable
+              size="medium"
+              suffix-icon="el-icon-search"
+              class="width-300"></el-input>
+          </template>
+        </vxe-toolbar>
+
+        <vxe-table class="mt-10"
+          style="clear: both;"
+          v-bind="gridOptions"
+          :data="queryList"
+          border>
+          <vxe-column v-for="(col, index) in columns"
+            :key="index"
+            :field="col.prop"
+            show-overflow-tooltip
+            :title="col.label"
+            :filters="col.filters || null"
+            sortable
+            align="center">
+            <template slot-scope="{row, column}">
+              <div v-if="col.prop === 'status'"><span class="dot mr-5" :class="row.status"></span>{{row.status}}</div>
+              <span v-else>{{row[column.property]}}</span>
+            </template>
+          </vxe-column>
+          <!-- <el-table-column prop="hostname"
                            show-overflow-tooltip
                            :label="$t('manage.Node Name')"
                            sortable
@@ -102,20 +119,26 @@
             <template slot-scope="scope">
               <span class="dot mr-5" :class="scope.row.status"></span>{{scope.row.status}}
             </template>
-          </el-table-column>
-          <el-table-column :label="$t('home.Actions')"
-                           v-if="mode === 'deploy'"
-                           #default="{ row }"
-                           align="center">
-            <template>
+          </el-table-column> -->
+          <vxe-column :title="$t('home.Actions')"
+            v-if="mode === 'deploy'"
+            align="center">
+            <template slot-scope="{ row, column }">
               <el-button type="text" :disabled="row.status === 'green'" @click="onlineClusterNode(row)" :loading="row.onlineLoading">{{ $t('manage.Online') }}</el-button>
               <el-button type="text" :disabled="row.status === 'red'" @click="offlineClusterNode(row)" :loading="row.offlineLoading">{{ $t('manage.Offline') }}</el-button>
               <i class="fa fa-trash pointer fs-18 ml-10"
                  v-tooltip="$t('common.Delete')"
                  @click="remove(row)" />
             </template>
-          </el-table-column>
-        </el-table>
+            <template>
+              <!-- <el-button type="text" :disabled="row.status === 'green'" @click="onlineClusterNode(row)" :loading="row.onlineLoading">{{ $t('manage.Online') }}</el-button>
+              <el-button type="text" :disabled="row.status === 'red'" @click="offlineClusterNode(row)" :loading="row.offlineLoading">{{ $t('manage.Offline') }}</el-button>
+              <i class="fa fa-trash pointer fs-18 ml-10"
+                 v-tooltip="$t('common.Delete')"
+                 @click="remove(row)" /> -->
+            </template>
+          </vxe-column>
+        </vxe-table>
       </div>
     </section>
   </main>
@@ -149,6 +172,23 @@ export default {
       policy: 'Full',
       needPassword: false,
       password: '',
+      gridOptions: {
+        border: true,
+        resizable: true,
+        showHeaderOverflow: true,
+        showOverflow: true,
+        highlightHoverRow: true,
+        rowId: 'tableName',
+        toolbarConfig: {
+          zoom: true,
+          custom: true
+        },
+        sortConfig: {
+          trigger: 'cell',
+        },
+        filterConfig: {
+        },
+      }
     };
   },
   computed: {
@@ -157,6 +197,47 @@ export default {
       return list.nodes.filter(node => {
         return node.hostname.includes(input) || node.ip.includes(input) || node.status.includes(input);
       });
+    },
+    columns() {
+      return [
+        {
+          prop: "ip",
+          label: this.$t('manage.Node IP'),
+          minWidth: 250,
+          sortable: true
+        },
+        {
+          prop: "hostname",
+          label: this.$t('manage.Node Name'),
+          minWidth: 250,
+          sortable: true
+        },
+        {
+          prop: "shardNumber",
+          label: this.$t('manage.shard number'),
+          minWidth: 250,
+          sortable: true
+        },
+        {
+          prop: "replicaNumber",
+          label: this.$t('manage.replica number'),
+          minWidth: 250,
+          sortable: true
+        },
+        {
+          prop: "disk",
+          label: this.$t('manage.Disk(Used/Total)'),
+          minWidth: 250,
+          sortable: true
+        },
+        {
+          prop: "status",
+          label: this.$t('manage.Node Status'),
+          minWidth: 250,
+          sortable: true,
+          filters: [{ 'label': 'green', 'value': 'green' }, { 'label': 'red', 'value': 'red' }]
+        }
+      ];
     }
   },
   mounted() {
