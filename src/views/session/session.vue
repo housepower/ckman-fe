@@ -15,7 +15,6 @@
           <div class="fs-18 font-bold pull-left">{{$t('session.Slow Sessions')}}</div>
           <div class="pull-right">
             <time-filter v-model="timeFilter"
-              :refreshDuration.sync="refresh"
               @input="timeFilterChange"
               @on-refresh="timeFilterRefresh" />
             <label class="ml-20">{{$t('session.Limit Count')}}</label>
@@ -75,7 +74,7 @@ export default {
       this.getSlowSessionList();
     },
     timeFilterChange() {
-
+      this.getSlowSessionList();
     }
   },
   components: { SessionTable },
