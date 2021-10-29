@@ -1,48 +1,57 @@
 <template>
   <div class="replication-status pb-20">
-    <div class="title flex flex-between flex-vcenter ptb-10">
+    <div class="title flex flex-between flex-vcenter ptb-10 pull-left">
       <span class="fs-20 font-bold">{{$t('tables.Table Replication Status')}}</span>
-      <el-input size="medium" :placeholder="$t('common.keyword search')" v-model="searchKey" class="width-250"></el-input>
     </div>
-    <el-table class="tb-edit"
-      v-loading="loading"
-      :data="queryList.slice((currentPage - 1)*pageSize, currentPage*pageSize)"
-      border
-      style="width: 100%">
-      <el-table-column v-for="(col, index) in cols"
+
+    <vxe-toolbar zoom custom class="pull-right">
+      <template #buttons>
+        <el-input size="medium" :placeholder="$t('common.keyword search')" v-model="searchKey" class="width-250 mr-10" suffix-icon="el-icon-search"></el-input>
+      </template>
+    </vxe-toolbar>
+
+    <vxe-table
+      style="clear: both;"
+      ref="xTable"
+      v-bind="gridOptions"
+      :loading="loading"
+      :columns="cols"
+      :data="currentPageData"
+      @sort-change="sortChangeEvent"
+    >
+      <div
+        :is="col.prop ? 'vxe-column' : 'vxe-colgroup'"
+        v-for="(col, index) of cols"
         :key="index"
-        :label="col.label"
-        :prop="col.prop || null"
-        ref="tableColumn"
-        width="auto"
         :sortable="!!col.prop"
-        align="center">
-        <el-table-column
+        :field="col.prop"
+        :title="col.label"
+        align="center"
+        :min-width="col.minWidth || 140">
+        <vxe-column
           v-for="(subItem, subItemIndex) in col.children"
-          :label="subItem.label"
-          :prop="subItem.prop"
+          :title="subItem.label"
+          :field="subItem.prop"
           width="auto"
           align="center"
           sortable
+          :sortConfig="{ trigger: 'cell' }"
           :key="subItemIndex">
           <template slot-scope="{ row, column }">
             <div :class="getClassName(row, column.property)">{{ row[column.property] }}</div>
           </template>
-        </el-table-column>
-      </el-table-column>
-    </el-table>
-    <!-- 前端分页 -->
-    <div class="text-center">
-      <el-pagination v-if="queryList.length > 0"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :current-page="currentPage"
-        :page-sizes="[5, 10, 20, 40]"
-        :page-size="pageSize"
-        layout="sizes, prev, pager, next, jumper"
-        :total="queryList.length">
-      </el-pagination>
-    </div>
+        </vxe-column>
+      </div>
+    </vxe-table>
+
+    <vxe-pager
+      :current-page="pagination.currentPage"
+      :page-size.sync="pagination.pageSize"
+      :page-sizes="pagination.pageSizes"
+      :total="pagination.total"
+      :layouts="['PrevPage', 'JumpNumber', 'NextPage', 'FullJump', 'Sizes', 'Total']"
+      @page-change="handlePageChange">
+    </vxe-pager>
   </div>
 </template>
 <script>
@@ -59,19 +68,72 @@ export default {
       pageSize: 10,
       loading: false,
       searchKey: '',
+      sort: {},
+      pagination: {
+        total: 0,
+        pageSize: 10,
+        pageSizes: [10, 15, 20, 50, 100, 200, 500, 1000],
+        currentPage: 1
+      },
+      gridOptions: {
+        border: true,
+        resizable: true,
+        showHeaderOverflow: true,
+        showOverflow: true,
+        highlightHoverRow: true,
+        height: 576,
+        rowId: 'tableName',
+        toolbarConfig: {
+          zoom: true,
+          custom: true
+        },
+        sortConfig: {
+          trigger: 'cell',
+        },
+        filterConfig: {
+        },
+      }
     };
+  },
+  watch: {
+    'queryList.length'(len) {
+      this.pagination.currentPage = 1;
+      this.pagination.total = len;
+    }
   },
   computed: {
     queryList() {
-      const { searchKey, tableData } = this;
-      this.currentPage = 1;
-      return tableData.filter(row => {
+      const { searchKey, tableData, sort: { property, order } } = this;
+      const result = tableData.filter(row => {
         return row.name.includes(searchKey)
           || row.shard1_0.includes(searchKey)
           || row.shard1_1.includes(searchKey)
           || row.shard2_0.includes(searchKey)
           || row.shard2_1.includes(searchKey);
+      }).sort((prev, next) => {
+        const type = typeof prev[property];
+        if (type === 'number') {
+          const flag = prev[property] - next[property];
+          if (order === 'asc') {
+            return flag;
+          } else if (order === 'desc') {
+            return -flag;
+          }
+        } else if (type === 'string') {
+          let flag;
+          if(prev[property].length === next[property].length){
+            flag = prev[property].localeCompare(next[property]);
+          } else{
+            flag = prev[property].length - next[property].length;
+          }
+          if (order === 'asc') {
+            return flag;
+          } else if (order === 'desc') {
+            return -flag;
+          }
+        }
       });
+      return result;
     },
     cols() {
       const cols = [{ prop: "name", label: this.$t('tables.Table Name'), children: [] }];
@@ -90,12 +152,26 @@ export default {
         cols.push(col);
       });
       return cols;
+    },
+    currentPageData() {
+      const { pagination: { currentPage, pageSize }, queryList } = this;
+      return this.queryList.slice((currentPage - 1)*pageSize, currentPage*pageSize);
     }
   },
   mounted() {
     this.fetchData();
   },
   methods: {
+    sortChangeEvent(ctx) {
+      const { property, order } = ctx;
+      this.sort = {
+        property,
+        order
+      };
+    },
+    handlePageChange(pager) {
+      this.pagination.currentPage = pager.currentPage;
+    },
     async fetchData() {
       this.loading = true;
       const {
@@ -121,21 +197,9 @@ export default {
       });
       this.tableData = uniqWith(tableData, isEqual);
     },
-    timeFilterChange() {
-      this.fetchData();
-    },
-    timeFilterRefresh() {
-      this.fetchData();
-    },
-    // 前端分页
-    handleSizeChange(size) {
-      this.pageSize = size;
-    },
-    handleCurrentChange(currentPage) {
-      this.currentPage = currentPage;
-    },
+
     getClassName(row, property) {
-      const [ name, order ] = property.split('_');
+      const [ name, order ] = property?.split('_') || ['', ''];
       const value = row[property];
       let nextOrder = order === '0' ? '1' : '0';
       const nextValue = row[name + '_' + nextOrder];

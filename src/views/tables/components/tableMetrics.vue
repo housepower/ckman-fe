@@ -94,6 +94,12 @@ export default {
       }
     };
   },
+  watch: {
+    'listData.length'(len) {
+      this.pagination.currentPage = 1;
+      this.pagination.total = len;
+    }
+  },
   computed: {
     columns() {
       let columns = [
@@ -173,7 +179,6 @@ export default {
     },
     listData() {
       const { searchKey, sort: { property, order } } = this;
-      this.pagination.currentPage = 1;
       const result = this.tableData
         .filter(x => {
           let flag = true;
@@ -204,7 +209,6 @@ export default {
             }
           }
         })
-      this.pagination.total = result.length;
       return result;
     },
     currentPageData() {
