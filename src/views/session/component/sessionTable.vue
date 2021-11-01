@@ -90,7 +90,6 @@ export default {
         {
           prop: "query",
           label: this.$t('session.Query'),
-          width: 240,
           sortable: true
         },
         {

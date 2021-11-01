@@ -20,8 +20,8 @@
           :min-width="180"
           :key="index"
           sortable>
-          <template slot-scope="scope">
-            <span class="text-ellipsis">{{scope.row[column.prop]}}</span>
+          <template slot-scope="{row, column}">
+            <span class="text-ellipsis">{{row[column.property]}}</span>
           </template>
         </vxe-column>
       </vxe-table>
