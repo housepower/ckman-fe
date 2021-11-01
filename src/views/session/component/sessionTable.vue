@@ -9,9 +9,11 @@
       :data="currentPageData">
         <vxe-column
           v-for="(col, index) in columns"
+          show-header-overflow
+          show-footer-overflow
+          show-overflow="ellipsis"
           :key="index"
           :field="col.prop"
-          show-overflow-tooltip
           :title="col.label"
           :width="col.width"
           align="center"
