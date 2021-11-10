@@ -58,6 +58,7 @@ const messages = {
       'Filter': 'Filter',
       'Reset': 'Reset',
       'keyword search': 'keyword search',
+      "Current Browser Not Support": "Current Browser Not Support",
     },
     layout: {
       'ClickHouse Management Console': 'ClickHouse Management Console',
@@ -251,6 +252,7 @@ const messages = {
       'Filter': '筛选',
       'Reset': '重置',
       'keyword search': '关键字搜索',
+      "Current Browser Not Support": '当前浏览器不支持',
     },
     layout: {
       'ClickHouse Management Console': 'ckman管理平台',
