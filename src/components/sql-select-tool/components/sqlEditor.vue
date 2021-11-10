@@ -80,6 +80,10 @@ export default {
           this.format();
           break;
       }
+    },
+
+    addSql(str) {
+      this.$refs.sqlCodeEditor.sqlEditor.setValue(this.sql + (this.sql ? '\n' : '') + str);
     }
   }
 }
@@ -89,5 +93,8 @@ export default {
   .CodeMirror {
     height: 100%;
   }
+}
+.el-tabs__nav-scroll {
+  background-color: #fcfcfc;
 }
 </style>

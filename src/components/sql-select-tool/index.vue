@@ -13,7 +13,7 @@
         <div class="pane" :style="{ minWidth: '100%', width: '100%', maxWidth: '100%', height: '50%', minHeight: '20%', maxHeight: '90%' }">
           <el-tabs value="console" class="custom-tab custom-tab-flex">
             <el-tab-pane :label="$t('queryExecution.SQL Console')" name="console">
-              <sql-editor @startRun="bottomActiveTab = 'result'"></sql-editor>
+              <sql-editor ref="sqlEditor" @startRun="bottomActiveTab = 'result'"></sql-editor>
             </el-tab-pane>
           </el-tabs>
         </div>
@@ -21,7 +21,7 @@
         <div class="pane" :style="{ flexGrow: 1, flex: 1, width: '100%' }">
           <el-tabs v-model="bottomActiveTab" @tab-click="handleClick" class="custom-tab-flex custom-tab-bottom">
             <el-tab-pane :label="$t('queryExecution.Query History')" name="history">
-              <run-history></run-history>
+              <run-history @addSql="onAddSql"></run-history>
             </el-tab-pane>
             <el-tab-pane :label="$t('queryExecution.Result')" name="result">
               <sql-result></sql-result>
@@ -73,6 +73,9 @@ export default {
     },
     persistHistory() {
       localStorage.setItem('__ckman__sql_history__', JSON.stringify(store.state.sqlSelect.history));
+    },
+    onAddSql(str) {
+      this.$refs.sqlEditor.addSql(str);
     }
   }
 }

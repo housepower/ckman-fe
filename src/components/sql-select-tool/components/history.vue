@@ -14,7 +14,7 @@
     :width="column.width"
     :key="index">
       <template slot-scope="scope">
-        <span class="text-ellipsis">{{scope.row[column.prop]}}</span>
+        <span class="text-ellipsis" @dblclick="onClickCell(scope)">{{scope.row[column.prop]}}</span>
       </template>
   </el-table-column>
   <el-table-column
@@ -75,6 +75,12 @@ export default {
     },
     deleteItem(index) {
       store.commit('sqlSelect/deleteHistory', index);
+    },
+    onClickCell(scope) {
+      const { row, column } = scope;
+      if (column.property === 'sql') {
+        this.$emit('addSql', row.sql);
+      }
     }
   }
 }
