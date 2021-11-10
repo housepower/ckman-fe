@@ -37,7 +37,7 @@ export const sqlSelect = {
       history.unshift(item);
     },
     deleteHistory(state, { clusterName, checksum }) {
-      const index = state.history.findIndex(x => x.clusterName === clusterName && x.checksum === checksum);
+      const index = state.history.findIndex(x => x.Cluster === clusterName && x.CheckSum === checksum);
       if (index !== -1) {
         state.history.splice(index, 1);
       }
@@ -63,7 +63,7 @@ export const sqlSelect = {
       commit('setHistory', entity);
     },
     async deleteHistory({ commit }, params) {
-      await SqlQueryApi.deleteHistory(params);
+      const result = await SqlQueryApi.deleteHistory(params);
       commit('deleteHistory', params);
     }
   },
