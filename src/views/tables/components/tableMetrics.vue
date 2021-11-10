@@ -1,9 +1,13 @@
 <template>
   <div class="table-metric pb-20">
     <div class="title flex flex-between flex-vcenter ptb-10 pull-left">
-      <span class="fs-20 font-bold">{{$t('tables.Table Metrics')}}</span>
+      <span class="fs-20 font-bold mr-10">{{$t('tables.Table Metrics')}}</span>
+      <time-filter v-model="timeFilter"
+          ref="timeFilter"
+          :refreshDuration.sync="refresh"
+          @input="timeFilterChange"
+          @on-refresh="timeFilterRefresh" />
     </div>
-
     <vxe-toolbar zoom custom class="pull-right">
       <template #buttons>
         <el-input size="medium" :placeholder="$t('common.keyword search')" v-model="searchKey" class="width-250 mr-10" suffix-icon="el-icon-search"></el-input>
@@ -65,6 +69,8 @@ import { byteConvert } from '@/helpers/';
 export default {
   data() {
     return {
+      timeFilter: null,
+      refresh: '',
       loading: false,
       tableData: [],
       searchKey: '',
@@ -220,6 +226,9 @@ export default {
   created() {
     this.fetchData();
   },
+  mounted() {
+    this.$refs.timeFilter.setRefresh('5s');
+  },
   methods: {
     byteConvert: byteConvert,
     async fetchData() {
@@ -286,6 +295,12 @@ export default {
           sql: create_table_query,
         },
       });
+    },
+    timeFilterChange() {
+      this.fetchData();
+    },
+    timeFilterRefresh() {
+      this.fetchData();
     },
   },
 };
