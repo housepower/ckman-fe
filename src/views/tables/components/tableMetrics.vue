@@ -11,6 +11,7 @@
     <vxe-toolbar zoom custom class="pull-right">
       <template #buttons>
         <el-input size="medium" :placeholder="$t('common.keyword search')" v-model="searchKey" class="width-250 mr-10" suffix-icon="el-icon-search"></el-input>
+        <el-button size="mini" @click="fetchData" circle icon="el-icon-refresh" class="fs-16 fc-black" style="border-color: #dcdfe6;"></el-button>
       </template>
     </vxe-toolbar>
 
@@ -232,9 +233,10 @@ export default {
   methods: {
     byteConvert: byteConvert,
     async fetchData() {
+      this.loading = true;
       const {
         data: { entity },
-      } = await TablesApi.tableMetrics(this.$route.params.id);
+      } = await TablesApi.tableMetrics(this.$route.params.id).finally(() => this.loading = false);
       this.tableData =  Object.freeze(Object.entries(entity).map(([key, values]) => {
         values.readwrite_status = values.readwrite_status.toString().toUpperCase();
         values.queryCost = Object.values(values.queryCost).join(',');
