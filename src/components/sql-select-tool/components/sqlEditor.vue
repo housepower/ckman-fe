@@ -12,7 +12,7 @@
 </template>
 <script>
 import { SqlCodeMirror } from '@/components/';
-import { SqlQuery } from '@/apis';
+import { SqlQueryApi } from '@/apis';
 import store from '@/store';
 import moment from 'moment';
 import { $message } from '@/services';
@@ -50,12 +50,8 @@ export default {
       }
       this.$emit('startRun');
       store.commit('sqlSelect/setStatus', 'loading');
-      store.commit('sqlSelect/addHistory', {
-        createTime: moment().format('YYYY-MM-DD HH:mm:ss'),
-        sql: selectSql || sql,
-        clusterName,
-      });
-      const { data: { entity } } = await SqlQuery[type === 'schedule' ? 'queryExplain' : 'query']({
+      store.dispatch('sqlSelect/retrieveHistory', clusterName);
+      const { data: { entity } } = await SqlQueryApi[type === 'schedule' ? 'queryExplain' : 'query']({
         clusterName,
          query: selectSql || sql,
       }).finally(() => {
@@ -83,7 +79,7 @@ export default {
     },
 
     addSql(str) {
-      this.$refs.sqlCodeEditor.sqlEditor.setValue(this.sql + (this.sql ? '\n' : '') + str);
+      this.$refs.sqlCodeEditor.sqlEditor.setValue(this.sql + (this.sql ? '\n\n' : '') + str);
     }
   }
 }
