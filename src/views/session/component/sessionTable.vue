@@ -11,7 +11,7 @@
           v-for="(col, index) in columns"
           show-header-overflow
           show-footer-overflow
-          show-overflow="ellipsis"
+          :show-overflow="true"
           :key="index"
           :field="col.prop"
           :title="col.label"
@@ -78,13 +78,11 @@ export default {
         {
           prop: "startTime",
           label: this.$t('session.Query Start Time'),
-          width: 180,
           sortable: true
         },
         {
           prop: "queryDuration",
           label: this.$t('session.Query Duration'),
-          width: 140,
           sortable: true
         },
         {
@@ -95,32 +93,27 @@ export default {
         {
           prop: "user",
           label: this.$t('session.Initial User'),
-          width: 140,
           sortable: true
         },
         {
           prop: "queryId",
           label: this.$t('session.Initial Query ID'),
-          width: 140,
           sortable: true
         },
         {
           prop: "address",
           label: this.$t('session.Initial Address'),
-          width: 140,
           sortable: true
         },
         {
           prop: "threads",
           label: this.$t('session.Thread Numbers'),
-          width: 140,
           sortable: true
         }
       ]
     },
     queryList() {
       const { sort: { property, order } } = this;
-      console.log(this.list);
       this.list.sort((prev, next) => {
           const type = typeof prev[property];
           if (type === 'number') {
@@ -148,7 +141,6 @@ export default {
     },
     currentPageData() {
       const { currentPage, pageSize } = this.pagination;
-      console.log(this.queryList);
       return this.queryList.slice((currentPage - 1)*pageSize, currentPage*pageSize);
     }
   },
