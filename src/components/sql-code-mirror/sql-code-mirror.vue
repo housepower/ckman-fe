@@ -17,6 +17,7 @@ import 'codemirror/addon/comment/comment';
 import 'codemirror/keymap/sublime';
 import { format } from 'sql-formatter';
 import { trim } from 'lodash-es';
+import { $message } from '@/services';
 
 function set(str) {
   let obj = {}, words = str.split(" ");
@@ -66,10 +67,15 @@ export default {
   },
 
   created() {
-    this.code = format(this.sql, {
-      language: 'mysql',
-      indent: '  ',
-    });
+    try {
+      this.code = format(this.sql, {
+        language: 'mysql',
+        indent: '  ',
+      });
+    } catch(e) {
+      this.code = this.sql;
+    }
+    
   },
 
   mounted() {
@@ -102,12 +108,16 @@ export default {
 
   methods: {
     format() {
-      const { sql, sqlEditor } = this;
-      this.code = format(sql, {
-        language: 'mysql',
-        indent: '  ',
-      });
-      sqlEditor.setValue(this.code);
+      try {
+        const { sql, sqlEditor } = this;
+        this.code = format(sql, {
+          language: 'mysql',
+          indent: '  ',
+        });
+        sqlEditor.setValue(this.code);
+      } catch(e) {
+        $message.info(this.$t("common.Current Browser Not Support"));
+      }
     },
 
     onOk() {
