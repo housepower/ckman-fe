@@ -20,7 +20,7 @@
   </div>
 </template>
 <script>
-import { SqlQuery } from '@/apis';
+import { SqlQueryApi } from '@/apis';
 export default {
   watch: {
     filterText(val) {
@@ -52,7 +52,7 @@ export default {
     // 获取数据库表结构数据，并转化成结构化树数据
     async getTableList() {
       const { id: clusterName } = this.$route.params;
-      const { data: { entity } } = await SqlQuery.getTableLists(clusterName);
+      const { data: { entity } } = await SqlQueryApi.getTableLists(clusterName);
       const treeData = Object.keys(entity).map(dbName => {
         const db = {
           id: dbName,

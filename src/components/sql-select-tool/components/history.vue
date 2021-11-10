@@ -14,7 +14,7 @@
     :width="column.width"
     :key="index">
       <template slot-scope="scope">
-        <span class="text-ellipsis" @dblclick="onClickCell(scope)">{{scope.row[column.prop]}}</span>
+        <span class="text-ellipsis" :title="scope.row[column.prop]" @dblclick="onClickCell(scope)">{{scope.row[column.prop]}}</span>
       </template>
   </el-table-column>
   <el-table-column
@@ -22,7 +22,7 @@
       width="100">
       <template slot-scope="scope">
         <el-button @click="copyItem(scope.row)" type="text" size="mini">{{$t('queryExecution.Copy')}}</el-button>
-        <el-button @click="deleteItem(scope.$index)" type="text" size="mini">{{$t('common.Delete')}}</el-button>
+        <el-button @click="deleteItem(scope.row)" type="text" size="mini">{{$t('common.Delete')}}</el-button>
       </template>
     </el-table-column>
 </el-table>
@@ -38,21 +38,19 @@ export default {
     columns() {
       return [
         {
-          prop: 'clusterName',
-          label: this.$t('home.Cluster Name'),
-          width: 100
-        },
-        {
-          prop: 'sql',
+          prop: 'QuerySql',
           label: this.$t('queryExecution.SQL'),
         },
         {
-          prop: 'createTime',
+          prop: 'CreateTime',
           label: this.$t('queryExecution.CreateTime'),
-          width: 150
         },
       ]
     }
+  },
+  created() {
+    const { id: clusterName } = this.$route.params;
+    store.dispatch('sqlSelect/retrieveHistory', clusterName);
   },
   methods: {
     copyItem(item) {
@@ -73,13 +71,17 @@ export default {
         //
       }
     },
-    deleteItem(index) {
-      store.commit('sqlSelect/deleteHistory', index);
+    deleteItem({ CheckSum }) {
+      const { id: clusterName } = this.$route.params;
+      store.dispatch('sqlSelect/deleteHistory', {
+        checksum: CheckSum,
+        clusterName
+      });
     },
     onClickCell(scope) {
       const { row, column } = scope;
-      if (column.property === 'sql') {
-        this.$emit('addSql', row.sql);
+      if (column.property === 'QuerySql') {
+        this.$emit('addSql', row.QuerySql);
       }
     }
   }

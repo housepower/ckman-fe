@@ -57,7 +57,7 @@
 </template>
 <script>
 import { remove } from "lodash-es";
-import { SqlQuery } from "@/apis";
+import { SqlQueryApi } from "@/apis";
 export default {
   props: {
     selectSql: {
@@ -102,7 +102,7 @@ export default {
       this.tableData = [];
       const {
         data: { entity },
-      } = await SqlQuery.query({
+      } = await SqlQueryApi.query({
         clusterName: this.$route.params.id,
         query: `${this.sqlInput}`,
       });

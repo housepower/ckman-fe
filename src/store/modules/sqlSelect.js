@@ -1,4 +1,5 @@
 import { cloneDeep } from 'lodash-es';
+import { SqlQueryApi } from '@/apis';
 export const sqlSelect = {
   namespaced: true,
   state: () => ({
@@ -35,8 +36,11 @@ export const sqlSelect = {
       }
       history.unshift(item);
     },
-    deleteHistory(state, index) {
-      state.history.splice(index, 1);
+    deleteHistory(state, { clusterName, checksum }) {
+      const index = state.history.findIndex(x => x.clusterName === clusterName && x.checksum === checksum);
+      if (index !== -1) {
+        state.history.splice(index, 1);
+      }
     },
     setHistory(state, list) {
       state.history = cloneDeep(list);
@@ -51,6 +55,16 @@ export const sqlSelect = {
         total: 0,
         currentPage: 1,
       };
+    }
+  },
+  actions: {
+    async retrieveHistory({ commit }, clusterName) {
+      const { data: { entity } } = await SqlQueryApi.getHistory(clusterName);
+      commit('setHistory', entity);
+    },
+    async deleteHistory({ commit }, params) {
+      await SqlQueryApi.deleteHistory(params);
+      commit('deleteHistory', params);
     }
   },
   getters: {

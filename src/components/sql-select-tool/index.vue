@@ -52,27 +52,12 @@ export default {
       bottomActiveTab: 'result',
     };
   },
-  mounted() {
-    window.addEventListener('beforeunload', this.persistHistory);
-    try {
-      const history = JSON.parse(localStorage.getItem('__ckman__sql_history__'));
-      if (history) {
-        store.commit('sqlSelect/setHistory', history);
-      }
-    } catch(e) {
-      
-    }
-  },
   beforeDestroy() {
-    this.persistHistory();
     store.commit('sqlSelect/clear');
   },
   methods: {
     handleClick() {
       //
-    },
-    persistHistory() {
-      localStorage.setItem('__ckman__sql_history__', JSON.stringify(store.state.sqlSelect.history));
     },
     onAddSql(str) {
       this.$refs.sqlEditor.addSql(str);
