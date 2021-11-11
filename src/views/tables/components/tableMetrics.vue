@@ -19,7 +19,6 @@
       style="clear: both;"
       ref="xTable"
       v-bind="gridOptions"
-      :loading="loading"
       :columns="columns"
       :data="currentPageData"
       @sort-change="sortChangeEvent"
