@@ -20,6 +20,7 @@
     "element-ui-eoi": "^2.14.11",
     "font-awesome": "^4.7.0",
     "get-ip-range": "^4.0.1",
+    "json-big": "^1.0.2",
     "lodash-es": "^4.17.21",
     "moment": "^2.29.1",
     "platform": "^1.3.6",
