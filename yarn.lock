@@ -2272,6 +2272,11 @@ big.js@^5.2.2:
   version "5.2.2"
   resolved "https://registry.npm.taobao.org/big.js/download/big.js-5.2.2.tgz"
 
+bignumber.js@^9.0.0:
+  version "9.0.1"
+  resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-9.0.1.tgz#8d7ba124c882bfd8e43260c67475518d0689e4e5"
+  integrity sha512-IdZR9mh6ahOBv/hYGiXyVuyCetmGJhtYkqLBpTStdhEGjegpPlUawydyaF3pbIOFynJTpllEs+NP+CS9jKFLjA==
+
 binary-extensions@^1.0.0:
   version "1.13.1"
   resolved "https://registry.npm.taobao.org/binary-extensions/download/binary-extensions-1.13.1.tgz"
@@ -5304,6 +5309,13 @@ jsesc@^2.5.1:
 jsesc@~0.5.0:
   version "0.5.0"
   resolved "https://registry.npm.taobao.org/jsesc/download/jsesc-0.5.0.tgz"
+
+json-big@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/json-big/-/json-big-1.0.2.tgz#9d5623922adb3d9fc4c661a44ce2021d72cc6a0f"
+  integrity sha512-o77ndb+SgKSocZ94ewjr0nsJcJw4WIlKQArPjaQhSeZE4dIzXMiwaWDBrw9+xP1ErLwvF960qFaWhASSIIg55Q==
+  dependencies:
+    bignumber.js "^9.0.0"
 
 json-parse-better-errors@^1.0.1, json-parse-better-errors@^1.0.2:
   version "1.0.2"
@@ -8422,6 +8434,11 @@ vue-loader@^15.9.2:
     vue-hot-reload-api "^2.3.0"
     vue-style-loader "^4.1.0"
 
+vue-multipane@^0.9.5:
+  version "0.9.5"
+  resolved "https://registry.yarnpkg.com/vue-multipane/-/vue-multipane-0.9.5.tgz#10ddaf9092e0a9e761edfd0d1f1db8bbb54b3e9c"
+  integrity sha512-4sr6POXY82VMzprQWGNMzTIBGGYEi7nG0uGQb6AYr8o0ngIsYCDPh/gmgms8NVsZzG28b7kn3tQhKP27cbbLdw==
+
 vue-router@^3.5.1:
   version "3.5.1"
   resolved "https://registry.npmjs.org/vue-router/-/vue-router-3.5.1.tgz"
@@ -8450,6 +8467,16 @@ vue@^2.6.12:
   version "2.6.12"
   resolved "https://registry.npmjs.org/vue/-/vue-2.6.12.tgz"
   integrity sha512-uhmLFETqPPNyuLLbsKz6ioJ4q7AZHzD8ZVFNATNyICSZouqP2Sz0rotWQC8UNBF6VGSCs5abnKJoStA6JbCbfg==
+
+vuex@^3.6.2:
+  version "3.6.2"
+  resolved "https://registry.yarnpkg.com/vuex/-/vuex-3.6.2.tgz#236bc086a870c3ae79946f107f16de59d5895e71"
+  integrity sha512-ETW44IqCgBpVomy520DT5jf8n0zoCac+sxWnn+hMe/CzaSejb/eVw2YToiXYX+Ex/AuHHia28vWTq4goAexFbw==
+
+vxe-table@^3.3.16:
+  version "3.4.5"
+  resolved "https://registry.yarnpkg.com/vxe-table/-/vxe-table-3.4.5.tgz#5922049ed5b8ebebc59c1b997d75b61b64ec02bc"
+  integrity sha512-BkbXbjXfnhDCqGtmpDyvBg0wtvcGrw/HYYF4lXHGn3aPa3oJ1dhkeqwbx6CASBuyWQjVsicA2T7j+YvXPnvTAQ==
 
 watchpack-chokidar2@^2.0.0:
   version "2.0.0"
@@ -8675,6 +8702,11 @@ ws@^6.0.0, ws@^6.2.1:
   resolved "https://registry.npm.taobao.org/ws/download/ws-6.2.1.tgz?cache=0&sync_timestamp=1593925518385&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fws%2Fdownload%2Fws-6.2.1.tgz"
   dependencies:
     async-limiter "~1.0.0"
+
+xe-utils@^3.4.0:
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/xe-utils/-/xe-utils-3.4.0.tgz#b5b52990858298e815763c46bada5741ebab15ed"
+  integrity sha512-V2o/Ew/iXBduWbj0ixqA7atUe4HFxo0HcpBsxnrLHbKVspfZ2O/7+m325AHcN2xxPZtBZGQVg1w/cQ5Q8WmcTA==
 
 xtend@^4.0.0, xtend@~4.0.1:
   version "4.0.2"
