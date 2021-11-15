@@ -56,7 +56,7 @@ export default {
     copyItem(item) {
       try {
         let input = document.createElement('textarea');
-        input.value = item.sql;
+        input.value = item.QuerySql;
         input.style.border = '0';
         input.style.padding = '0';
         input.style.margin  = '0';
