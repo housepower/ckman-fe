@@ -18,6 +18,7 @@ export const sqlSelect = {
     setResult(state, data) {
       state.result = cloneDeep(data);
       state.pagination.total = data.length - 1;
+      state.pagination.currentPage = 1;
       data = null;
     },
     changePageSize(state, pageSize) {
