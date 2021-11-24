@@ -40,6 +40,11 @@ export const $router = new Router({
           component: () => import('@/views/home-setting/homeSetting.vue'),
         },
         {
+          path: 'task',
+          name: 'TaskList',
+          component: () => import('@/views/task/list.vue'),
+        },
+        {
           path: '/clusters/:id',
           component: ChildViewHolder,
           redirect: '/clusters/:id/overview',

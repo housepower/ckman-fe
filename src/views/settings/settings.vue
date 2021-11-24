@@ -53,7 +53,6 @@ export default {
       const { data: { entity } } = await ClusterApi.getClusterUpdateFormSchema();
       try {
         const schema = (new Function("return " + entity))();
-        console.log(schema);
         this.schema = schema;
       } catch (e) {
 
