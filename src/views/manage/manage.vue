@@ -87,39 +87,6 @@
               <span v-else>{{row[column.property]}}</span>
             </template>
           </vxe-column>
-          <!-- <el-table-column prop="hostname"
-                           show-overflow-tooltip
-                           :label="$t('manage.Node Name')"
-                           sortable
-                           align="center" />
-          <el-table-column prop="shardNumber"
-                           show-overflow-tooltip
-                           :label="$t('manage.shard number')"
-                           sortable
-                           align="center" />
-          <el-table-column prop="replicaNumber"
-                           show-overflow-tooltip
-                           :label="$t('manage.replica number')"
-                           sortable
-                           align="center" />
-          <el-table-column prop="disk"
-                           show-overflow-tooltip
-                           :label="$t('manage.Disk(Used/Total)')"
-                           align="center">
-            <template slot-scope="scope">
-              {{ scope.row.disk }}
-            </template>
-          </el-table-column>
-          <el-table-column prop="status"
-                           show-overflow-tooltip
-                           :label="$t('manage.Node Status')"
-                           :filters="[{ 'text': 'green', 'value': 'green' }, { 'text': 'red', 'value': 'red' }]"
-                           :filter-method="filterHandler"
-                           align="center">
-            <template slot-scope="scope">
-              <span class="dot mr-5" :class="scope.row.status"></span>{{scope.row.status}}
-            </template>
-          </el-table-column> -->
           <vxe-column :title="$t('home.Actions')"
             v-if="mode === 'deploy'"
             align="center">
@@ -131,11 +98,6 @@
                  @click="remove(row)" />
             </template>
             <template>
-              <!-- <el-button type="text" :disabled="row.status === 'green'" @click="onlineClusterNode(row)" :loading="row.onlineLoading">{{ $t('manage.Online') }}</el-button>
-              <el-button type="text" :disabled="row.status === 'red'" @click="offlineClusterNode(row)" :loading="row.offlineLoading">{{ $t('manage.Offline') }}</el-button>
-              <i class="fa fa-trash pointer fs-18 ml-10"
-                 v-tooltip="$t('common.Delete')"
-                 @click="remove(row)" /> -->
             </template>
           </vxe-column>
         </vxe-table>
@@ -150,6 +112,7 @@ import InputPassword from "./modal/inputPassword";
 import { $modal, $loading } from "@/services";
 import { ClusterStatus, ClusterTypeStatus } from "@/constants";
 import { ClusterApi, PackageApi } from "@/apis";
+import TaskDetail from '@/views/task/components/TaskDetail.vue';
 export default {
   data() {
     return {
@@ -363,14 +326,34 @@ export default {
         const { packageVersion, policy, skip } = this;
         params = Object.assign(params, { packageVersion, policy, skip });
       }
-      await ClusterApi.manageCluster(type, params, password).finally(() =>
+      const { data: { entity: taskId } } = await ClusterApi.manageCluster(type, params, password).finally(() =>
         $loading.decrease()
       );
-      this.$message.success(`${this.$t('manage.' + upperFirst(type) + ' Cluster')}` + ` ${this.$t('common.' + 'Success')}`);
+
+      // 升级集群，显示任务状态弹出层
+      if (type === 'upgrade' && taskId) {
+        await $modal({
+          component: TaskDetail,
+          props: {
+            title: this.$t('task.View Task'),
+            width: 800,
+            cancelText: this.$t("task.Close"),
+            okText: null,
+          },
+          data: {
+            taskId: taskId,
+            refresh: true
+          },
+        })
+      } else {
+        this.$message.success(`${this.$t('manage.' + upperFirst(type) + ' Cluster')}` + ` ${this.$t('common.' + 'Success')}`);
+      }
+
       if (type === 'destroy') {
         this.$router.push('/home');
         return;
       }
+  
       this.fetchData();
     },
 

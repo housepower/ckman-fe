@@ -4,6 +4,7 @@
       <label>{{$t('task.Task ID')}}：</label><span class="fc-black">{{detail.TaskId}}</span>
       <label class="ml-20">{{$t('task.Cluster Name')}}：</label><span class="fc-black">{{detail.ClusterName}}</span>
       <label class="ml-20">{{$t('task.Current Action')}}：</label><span class="fc-black">{{detail.Option[lang] }}</span>
+      <i class="el-icon-loading fc-primary fs-16 ml-10" v-show="loading"></i>
     </div>
 
     <vxe-table
@@ -58,6 +59,7 @@ export default {
         highlightHoverRow: true,
         rowId: 'Host',
       },
+      loading: false,
     };
   },
   computed: {
@@ -78,6 +80,7 @@ export default {
   created() {
     this.getTaskDetail();
     if (this.refresh) {
+      this.loading = true;
       this.timerId = setInterval(this.getTaskDetail, 3000);
     }
   },
@@ -92,8 +95,10 @@ export default {
       this.detail = entity;
       this.pagination.currentPage = 1;
       this.pagination.total = entity.NodeStatus.length;
-      if (['Success', 'Failed'].includes(entity.Status)) {
+      // 全部任务成功或失败后，清除定时器，关闭loading
+      if (entity.NodeStatus.filter(x => !['Done', 'Failed'].includes(x.Status.EN)).length == 0) {
         clearInterval(this.timerId);
+        this.loading = false;
       }
     },
     handlePageChange(pager) {
