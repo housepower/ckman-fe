@@ -59,9 +59,12 @@ const messages = {
       'Reset': 'Reset',
       'keyword search': 'keyword search',
       "Current Browser Not Support": "Current Browser Not Support",
+      'Message Center': 'Message Center',
     },
     layout: {
       'ClickHouse Management Console': 'ClickHouse Management Console',
+      'Settings': 'Settings',
+      'Logout Success': 'Logout Success',
     },
     home: {
       'Create or import a ClickHouse Cluster': 'Create or import a ClickHouse Cluster',
@@ -198,6 +201,22 @@ const messages = {
       'rate clickhouse_sinker_parsing_pool_backlog 1m': 'sum by(task)(clickhouse_sinker_parsing_pool_backlog)',
       'rate clickhouse_sinker_writing_pool_backlog 1m': 'sum by(task) (clickhouse_sinker_writing_pool_backlog)',
     },
+    task: {
+      'Task List': 'Task List',
+      "Running Task Num": 'Running Task: ',
+      'Task ID': 'Task ID',
+      'Cluster Name': 'Cluster Name',
+      'Task Type': 'Task Type',
+      'Task Name': 'Task Name',
+      'Task Status': 'Task Status',
+      'Create Time': 'Create Time',
+      'View': 'View',
+      'View Task': 'View Task',
+      'Close': 'Close',
+      'Current Action': 'Current Action',
+      'Node': 'Node',
+      'Status': 'Status'
+    }
   },
   zh: {
     ...zhCN,
@@ -253,9 +272,12 @@ const messages = {
       'Reset': '重置',
       'keyword search': '关键字搜索',
       "Current Browser Not Support": '当前浏览器不支持',
+      'Message Center': '消息中心',
     },
     layout: {
       'ClickHouse Management Console': 'ckman管理平台',
+      'Settings': '设置',
+      'Logout Success': '成功登出',
     },
     home: {
       'Create or import a ClickHouse Cluster': '创建或导入集群',
@@ -392,6 +414,22 @@ const messages = {
       'rate clickhouse_sinker_parsing_pool_backlog 1m': 'clickhouse_sinker 解析协程池当前积压的消息数目',
       'rate clickhouse_sinker_writing_pool_backlog 1m': 'clickhouse_sinker 输出协程池当前积压的批数目',
     },
+    task: {
+      'Task List': '任务列表',
+      "Running Task Num": '运行中：',
+      'Task ID': '任务编号',
+      'Cluster Name': '集群名称',
+      'Task Type': '任务类型',
+      'Task Name': '任务名称',
+      'Task Status': '任务状态',
+      'Create Time': '创建时间',
+      'View': '查看',
+      'View Task': '查看任务',
+      'Close': '关闭',
+      'Current Action': '当前操作',
+      'Node': '节点',
+      'Status': '状态'
+    }
   },
 };
 

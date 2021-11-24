@@ -2,13 +2,16 @@
   <div class="layout flex flex-column overflow-hidden">
     <header class="flex-between flex-vcenter plr-20">
       <router-link to="/" class="fs-18 font-bold">{{title}}  {{version}}</router-link>
-      <div class="header-right">
-        <el-select v-model="$i18n.locale" class="mr-10 width-100" size="mini">
-          <el-option value="en" label="English" />
-          <el-option value="zh" label="中文" />
-        </el-select>
+      <div class="header-right flex flex-vcenter">
+
+        <div class="flex flex-vcenter mr-15 pointer" @click="viewTaskList">
+          <i class="el-icon-bell fs-20 mr-5"></i>
+          <span class="fs-16">{{$t('common.Message Center')}}</span>
+          <el-badge is-dot></el-badge>
+        </div>
+
         <el-dropdown class="pointer">
-          <div>
+          <div class="flex flex-vcenter">
             <i class="fa fa-user-o fs-20"></i>
             <span v-text="user"
                   class="fs-16 ml-5 user" />
@@ -17,7 +20,13 @@
             <el-dropdown-item @click.native="logout">{{$t("common.Logout")}}</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
-        <router-link to="/setting" class="fa fa-cog fs-20 pointer ml-10" />
+  
+        <router-link to="/setting" class="fa fa-gear fs-20 pointer ml-15"><span class="fs-16 ml-5">{{$t('layout.Settings')}}</span></router-link>
+
+        <el-select v-model="$i18n.locale" class="ml-10 width-100" size="mini">
+          <el-option value="en" label="English" />
+          <el-option value="zh" label="中文" />
+        </el-select>
       </div>
     </header>
 
@@ -42,7 +51,7 @@
 </template>
 <script>
 import { Menus, LoaderMenus } from "@/constants";
-import { PackageApi, ClusterApi } from "@/apis";
+import { PackageApi, ClusterApi, TaskApi } from "@/apis";
 
 export default {
   name: "Layout",
@@ -53,6 +62,8 @@ export default {
       version: "",
       mode: '',
       currentMenu: '',
+      timerId: null,
+      taskNum: null
     };
   },
   mounted() {
@@ -75,6 +86,7 @@ export default {
 
       this.mode = mode;
     },
+
     async handleMenuClick(item) {
       if (item.name === 'Settings') {
 
@@ -88,16 +100,24 @@ export default {
         this.currentMenu = item.path.split('/').lastItem;
       }
     },
+
     logout() {
       localStorage.removeItem("user");
-      this.$message.success("成功登出");
+      this.$message.success(this.$t('layout.Logout Success'));
       this.$router.push('/login');
     },
+
     async fetchVersion() {
       const {
         data: { entity },
       } = await PackageApi.getVersion();
       this.version = entity;
+    },
+
+    viewTaskList() {
+      this.$router.push({
+        name: 'TaskList'
+      });
     }
   },
   watch: {

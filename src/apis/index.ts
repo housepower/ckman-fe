@@ -5,3 +5,4 @@ export * from './metric';
 export * from './sqlQuery';
 export * from './tables';
 export * from './session';
+export * from './task';
