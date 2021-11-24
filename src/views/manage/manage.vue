@@ -302,11 +302,25 @@ export default {
         cancelButtonText: this.$t("common.Cancel"),
         text: "warning",
       });
-      await ClusterApi.deleteClusterNode(this.$route.params.id, {
+      const { data: { entity: taskId } } = await ClusterApi.deleteClusterNode(this.$route.params.id, {
         ip: item.ip,
       }, password);
-      this.$message.success(this.$t("common.Delete") + this.$t("common.Success"));
-      this.fetchData();
+
+      if (taskId) {
+        $modal({
+          component: TaskDetail,
+          props: {
+            title: this.$t('task.View Task'),
+            width: 800,
+            cancelText: this.$t("task.Close"),
+            okText: null,
+          },
+          data: {
+            taskId: taskId,
+            refresh: true
+          },
+        }).finally(() => this.fetchData());
+      }
     },
     async clusterOperation(type) {
       let password = '';
