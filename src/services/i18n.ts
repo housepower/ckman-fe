@@ -215,7 +215,8 @@ const messages = {
       'Close': 'Close',
       'Current Action': 'Current Action',
       'Node': 'Node',
-      'Status': 'Status'
+      'Status': 'Status',
+      'Delete Task': 'Delete Task',
     }
   },
   zh: {
@@ -428,7 +429,8 @@ const messages = {
       'Close': '关闭',
       'Current Action': '当前操作',
       'Node': '节点',
-      'Status': '状态'
+      'Status': '状态',
+      'Delete Task': '删除任务',
     }
   },
 };

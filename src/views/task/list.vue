@@ -9,7 +9,6 @@
       <vxe-toolbar zoom custom class="pull-right">
         <template #buttons>
           <el-input size="medium" :placeholder="$t('common.keyword search')" v-model="searchKey" class="width-250 mr-10" suffix-icon="el-icon-search"></el-input>
-          <el-button size="mini" @click="refresh()" circle icon="el-icon-refresh" class="fs-16 fc-black" style="border-color: #dcdfe6;"></el-button>
         </template>
       </vxe-toolbar>
 
@@ -97,8 +96,7 @@ export default {
       },
       clusters: [],
       runningTaskNum: null,
-      timerId1: null,
-      timerId2: null
+      timerId: null,
     };
   },
   computed: {
@@ -122,11 +120,15 @@ export default {
       return this.$i18n.locale.toUpperCase();
     },
     listData() {
-      const { searchKey, sort: { property, order } } = this;
+      const { searchKey, sort: { property, order }, lang } = this;
       const result = this.tableData
         .filter(x => {
           let flag = true;
-          if (!x.ClusterName?.includes(searchKey)) {
+          if (!x.ClusterName?.includes(searchKey)
+            && !x.Type?.includes(searchKey)
+            && !x.Status?.includes(searchKey)
+            && !x.Option[lang]?.includes(searchKey)
+            && !x.TaskId?.includes(searchKey)) {
             flag = false;
           }
           return flag;
@@ -171,6 +173,10 @@ export default {
     await this.getClusterList();
     this.fetchData();
     this.getRunningTasks();
+    this.timerId = setInterval(this.refresh, 3000);
+  },
+  beforeDestroy() {
+    this.timerId && clearInterval(this.timerId);
   },
   methods: {
     async getClusterList() {
@@ -201,8 +207,15 @@ export default {
         });
 
       this.tableData = entity;
+      if (entity.filter(task => !['Success', 'Failed'].includes(task.Status)).length === 0) {
+        this.timerId && clearInterval(this.timerId);
+      }
     },
     async deleteTask(taskId) {
+      await this.$confirm(this.$t('task.Delete Task'), this.$t('common.tips'), {
+        confirmButtonText: this.$t("common.Confirm"),
+        cancelButtonText: this.$t("common.Cancel"),
+      });
       await TaskApi.deleteTask(taskId);
       $message.success(this.$t('common.Delete') + this.$t('common.Success'));
       this.fetchData();

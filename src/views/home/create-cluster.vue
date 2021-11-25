@@ -7,8 +7,9 @@
 </template>
 <script>
 import { DForm } from '@/components/';
-// import mockData from '@/components/d-form/mock/data.json';
 import { ClusterApi } from '@/apis';
+import { $modal } from '@/services/';
+import TaskDetail from '@/views/task/components/TaskDetail.vue';
 export default {
   name: 'test',
   components: {
@@ -46,8 +47,22 @@ export default {
 
     async onSubmit(data) {
       this.loading = true;
-      await ClusterApi.createCluster(data).finally(() => this.loading = false);
-      this.$router.go(-1);
+      const { data: { entity: taskId } } = await ClusterApi.createCluster(data).finally(() => this.loading = false);
+      await $modal({
+        component: TaskDetail,
+        props: {
+          title: this.$t('task.View Task'),
+          width: 800,
+          cancelText: this.$t("task.Close"),
+          okText: null,
+        },
+        data: {
+          taskId: taskId,
+          refresh: true
+        },
+      }).finally(() => {
+        this.$router.go(-1);
+      })
     }
   }
 }

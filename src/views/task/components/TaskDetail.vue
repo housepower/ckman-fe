@@ -4,7 +4,6 @@
       <label>{{$t('task.Task ID')}}：</label><span class="fc-black">{{detail.TaskId}}</span>
       <label class="ml-20">{{$t('task.Cluster Name')}}：</label><span class="fc-black">{{detail.ClusterName}}</span>
       <label class="ml-20">{{$t('task.Current Action')}}：</label><span class="fc-black">{{detail.Option[lang] }}</span>
-      <i class="el-icon-loading fc-primary fs-16 ml-10" v-show="loading"></i>
     </div>
 
     <vxe-table
@@ -18,7 +17,10 @@
         <vxe-column fixed="right" align="center" :title="$t('task.Node')" field="Host"></vxe-column>
         <vxe-column fixed="right" align="center" :title="$t('task.Status')" field="Status">
           <template slot-scope="scope">
-            <span class="status" :class="scope.row.Status.EN">{{scope.row.Status[lang]}}</span>
+            <div class="flex flex-vcenter flex-center">
+              <img src="/images/5-130H2191322-50.gif" v-if="loading" class="mr-20" />
+              <span class="status" :class="scope.row.Status.EN">{{scope.row.Status[lang]}}</span>
+            </div>
           </template>
         </vxe-column>
       </vxe-table>
