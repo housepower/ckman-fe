@@ -13,6 +13,8 @@
 <script>
 import { DForm } from '@/components/';
 import { ClusterApi } from '@/apis';
+import { $modal } from '@/services/';
+import TaskDetail from '@/views/task/components/TaskDetail.vue';
 export default {
   name: 'test',
   components: {
@@ -62,8 +64,20 @@ export default {
     async onSubmit(data) {
       this.loading = true;
       const clusterName = this.$route.params.id;
-      await ClusterApi.saveClusterConfig(clusterName, data).finally(() => this.loading = false);
-      this.$message.success(`${clusterName} Cluster ${ this.$t("common.Save") }${ this.$t("common.Success") }`);
+      const { data: { entity: taskId } } = await ClusterApi.saveClusterConfig(clusterName, data).finally(() => this.loading = false);
+      await $modal({
+        component: TaskDetail,
+        props: {
+          title: this.$t('task.View Task'),
+          width: 800,
+          cancelText: this.$t("task.Close"),
+          okText: null,
+        },
+        data: {
+          taskId: taskId,
+          refresh: true
+        },
+      });
     }
   }
 }

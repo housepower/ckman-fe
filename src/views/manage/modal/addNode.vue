@@ -35,10 +35,11 @@ export default {
   methods: {
     async onOk() {
       const { ips, shard } = this.formModel;
-      await ClusterApi.addClusterNode(this.$route.params.id, {
+      const { data: { entity: taskId } } = await ClusterApi.addClusterNode(this.$route.params.id, {
         ips: getCirdOrRangeIps(lineFeed(ips)),
         shard: +shard,
       }, this.password);
+      return taskId;
     },
   },
 };

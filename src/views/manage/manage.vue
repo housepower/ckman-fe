@@ -288,9 +288,23 @@ export default {
           numberRange: this.numberRange(),
           password,
         },
+      }).then((taskId) => {
+        if (taskId) {
+          $modal({
+            component: TaskDetail,
+            props: {
+              title: this.$t('task.View Task'),
+              width: 800,
+              cancelText: this.$t("task.Close"),
+              okText: null,
+            },
+            data: {
+              taskId: taskId,
+              refresh: true
+            },
+          }).finally(() => this.fetchData());
+        }
       });
-      this.$message.success(this.$t("manage.Add Node") + this.$t("common.Success"));
-      this.fetchData();
     },
     async remove(item) {
       let password = '';
@@ -345,7 +359,7 @@ export default {
       );
 
       // 升级集群，显示任务状态弹出层
-      if (type === 'upgrade' && taskId) {
+      if ((type === 'upgrade' || type === 'destroy') && taskId) {
         await $modal({
           component: TaskDetail,
           props: {
@@ -358,17 +372,18 @@ export default {
             taskId: taskId,
             refresh: true
           },
-        })
+        }).finally(() => {
+          if (type === 'destroy') {
+            this.$router.push('/home');
+            return;
+          } else {
+            this.fetchData();
+          }
+        });
       } else {
         this.$message.success(`${this.$t('manage.' + upperFirst(type) + ' Cluster')}` + ` ${this.$t('common.' + 'Success')}`);
+        this.fetchData();
       }
-
-      if (type === 'destroy') {
-        this.$router.push('/home');
-        return;
-      }
-  
-      this.fetchData();
     },
 
     // 集群node上线
