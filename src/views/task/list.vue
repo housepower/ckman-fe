@@ -113,7 +113,10 @@ export default {
           { label: 'Failed', value: 'Failed' },
           { label: 'Success', value: 'Success' }
         ] },
+        { prop: 'Message', label: this.$t('task.Message')},
         { prop: 'CreateTime', label: this.$t('task.Create Time') },
+        { prop: 'UpdateTime', label: this.$t('task.Update Time')},
+        { prop: 'Duration', label: this.$t('task.Duration')},
       ];
     },
     lang() {

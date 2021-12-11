@@ -217,6 +217,9 @@ const messages = {
       'Node': 'Node',
       'Status': 'Status',
       'Delete Task': 'Delete Task',
+      'Message': '返回信息',
+      'Update Time': '更新时间',
+      'Duration': '持续时间',
     }
   },
   zh: {
@@ -431,6 +434,9 @@ const messages = {
       'Node': '节点',
       'Status': '状态',
       'Delete Task': '删除任务',
+      'Message': '返回信息',
+      'Update Time': '更新时间',
+      'Duration': '持续时间',
     }
   },
 };
