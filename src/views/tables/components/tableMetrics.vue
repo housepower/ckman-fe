@@ -240,6 +240,7 @@ export default {
         values.readwrite_status = values.readwrite_status.toString().toUpperCase();
         values.queryCost = Object.values(values.queryCost).join(',');
         values.tableName = key;
+        values.rows = values.rows.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); // 加入数字千分位分隔符
         return values;
       }));
       this.pagination.total = this.tableData.length;
