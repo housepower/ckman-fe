@@ -217,9 +217,9 @@ const messages = {
       'Node': 'Node',
       'Status': 'Status',
       'Delete Task': 'Delete Task',
-      'Message': '返回信息',
-      'Update Time': '更新时间',
-      'Duration': '持续时间',
+      'Message': 'Message',
+      'Update Time': 'Update Time',
+      'Duration': 'Duration',
     }
   },
   zh: {

@@ -7,7 +7,7 @@ module.exports = {
   devServer: {
     proxy: {
       '/api/login': {
-        target: 'http://192.168.101.108:8808',
+        target: 'http://192.168.110.8:8808',
         logLevel: 'debug',
         // pathRewrite: { '^/api/login': '/api/login' },
         changeOrigin: true,
@@ -17,7 +17,7 @@ module.exports = {
         },
       },
       '/api/v1': {
-        target: 'http://192.168.101.108:8808',
+        target: 'http://192.168.110.8:8808',
         logLevel: 'debug',
         // pathRewrite: { '^/api/v1': '/api/v1' },
         changeOrigin: true,
