@@ -61,7 +61,7 @@ export const chartOption = (data: MetricData[], min: number, max: number) => ({
     },
     name: '值',
   },
-  series: data.map(({metric, values}) => ({
+  series: (data||[]).map(({metric, values}) => ({
     name: (() => {
       if(metric.instance) {
         if(metric.device) return `${metric.instance}-${metric.device}`;
