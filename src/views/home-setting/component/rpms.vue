@@ -9,7 +9,11 @@
                        show-overflow-tooltip
                        :label="$t('common.Version')"
                        align="center" />
-      <el-table-column prop="files"
+      <el-table-column prop="pkgType"
+                       show-overflow-tooltip
+                       :label="$t('common.Package Type')"
+                       align="center" />
+      <el-table-column prop="pkgName"
                        show-overflow-tooltip
                        :label="$t('common.Files')"
                        align="left"
@@ -45,12 +49,7 @@ export default {
       const {
         data: { entity },
       } = await PackageApi.getList();
-      entity.forEach((item) => {
-        this.list.push({
-          version: item,
-          files: `clickhouse-client-${item}-2.noarch.rpm,clickhouse-common-static-${item}-2.x86_64.rpm,clickhouse-server-${item}-2.noarch.rpm`,
-        });
-      });
+      this.list = entity;
     },
     async chooseFile() {
       await $modal({
@@ -71,7 +70,7 @@ export default {
         text: "warning",
       });
       await PackageApi.deletePackage({ packageVersion: item.version });
-      this.$message.success(`${item.version}版本已删除成功`);
+      this.$message.success(`${item.version} ${this.$t('common.Version')} ${this.$t('common.Delete')} ${this.$t('common.Success')}`);
       this.fetchData();
     },
   },
