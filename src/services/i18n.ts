@@ -59,12 +59,13 @@ const messages = {
       'Reset': 'Reset',
       'keyword search': 'keyword search',
       "Current Browser Not Support": "Current Browser Not Support",
-      'Message Center': 'Message Center',
+      'Package Type': 'Package Type',
     },
     layout: {
       'ClickHouse Management Console': 'ClickHouse Management Console',
       'Settings': 'Settings',
       'Logout Success': 'Logout Success',
+      'Message Center': 'Message Center',
       'Document': 'Document',
     },
     home: {
@@ -277,12 +278,13 @@ const messages = {
       'Reset': '重置',
       'keyword search': '关键字搜索',
       "Current Browser Not Support": '当前浏览器不支持',
-      'Message Center': '消息中心',
+      'Package Type': '安装包类型',
     },
     layout: {
       'ClickHouse Management Console': 'ckman管理平台',
       'Settings': '设置',
       'Logout Success': '成功登出',
+      'Message Center': '消息中心',
       'Document': '文档',
     },
     home: {
