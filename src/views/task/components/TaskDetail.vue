@@ -62,6 +62,7 @@ export default {
         rowId: 'Host',
       },
       loading: false,
+      status: null,
     };
   },
   computed: {
@@ -93,6 +94,7 @@ export default {
   },
   methods: {
     async getTaskDetail() {
+      this.status = null;
       const { data: { entity } } = await TaskApi.getTaskDetail(this.taskId);
       this.detail = entity;
       this.pagination.currentPage = 1;
@@ -101,11 +103,20 @@ export default {
       if (entity.NodeStatus.filter(x => !['Done', 'Failed'].includes(x.Status.EN)).length == 0) {
         clearInterval(this.timerId);
         this.loading = false;
+        // 任务全部完成，状态为Done，否则为Failed
+        if (entity.NodeStatus.every(x => x.Status.EN === 'Done')) {
+          this.status = 'Done';
+        } else {
+          this.status = 'Failed';
+        }
       }
     },
     handlePageChange(pager) {
       this.pagination.currentPage = pager.currentPage;
     },
+    onOk() {
+      return this.status;
+    }
   },
 };
 </script>

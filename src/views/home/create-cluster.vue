@@ -3,7 +3,6 @@
     <breadcrumb :data="breadcrumbInfo"></breadcrumb>
     <d-form :loading="loading" class="mt-30" v-if="schema" :schema="schema" :form-model="formModel" @submit="onSubmit"></d-form>
   </div>
-  
 </template>
 <script>
 import { DForm } from '@/components/';
@@ -11,7 +10,7 @@ import { ClusterApi } from '@/apis';
 import { $modal } from '@/services/';
 import TaskDetail from '@/views/task/components/TaskDetail.vue';
 export default {
-  name: 'test',
+  name: 'CreateCluster',
   components: {
     DForm,
   },
@@ -29,9 +28,6 @@ export default {
 
   created() {
     this.getFormSchema();
-  },
-
-  mounted() {
   },
 
   methods: {
@@ -54,14 +50,18 @@ export default {
           title: this.$t('task.View Task'),
           width: 800,
           cancelText: this.$t("task.Close"),
-          okText: null,
+          okText: '关闭',
+          cancelText: null
         },
         data: {
           taskId: taskId,
           refresh: true
         },
-      }).finally(() => {
-        this.$router.go(-1);
+      }).then(status => {
+        // 任务全部成功，返回上层页面
+        if (status === 'Done') {
+          this.$router.go(-1);
+        }
       })
     }
   }
