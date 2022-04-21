@@ -67,6 +67,7 @@ const messages = {
       'ClickHouse Management Console': 'ClickHouse Management Console',
       'Settings': 'Settings',
       'Logout Success': 'Logout Success',
+      'Message Center': 'Message Center',
       'Document': 'Document',
       'API': 'Swagger'
     },
@@ -292,6 +293,7 @@ const messages = {
       'ClickHouse Management Console': 'ckman管理平台',
       'Settings': '设置',
       'Logout Success': '成功登出',
+      'Message Center': '消息中心',
       'Document': '文档',
       'API':'接口说明',
     },
