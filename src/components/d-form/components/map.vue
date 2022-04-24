@@ -1,10 +1,10 @@
 <template>
   <div class="ml-10">
     <div v-for="(item, index) in formData" :key="index" class="flex flex-vcenter mb-10">
-      <el-input size="medium" style="flex: 1;" v-model="item.key" @change="onChange" />
+      <el-input size="medium" style="flex: 1;" :disabled="schema.editable === 'false'" v-model="item.key" @change="onChange" />
       <span class="pl-5 pr-5">:</span>
-      <el-input size="medium" style="flex: 2;" v-model="item.value" @change="onChange" />
-      <i class="fa fa-trash pointer fs-16 fc-red ml-10" @click="deleteItem(index)"></i>
+      <el-input size="medium" style="flex: 2;" :disabled="schema.editable === 'false'" v-model="item.value" @change="onChange" />
+      <i class="fa fa-trash pointer fs-16 fc-red ml-10" v-if="schema.editable === 'true'" @click="deleteItem(index)"></i>
     </div>
   </div>
 </template>

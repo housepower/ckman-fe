@@ -12,7 +12,7 @@
         </el-tooltip>
         <span class="fc-red bold ml-5" v-if="isRequired">*</span>
         <span>：</span>
-        <el-button v-if="isShowAddIcon" @click.stop="addItem" size="mini" class="absolute" :style="{ 'left': isCascade ? '300px' : '260px' }">
+        <el-button v-if="isShowAddIcon && schema.editable === 'true'" @click.stop="addItem" size="mini" class="absolute" :style="{ 'left': isCascade ? '300px' : '260px' }">
           <i class="fa fa-plus pointer el-link--primary"></i>
         </el-button>
         <span class="fc-red absolute error-message">{{errorMessage}}</span>
@@ -24,25 +24,26 @@
     <!-- {{ schema.type }} -->
     <!-- {{formModel}} -->
     <template v-if="schema.candidates && schema.candidates.length > 0">
-      <el-select v-model="formModel[originName]" size="medium" class="width-350" :placeholder="$t('common.Please choose')">
-        <el-option v-for="(item, index) in schema.candidates" :key="index" :label="item['label_' + lang]" :value="['int', 'float'].includes(schema.type) ? Number(item.value) : item.value"></el-option>
+      <el-select v-model="formModel[originName]" :disabled="schema.editable === 'false'" size="medium" class="width-350" :placeholder="$t('common.Please choose')">
+        <el-option v-for="(item, index) in getFilterOption(schema.candidates)" :key="index" :label="item['label_' + lang]" :value="['int', 'float'].includes(schema.type) ? Number(item.value) : item.value"></el-option>
       </el-select>
     </template>
     
     <template v-else>
       <template v-if="schema.type === 'string'">
         <!-- 单行文本 -->
-        <el-input class="width-350" size="medium" v-model="formModel[originName]" :placeholder="$t('common.Please fill out')" v-if="schema.input_type === 'text'"></el-input>
+        <el-input class="width-350" size="medium" :disabled="schema.editable === 'false'" v-model="formModel[originName]" :placeholder="$t('common.Please fill out')" v-if="schema.input_type === 'text'"></el-input>
         <!-- 多行文本 -->
-        <el-input class="width-350" size="medium" type="textarea" v-model="formModel[originName]" :placeholder="$t('common.Please fill out')" v-if="schema.input_type === 'textarea'"></el-input>
+        <el-input class="width-350" size="medium" :disabled="schema.editable === 'false'" type="textarea" v-model="formModel[originName]" :placeholder="$t('common.Please fill out')" v-if="schema.input_type === 'textarea'"></el-input>
         <!-- 密码 -->
-        <el-input class="width-350" size="medium" autocomplete="new-password" v-model="formModel[originName]" :placeholder="$t('common.Please fill out')" v-if="schema.input_type === 'password'" show-password></el-input>
+        <el-input class="width-350" size="medium" :disabled="schema.editable === 'false'" autocomplete="new-password" v-model="formModel[originName]" :placeholder="$t('common.Please fill out')" v-if="schema.input_type === 'password'" show-password></el-input>
       </template>
       
       <!-- switch -->
-      <el-switch v-model="formModel[originName]" size="medium" v-if="schema.type === 'bool'"></el-switch>
+      <el-switch v-model="formModel[originName]" :disabled="schema.editable === 'false'" size="medium" v-if="schema.type === 'bool'"></el-switch>
       <!-- 数字输入-整数 -->
       <el-input-number
+        :disabled="schema.editable === 'false'"
         class="width-350"
         size="medium"
         v-model="formModel[originName]"
@@ -55,6 +56,7 @@
       </el-input-number>
       <!-- 数字输入-小数 -->
       <el-input-number
+        :disabled="schema.editable === 'false'"
         class="width-350"
         size="medium"
         v-model="formModel[originName]"
@@ -286,6 +288,15 @@ export default {
   },
 
   methods: {
+    getFilterOption(candidates) {
+      const { filter } = this.schema;
+      if (!filter) {
+        return candidates;
+      }
+      return candidates.filter((item) => {
+        return catWith(this.formModel, `return ${ filter.replace(this.originName, `${item.value}`) };`);
+      });;
+    },
     addItem() {
       this.isSlideUp = true;
       const { schema } = this;

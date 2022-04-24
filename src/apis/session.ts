@@ -11,4 +11,9 @@ export const SessionApi = {
       params,
     });
   },
+  kill(clusterName, params: { host: string; query_id: string }) {
+    return axios.put(`${url}/open_sessions/${clusterName}`, {
+      params,
+    });
+  }
 };

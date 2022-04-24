@@ -6,7 +6,7 @@
 
         <div class="flex flex-vcenter mr-15 pointer" @click="viewTaskList">
           <i class="el-icon-bell fs-20 mr-5"></i>
-          <span class="fs-16">{{$t('layout.Message Center')}}</span>
+          <span class="fs-16">{{$t('common.Message Center')}}</span>
           <el-badge is-dot></el-badge>
         </div>
 

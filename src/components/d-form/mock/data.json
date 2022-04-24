@@ -1,263 +1,503 @@
 {
+    "PkgType": {
+        "label_en": "Package Type",
+        "label_zh": "安装包类型",
+        "description_en": "The type of the installation package, indicating what system architecture and compression format",
+        "description_zh": "安装包的类型，表示当前安装包是什么系统架构，什么压缩格式",
+        "visiable": "true",
+        "required": "true",
+        "editable": "true",
+        "type": "string",
+        "input_type": "text",
+        "candidates": [
+            {
+                "label_en": null,
+                "label_zh": null,
+                "value": "x86_64.rpm"
+            }
+        ],
+        "filter": null,
+        "default": null,
+        "regexp": null
+    },
+    "PkgName": {
+        "label_en": "Package Name",
+        "label_zh": "ClickHouse版本",
+        "description_en": "which package of clickhouse will deployed, need upload rpm package before",
+        "description_zh": "需要部署的ClickHouse集群的安装包版本，只显示common安装包，但需提前上传common、server、client安装包",
+        "visiable": "true",
+        "required": "true",
+        "editable": "true",
+        "type": "string",
+        "input_type": "text",
+        "candidates": [
+            {
+                "label_en": null,
+                "label_zh": null,
+                "value": "clickhouse-common-static-22.3.3.44.x86_64.rpm"
+            },
+            {
+                "label_en": null,
+                "label_zh": null,
+                "value": "clickhouse-common-static-21.9.5.16-2.x86_64.rpm"
+            },
+            {
+                "label_en": null,
+                "label_zh": null,
+                "value": "clickhouse-common-static-21.8.9.13-2.x86_64.rpm"
+            },
+            {
+                "label_en": null,
+                "label_zh": null,
+                "value": "clickhouse-common-static-21.8.9.13-2.rpm"
+            }
+        ],
+        "filter": "\"PkgName\".indexOf(PkgType) !== -1",
+        "default": null,
+        "regexp": null
+    },
     "Cluster": {
-        "label_en": null,
+        "label_en": "Cluster Name",
         "label_zh": "物理集群名",
-        "description_en": null,
+        "description_en": "not allow to duplicate with exist name",
         "description_zh": "不得与本ckman管理的其他集群名重复",
         "visiable": "true",
         "required": "true",
+        "editable": "true",
+        "type": "string",
         "input_type": "text",
-        "candinates": null,
+        "candidates": null,
         "default": null,
-        "range": null,
-        "type": "string"
+        "regexp": null
     },
-    "SshUser": {
-        "label_en": null,
-        "label_zh": "系统账户名",
-        "description_en": null,
-        "description_zh": "必须有root或者sudo权限",
+    "LogicCluster": {
+        "label_en": "Logic Name",
+        "label_zh": "逻辑集群名",
+        "description_en": "require physical cluster",
+        "description_zh": "逻辑集群，存在于物理集群之上",
         "visiable": "true",
-        "required": "true",
+        "required": "false",
+        "editable": "true",
+        "type": "string",
         "input_type": "text",
-        "candinates": null,
+        "candidates": null,
         "default": null,
-        "range": null,
-        "type": "string"
-    },
-    "SshPassword": {
-        "label_en": null,
-        "label_zh": "系统账户密码",
-        "description_en": null,
-        "description_zh": "不得为空",
-        "visiable": "true",
-        "required": "true",
-        "input_type": "password",
-        "candinates": null,
-        "default": null,
-        "range": null,
-        "type": "string"
-    },
-    "IsReplica": {
-        "label_en": null,
-        "label_zh": "物理集群的每个shard是否为多副本",
-        "description_en": null,
-        "description_zh": "生产环境建议每个shard为两副本",
-        "visiable": "true",
-        "required": "true",
-        "type": "bool"
-    },
-    "ManualShards": {
-        "label_en": null,
-        "label_zh": "手工指定各结点分配到shard",
-        "description_en": null,
-        "description_zh": "由ckman完成或者手工指定各结点分配到shard",
-        "visiable": "IsReplica == true",
-        "required": "true",
-        "type": "bool"
-    },
-    "Hosts": {
-        "label_en": null,
-        "label_zh": "集群结点IP地址列表",
-        "description_en": null,
-        "description_zh": "由ckman完成各结点分配到shard。每输入框为单个IP，或者IP范围，或者网段掩码",
-        "visiable": "true",
-        "required": "ManualShards == false",
-        "type": "list-string"
-    },
-    "Shards": {
-        "label_en": null,
-        "label_zh": "集群结点IP地址列表",
-        "description_en": null,
-        "description_zh": "手工指定各结点分配到shard",
-        "visiable": "true",
-        "required": "ManualShards == true",
-        "type": "list-struct",
-        "struct": {
-            "Replicas": {
-                "label_en": null,
-                "label_zh": "Shard",
-                "description_en": null,
-                "description_zh": "Shard内结点IP列表",
-                "visiable": "true",
-                "required": "true",
-                "type": "list-struct",
-                "struct": {
-                    "Ip": {
-                        "label_en": null,
-                        "label_zh": "副本IP地址",
-                        "description_en": null,
-                        "description_zh": "副本IP地址",
-                        "visiable": "true",
-                        "required": "true",
-                        "input_type": "text",
-                        "candinates": null,
-                        "default": null,
-                        "range": null,
-                        "type": "string"
-                    }
-                }
-            }
-        }
+        "regexp": null
     },
     "Port": {
-        "label_en": null,
-        "label_zh": "集群数据库监听TCP端口",
+        "label_en": "TCPPort",
+        "label_zh": "TCP端口",
         "description_en": null,
         "description_zh": null,
         "visiable": "true",
         "required": "true",
+        "editable": "true",
+        "type": "int",
         "input_type": "text",
-        "candinates": null,
-        "default": "9000",
-        "range": null,
-        "type": "number"
+        "candidates": null,
+        "default": "9000"
     },
-    "ZkNodes": {
-        "label_en": null,
-        "label_zh": "ZooKeeper集群结点列表",
-        "description_en": null,
-        "description_zh": "逗号分隔，每段为单个IP，或者IP范围，或者网段掩码",
+    "IsReplica": {
+        "label_en": "Replica",
+        "label_zh": "是否为多副本",
+        "description_en": "Whether each Shard of the cluster is multiple replication, we suggest each shard have two copies.",
+        "description_zh": "物理集群的每个shard是否为多副本, 生产环境建议每个shard为两副本",
         "visiable": "true",
         "required": "true",
+        "editable": "true",
+        "type": "bool"
+    },
+    "Hosts": {
+        "label_en": "ClickHouse Node List",
+        "label_zh": "集群结点IP地址列表",
+        "description_en": "ClickHouse Node ip, support CIDR or Range.designation by ckman automatically",
+        "description_zh": "由ckman完成各结点分配到shard。每输入框为单个IP，或者IP范围，或者网段掩码",
+        "visiable": "true",
+        "required": "true",
+        "editable": "true",
         "type": "list-string"
     },
-    "Storage": {
-        "label_en": null,
-        "label_zh": "集群存储配置",
-        "description_en": null,
-        "description_zh": "由disks, policies两部分构成。policies提到的disk名必须在disks中定义。ClickHouse内置了名为default的policy和disk。",
+    "ZkNodes": {
+        "label_en": "Zookeeper Node List",
+        "label_zh": "ZooKeeper集群结点列表",
+        "description_en": "Zookeeper Node ip, support CIDR or Range.",
+        "description_zh": "每段为单个IP，或者IP范围，或者网段掩码",
         "visiable": "true",
         "required": "true",
+        "editable": "true",
+        "type": "list-string"
+    },
+    "ZkPort": {
+        "label_en": "Zookeeper Port",
+        "label_zh": "ZooKeeper集群监听端口",
+        "description_en": null,
+        "description_zh": null,
+        "visiable": "true",
+        "required": "true",
+        "editable": "true",
+        "type": "int",
+        "input_type": "text",
+        "candidates": null,
+        "default": "2181"
+    },
+    "ZkStatusPort": {
+        "label_en": "Zookeeper Status Port",
+        "label_zh": "Zookeeper监控端口",
+        "description_en": "expose to commands/mntr, zookeeper support it after 3.5.0",
+        "description_zh": "暴露给mntr等四字命令的端口，zookeeper 3.5.0 以上支持",
+        "visiable": "true",
+        "required": "true",
+        "editable": "true",
+        "type": "int",
+        "input_type": "text",
+        "candidates": null,
+        "default": "8080"
+    },
+    "PromHost": {
+        "label_en": "Prometheus Host",
+        "label_zh": "Promethues 地址",
+        "description_en": null,
+        "description_zh": null,
+        "visiable": "true",
+        "required": "false",
+        "editable": "true",
+        "type": "string",
+        "input_type": "text",
+        "candidates": null,
+        "default": "127.0.0.1",
+        "regexp": null
+    },
+    "PromPort": {
+        "label_en": "Prometheus Port",
+        "label_zh": "Promethues 端口",
+        "description_en": null,
+        "description_zh": null,
+        "visiable": "true",
+        "required": "false",
+        "editable": "true",
+        "type": "int",
+        "input_type": "text",
+        "candidates": null,
+        "default": "9090"
+    },
+    "Password": {
+        "label_en": "Default Password",
+        "label_zh": "默认用户密码",
+        "description_en": null,
+        "description_zh": null,
+        "visiable": "true",
+        "required": "true",
+        "editable": "true",
+        "type": "string",
+        "input_type": "password",
+        "candidates": null,
+        "default": null,
+        "regexp": null
+    },
+    "Path": {
+        "label_en": "Data Path",
+        "label_zh": "数据存储路径",
+        "description_en": "path need exist, must end with '/'",
+        "description_zh": "ClickHouse存储数据的路径，路径需要存在且必须以'/'结尾",
+        "visiable": "true",
+        "required": "true",
+        "editable": "true",
+        "type": "string",
+        "input_type": "text",
+        "candidates": null,
+        "default": null,
+        "regexp": "^/.+/$"
+    },
+    "SshUser": {
+        "label_en": "SSH Username",
+        "label_zh": "系统账户名",
+        "description_en": "must have permission with root or sudo",
+        "description_zh": "必须有root或者sudo权限",
+        "visiable": "true",
+        "required": "true",
+        "editable": "true",
+        "type": "string",
+        "input_type": "text",
+        "candidates": null,
+        "default": null,
+        "regexp": null
+    },
+    "AuthenticateType": {
+        "label_en": "Authenticate Type",
+        "label_zh": "认证方式",
+        "description_en": "Authenticate type of connect node, you need copy id_rsa to conf/ if use public key",
+        "description_zh": "SSH 访问节点的方式，可使用公钥或者密码，使用公钥时需将公钥文件放到conf目录下",
+        "visiable": "true",
+        "required": "true",
+        "editable": "true",
+        "type": "int",
+        "input_type": "text",
+        "candidates": [
+            {
+                "label_en": "Password(save)",
+                "label_zh": "密码认证(保存密码)",
+                "value": "0"
+            },
+            {
+                "label_en": "Password(not save)",
+                "label_zh": "密码认证(不保存密码)",
+                "value": "1"
+            },
+            {
+                "label_en": "Public Key",
+                "label_zh": "公钥认证",
+                "value": "2"
+            }
+        ],
+        "filter": null,
+        "default": "2"
+    },
+    "SshPassword": {
+        "label_en": "SSH Password",
+        "label_zh": "系统账户密码",
+        "description_en": "can't be empty",
+        "description_zh": "不得为空",
+        "visiable": "AuthenticateType != '2'",
+        "required": "true",
+        "editable": "true",
+        "type": "string",
+        "input_type": "password",
+        "candidates": null,
+        "default": null,
+        "regexp": null
+    },
+    "SshPort": {
+        "label_en": "SSH Port",
+        "label_zh": "SSH 端口",
+        "description_en": null,
+        "description_zh": "不得为空",
+        "visiable": "true",
+        "required": "true",
+        "editable": "true",
+        "type": "int",
+        "input_type": "text",
+        "candidates": null,
+        "default": "22"
+    },
+    "Storage": {
+        "label_en": "Storage Policy",
+        "label_zh": "集群存储配置",
+        "description_en": "Composed of Disks, Policies. The Disk name mentioned by Policies must be defined in Disks. Clickhouse has built-in Policy and Disk named Default. ",
+        "description_zh": "由disks, policies两部分构成。policies提到的disk名必须在disks中定义。ClickHouse内置了名为default的policy和disk。",
+        "visiable": "true",
+        "required": "false",
+        "editable": "true",
         "type": "struct",
         "struct": {
             "Disks": {
-                "label_en": null,
+                "label_en": "Disk List",
                 "label_zh": "硬盘列表",
-                "description_en": null,
+                "description_en": "defined Disks, follow-up in policies",
                 "description_zh": "定义的disks，后续在policies中用到",
                 "visiable": "true",
-                "required": "true",
+                "required": "false",
+                "editable": "true",
                 "type": "list-struct",
                 "struct": {
-                    "Type": {
-                        "label_en": null,
-                        "label_zh": "disk type",
+                    "Name": {
+                        "label_en": "Name",
+                        "label_zh": "磁盘名称",
                         "description_en": null,
-                        "description_zh": "硬盘类型",
+                        "description_zh": null,
                         "visiable": "true",
                         "required": "true",
+                        "editable": "true",
+                        "type": "string",
                         "input_type": "text",
-                        "candinates": [
-                            "local",
-                            "s3",
-                            "hdfs"
+                        "candidates": null,
+                        "default": null,
+                        "regexp": null
+                    },
+                    "Type": {
+                        "label_en": "Disk Type",
+                        "label_zh": "硬盘类型",
+                        "description_en": null,
+                        "description_zh": null,
+                        "visiable": "true",
+                        "required": "true",
+                        "editable": "true",
+                        "type": "string",
+                        "input_type": "text",
+                        "candidates": [
+                            {
+                                "label_en": "Local",
+                                "label_zh": "本地磁盘",
+                                "value": "local"
+                            },
+                            {
+                                "label_en": "AWS S3",
+                                "label_zh": "AWS S3",
+                                "value": "s3"
+                            },
+                            {
+                                "label_en": "HDFS",
+                                "label_zh": "HDFS",
+                                "value": "hdfs"
+                            }
                         ],
+                        "filter": null,
                         "default": "local",
-                        "range": null,
-                        "type": "string"
+                        "regexp": null
                     },
                     "DiskLocal": {
-                        "label_en": null,
-                        "label_zh": "DiskLocal",
+                        "label_en": "Local",
+                        "label_zh": "本地硬盘",
                         "description_en": null,
-                        "description_zh": "本地硬盘",
+                        "description_zh": null,
                         "visiable": "Type == 'local'",
                         "required": "false",
+                        "editable": "true",
                         "type": "struct",
                         "struct": {
                             "Path": {
-                                "label_en": null,
+                                "label_en": "Amount Path",
                                 "label_zh": "挂载路径",
-                                "description_en": null,
-                                "description_zh": "挂载路径",
+                                "description_en": "need exist, can be accessed by clickhouse, and must begin and end with '/'",
+                                "description_zh": "必须存在，clickhouse用户可访问， 且必须以'/'开头和结尾",
                                 "visiable": "true",
                                 "required": "true",
+                                "editable": "true",
+                                "type": "string",
                                 "input_type": "text",
-                                "candinates": null,
+                                "candidates": null,
                                 "default": null,
-                                "range": null,
-                                "type": "string"
+                                "regexp": "^/.+/$"
+                            },
+                            "KeepFreeSpaceBytes": {
+                                "label_en": "KeepFreeSpaceBytes",
+                                "label_zh": "保留空闲空间大小",
+                                "description_en": null,
+                                "description_zh": null,
+                                "visiable": "true",
+                                "required": "false",
+                                "editable": "true",
+                                "type": "int",
+                                "input_type": "text",
+                                "candidates": null,
+                                "default": null,
+                                "range": {
+                                    "min": -9223372036854776000,
+                                    "max": 9223372036854776000,
+                                    "step": 1
+                                }
+                            }
+                        }
+                    },
+                    "DiskHdfs": {
+                        "label_en": "HDFS",
+                        "label_zh": "HDFS",
+                        "description_en": null,
+                        "description_zh": null,
+                        "visiable": "Type == 'hdfs'",
+                        "required": "false",
+                        "editable": "true",
+                        "type": "struct",
+                        "struct": {
+                            "Endpoint": {
+                                "label_en": "Endpoint",
+                                "label_zh": "HDFS端点URI",
+                                "description_en": null,
+                                "description_zh": null,
+                                "visiable": "true",
+                                "required": "true",
+                                "editable": "true",
+                                "type": "string",
+                                "input_type": "text",
+                                "candidates": null,
+                                "default": null,
+                                "regexp": "^hdfs://.+/$"
                             }
                         }
                     },
                     "DiskS3": {
-                        "label_en": null,
-                        "label_zh": "DiskS3",
+                        "label_en": "AWS S3",
+                        "label_zh": "AWS S3",
                         "description_en": null,
-                        "description_zh": "AWS S3",
-                        "visiable": "Type == \"s3\"",
+                        "description_zh": null,
+                        "visiable": "Type == 's3'",
                         "required": "false",
+                        "editable": "true",
                         "type": "struct",
                         "struct": {
                             "Endpoint": {
-                                "label_en": null,
+                                "label_en": "Endpoint",
                                 "label_zh": "S3端点URI",
                                 "description_en": null,
-                                "description_zh": "S3端点URI",
+                                "description_zh": null,
                                 "visiable": "true",
                                 "required": "true",
+                                "editable": "true",
+                                "type": "string",
                                 "input_type": "text",
-                                "candinates": null,
+                                "candidates": null,
                                 "default": null,
-                                "range": null,
-                                "type": "string"
+                                "regexp": "^(http|https)://.+/$"
                             },
                             "AccessKeyID": {
-                                "label_en": null,
-                                "label_zh": null,
+                                "label_en": "AccessKeyID",
+                                "label_zh": "AccessKeyID",
                                 "description_en": null,
                                 "description_zh": null,
                                 "visiable": "true",
                                 "required": "true",
+                                "editable": "true",
+                                "type": "string",
                                 "input_type": "text",
-                                "candinates": null,
+                                "candidates": null,
                                 "default": null,
-                                "range": null,
-                                "type": "string"
+                                "regexp": null
                             },
                             "SecretAccessKey": {
-                                "label_en": null,
-                                "label_zh": null,
+                                "label_en": "SecretAccessKey",
+                                "label_zh": "SecretAccessKey",
                                 "description_en": null,
                                 "description_zh": null,
                                 "visiable": "true",
                                 "required": "true",
+                                "editable": "true",
+                                "type": "string",
                                 "input_type": "text",
-                                "candinates": null,
+                                "candidates": null,
                                 "default": null,
-                                "range": null,
-                                "type": "string"
+                                "regexp": null
                             },
                             "Region": {
-                                "label_en": null,
-                                "label_zh": null,
+                                "label_en": "Region",
+                                "label_zh": "Region",
                                 "description_en": null,
                                 "description_zh": null,
                                 "visiable": "true",
                                 "required": "false",
+                                "editable": "true",
+                                "type": "string",
                                 "input_type": "text",
-                                "candinates": null,
+                                "candidates": null,
                                 "default": null,
-                                "range": null,
-                                "type": "string"
+                                "regexp": null
                             },
                             "UseEnvironmentCredentials": {
-                                "label_en": null,
-                                "label_zh": null,
+                                "label_en": "UseEnvironmentCredentials",
+                                "label_zh": "UseEnvironmentCredentials",
                                 "description_en": null,
                                 "description_zh": null,
                                 "visiable": "true",
                                 "required": "false",
+                                "editable": "true",
                                 "type": "bool"
                             },
                             "Expert": {
-                                "label_en": null,
+                                "label_en": "Expert Mode",
                                 "label_zh": "专家模式",
-                                "description_en": null,
-                                "description_zh": "专家模式的S3参数",
+                                "description_en": "configure S3 params by yourself, please visit: https://clickhouse.tech/docs/en/engines/table-engines/mergetree-family/mergetree/#table_engine-mergetree-s3",
+                                "description_zh": "专家模式的S3参数, 请参考: https://clickhouse.tech/docs/en/engines/table-engines/mergetree-family/mergetree/#table_engine-mergetree-s3",
                                 "visiable": "true",
-                                "required": "true",
+                                "required": "false",
+                                "editable": "true",
                                 "type": "map"
                             }
                         }
@@ -265,53 +505,80 @@
                 }
             },
             "Policies": {
-                "label_en": null,
+                "label_en": "Policies List",
                 "label_zh": "存储策略列表",
                 "description_en": null,
-                "description_zh": "存储策略列表",
+                "description_zh": null,
                 "visiable": "true",
-                "required": "true",
+                "required": "false",
+                "editable": "true",
                 "type": "list-struct",
                 "struct": {
                     "Name": {
-                        "label_en": null,
-                        "label_zh": null,
+                        "label_en": "Name",
+                        "label_zh": "策略名称",
                         "description_en": null,
                         "description_zh": null,
                         "visiable": "true",
                         "required": "true",
+                        "editable": "true",
+                        "type": "string",
                         "input_type": "text",
-                        "candinates": null,
+                        "candidates": null,
                         "default": null,
-                        "range": null,
-                        "type": "string"
+                        "regexp": null
                     },
-                    "Volumes": {
-                        "label_en": null,
-                        "label_zh": null,
+                    "Volumns": {
+                        "label_en": "Volumns",
+                        "label_zh": "卷",
                         "description_en": null,
                         "description_zh": null,
                         "visiable": "true",
                         "required": "true",
+                        "editable": "true",
                         "type": "list-struct",
                         "struct": {
-                            "Disks": {
-                                "label_en": null,
-                                "label_zh": null,
+                            "Name": {
+                                "label_en": "Name",
+                                "label_zh": "卷名称",
                                 "description_en": null,
                                 "description_zh": null,
                                 "visiable": "true",
                                 "required": "true",
+                                "editable": "true",
+                                "type": "string",
+                                "input_type": "text",
+                                "candidates": null,
+                                "default": null,
+                                "regexp": null
+                            },
+                            "Disks": {
+                                "label_en": "Disks",
+                                "label_zh": "磁盘",
+                                "description_en": null,
+                                "description_zh": null,
+                                "visiable": "true",
+                                "required": "true",
+                                "editable": "true",
                                 "type": "list-string"
                             },
-                            "Expert": {
-                                "label_en": null,
-                                "label_zh": null,
+                            "MaxDataPartSizeBytes": {
+                                "label_en": "MaxDataPartSizeBytes",
+                                "label_zh": "MaxDataPartSizeBytes",
                                 "description_en": null,
                                 "description_zh": null,
                                 "visiable": "true",
-                                "required": "true",
-                                "type": "map"
+                                "required": "false",
+                                "editable": "true",
+                                "type": "int",
+                                "input_type": "text",
+                                "candidates": null,
+                                "default": null,
+                                "range": {
+                                    "min": -9223372036854776000,
+                                    "max": 9223372036854776000,
+                                    "step": 1
+                                }
                             }
                         }
                     },
@@ -322,14 +589,81 @@
                         "description_zh": "当一个volume空闲空间占比小于此值时，移动部分parts到下一个volume",
                         "visiable": "true",
                         "required": "false",
+                        "editable": "true",
+                        "type": "float",
                         "input_type": "text",
-                        "candinates": null,
+                        "candidates": null,
                         "default": null,
-                        "range": null,
-                        "type": "number"
+                        "range": {
+                            "min": 0,
+                            "max": 1,
+                            "step": 0.1
+                        }
                     }
                 }
             }
         }
+    },
+    "UsersConf": {
+        "label_en": "User Config",
+        "label_zh": "用户管理配置",
+        "description_en": null,
+        "description_zh": null,
+        "visiable": "true",
+        "required": "false",
+        "editable": "true",
+        "type": "struct",
+        "struct": {
+            "Users": {
+                "label_en": "Users",
+                "label_zh": "用户",
+                "description_en": "normal user config management",
+                "description_zh": "普通用户的管理",
+                "visiable": "true",
+                "required": "false",
+                "editable": "true",
+                "type": "list-struct",
+                "struct": {
+                    "Name": {
+                        "label_en": "Name",
+                        "label_zh": "用户名",
+                        "description_en": "username, can't be duplicate or default",
+                        "description_zh": "用户名称，不可以是已经存在的或default",
+                        "visiable": "true",
+                        "required": "true",
+                        "editable": "true",
+                        "type": "string",
+                        "input_type": "text",
+                        "candidates": null,
+                        "default": null,
+                        "regexp": null
+                    },
+                    "Password": {
+                        "label_en": "Password",
+                        "label_zh": "密码",
+                        "description_en": "can't be empty",
+                        "description_zh": "用户密码，不可为空",
+                        "visiable": "true",
+                        "required": "true",
+                        "editable": "true",
+                        "type": "string",
+                        "input_type": "password",
+                        "candidates": null,
+                        "default": null,
+                        "regexp": null
+                    }
+                }
+            }
+        }
+    },
+    "Expert": {
+        "label_en": "Custom Config",
+        "label_zh": "自定义配置项",
+        "description_en": "Custom configuration items, similar to xpath syntax(https://www.w3schools.com/xml/xpath_syntax.asp);\nFor example: title[@lang='en', @size=4]/header:header123, the final generated configuration is:\n<title lang=\"en\" size=\"4\">\n    <header>header123</header>\n</title>\nNon-professionals please do not fill in this",
+        "description_zh": "自定义配置文件，语法接近xpath(https://www.w3schools.com/xml/xpath_syntax.asp);\n举例：title[@lang='en', @size=4]/header:header123， 最终生成的配置为:\n<title lang=\"en\" size=\"4\">\n    <header>header123</header>\n</title>\n非专业人士请勿填写此项",
+        "visiable": "true",
+        "required": "false",
+        "editable": "true",
+        "type": "map"
     }
 }
