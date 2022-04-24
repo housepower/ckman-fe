@@ -23,4 +23,8 @@ export const TaskApi = {
   getTaskDetail(taskId) {
     return axios.get(`${url}/${taskId}`);
   },
+  // 停止任务
+  stopTask(taskId) {
+    return axios.put(`${url}/${taskId}`);
+  }
 };

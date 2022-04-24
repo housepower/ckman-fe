@@ -9,6 +9,7 @@ import { DForm } from '@/components/';
 import { ClusterApi } from '@/apis';
 import { $modal } from '@/services/';
 import TaskDetail from '@/views/task/components/TaskDetail.vue';
+// import dataJson from '@/components/d-form/mock/data.json';
 export default {
   name: 'CreateCluster',
   components: {
@@ -36,6 +37,8 @@ export default {
       try {
         const schema = (new Function("return " + entity))();
         this.schema = schema;
+        // this.schema = dataJson;
+        // console.log(dataJson);
       } catch (e) {
 
       }

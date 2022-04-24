@@ -60,12 +60,13 @@ const messages = {
       'keyword search': 'keyword search',
       "Current Browser Not Support": "Current Browser Not Support",
       'Package Type': 'Package Type',
+      'Message Center': 'Message Center',
+      'Action Success': 'Action Success',
     },
     layout: {
       'ClickHouse Management Console': 'ClickHouse Management Console',
       'Settings': 'Settings',
       'Logout Success': 'Logout Success',
-      'Message Center': 'Message Center',
       'Document': 'Document',
     },
     home: {
@@ -161,6 +162,8 @@ const messages = {
       'Initial Query ID': 'Initial Query ID',
       'Initial Address': 'Initial Address',
       'Thread Numbers': 'Thread Numbers',
+      'Kill': 'Kill',
+      'Node Host': 'Node Host',
     },
     queryExecution: {
       'Query History': 'Query History',
@@ -222,6 +225,8 @@ const messages = {
       'Message': 'Message',
       'Update Time': 'Update Time',
       'Duration': 'Duration',
+      'Stop': 'Stop',
+      'The current operation cannot be actually canceled, only the task status is changed to stopped': 'The current operation cannot be actually canceled, only the task status is changed to stopped.Confirm the operation?',
     }
   },
   zh: {
@@ -279,12 +284,13 @@ const messages = {
       'keyword search': '关键字搜索',
       "Current Browser Not Support": '当前浏览器不支持',
       'Package Type': '安装包类型',
+      'Message Center': '消息中心',
+      'Action Success': '操作成功',
     },
     layout: {
       'ClickHouse Management Console': 'ckman管理平台',
       'Settings': '设置',
       'Logout Success': '成功登出',
-      'Message Center': '消息中心',
       'Document': '文档',
     },
     home: {
@@ -377,9 +383,11 @@ const messages = {
       'Query Duration': 'SQL持续时间(ms)',
       'Query': 'SQL语句',
       'Initial User': '执行用户',
-      'Initial Query ID': 'Query ID',
+      'Initial Query ID': '初始查询ID',
       'Initial Address': '执行主机',
       'Thread Numbers': '线程号',
+      'Kill': '终止',
+      'Node Host': '主节点',
     },
     queryExecution: {
       'Query History': '查询历史',
@@ -441,6 +449,8 @@ const messages = {
       'Message': '返回信息',
       'Update Time': '更新时间',
       'Duration': '持续时间',
+      'Stop': '停止',
+      'The current operation cannot be actually canceled, only the task status is changed to stopped': '当前操作无法实际取消，仅将任务状态改为已停止。确认操作？',
     }
   },
 };

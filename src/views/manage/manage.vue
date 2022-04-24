@@ -135,6 +135,7 @@ export default {
       policy: 'Full',
       needPassword: false,
       password: '',
+      packageType: '',
       gridOptions: {
         border: true,
         resizable: true,
@@ -218,15 +219,17 @@ export default {
       this.list = entity;
       this.mode = entity.mode;
       this.needPassword = entity.needPassword;
+      this.packageType = entity.packageType;
     },
     async fetchVersionData() {
+      const { packageType } = this;
       const {
         data: { entity },
-      } = await PackageApi.getList();
+      } = await PackageApi.getList(packageType);
       this.versionOptions = entity.map((item) => ({
-        value: item,
-        label: item,
-        disabled: item === this.list.version,
+        value: item.version,
+        label: item.version,
+        disabled: item.version === this.list.version,
       }));
     },
     isStatusDisable(item) {

@@ -4,11 +4,12 @@
     <div class="title flex flex-between flex-vcenter ptb-10 pull-left">
       <span class="fs-20 font-bold">{{$t('task.Task List')}}</span>
       <span class="ml-5 fc-green fs-14">( {{$t('task.Running Task Num')}} {{runningTaskNum}} )</span>
-    </div
+    </div>
     <section class="mb-20" v-if="isLoaded">
       <vxe-toolbar zoom custom class="pull-right">
         <template #buttons>
           <el-input size="medium" :placeholder="$t('common.keyword search')" v-model="searchKey" class="width-250 mr-10" suffix-icon="el-icon-search"></el-input>
+          <el-button size="small" type="danger" icon="el-icon-delete fs-14" circle @click="deleteTaskBatch"></el-button>
         </template>
       </vxe-toolbar>
 
@@ -21,6 +22,7 @@
         :data="currentPageData"
         @sort-change="sortChangeEvent"
       >
+       <vxe-column type="checkbox" width="60" align="center"></vxe-column>
        <vxe-column
           v-for="{ prop, label, minWidth, fixed, filters } of columns"
           :key="prop"
@@ -43,6 +45,7 @@
           <template slot-scope="scope">
             <el-button  type="text" size="small" @click="viewDetail(scope.row)">{{$t('task.View')}}</el-button>
             <el-button  type="text" size="small" :disabled="!['Success', 'Failed'].includes(scope.row.Status)" @click="deleteTask(scope.row.TaskId)">{{$t('common.Delete')}}</el-button>
+            <el-button  type="text" size="small" :disabled="!['Running', 'Waiting'].includes(scope.row.Status)" @click="stopTask(scope.row)">{{$t('task.Stop')}}</el-button>
           </template>
         </vxe-column>
       </vxe-table>
@@ -220,7 +223,7 @@ export default {
         cancelButtonText: this.$t("common.Cancel"),
       });
       await TaskApi.deleteTask(taskId);
-      $message.success(this.$t('common.Delete') + this.$t('common.Success'));
+      $message.success(this.$t('common.Delete') + ' ' + this.$t('common.Success'));
       this.fetchData();
     },
     async getRunningTasks() {
@@ -245,6 +248,47 @@ export default {
     refresh() {
       this.fetchData();
       this.getRunningTasks();
+    },
+    getSelectRecords() {
+      const $table = this.$refs.xTable;
+      const selectRecords = $table?.getCheckboxRecords();
+      return selectRecords || [];
+    },
+    async deleteTaskBatch() {
+      const selectRecords = this.getSelectRecords();
+      await this.$confirm(this.$t('task.Delete Task'), this.$t('common.tips'), {
+        confirmButtonText: this.$t("common.Confirm"),
+        cancelButtonText: this.$t("common.Cancel"),
+      });
+      // @ts-ignore
+      const results:{ status: string, value: any}[] = await Promise.allSettled(selectRecords.map(x => {
+        return TaskApi.deleteTask(x.TaskId);
+      }));
+      if (results.length === 1) {
+        if (results[0].status === 'fulfilled') {
+          $message.success(this.$t('common.Action Success'));
+        } else {
+          $message.fuck(results[0]?.value?.data?.retMsg);
+        }
+      } else {
+        const msg = results.some(x => x.status === 'rejected') ? $message.warning : $message.success;
+        msg(`${this.$t('common.Action Success')}，${this.$t('common.Success')}${
+          results.filter(x => x.status === 'fulfilled').length
+        }，${this.$t('common.Failed')}${
+          results.filter(x => x.status === 'rejected').length
+        }`);
+      }
+      $message.success(this.$t('common.Delete') + ' ' + this.$t('common.Success'));
+      this.fetchData();
+    },
+    async stopTask(item) {
+      await this.$confirm(this.$t("task.The current operation cannot be actually canceled, only the task status is changed to stopped"), this.$t("common.tips"), {
+        confirmButtonText: this.$t("task.Stop"),
+        cancelButtonText: this.$t("common.Cancel"),
+        text: "warning",
+      });
+      await TaskApi.stopTask(item.TaskId);
+      this.$message.success(this.$t('common.Action Success'));
     }
   },
 };

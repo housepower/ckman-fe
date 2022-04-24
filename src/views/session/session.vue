@@ -10,7 +10,7 @@
       </div>
       <div class="tables">
         <h3 class="mb-10">{{$t('session.Open Sessions')}}</h3>
-        <session-table :list="openList" />
+        <session-table :list="openList" :clusterName="id" type="open" />
         <div class="mb-10 mt-50" style="overflow: hidden;">
           <div class="fs-18 font-bold pull-left">{{$t('session.Slow Sessions')}}</div>
           <div class="pull-right">
@@ -21,7 +21,7 @@
             <el-input-number class="ml-10" placeholder="查询条数" @change="timeFilterRefresh" v-model="limit" size="small" :min="5" style="width:100px;"/>
           </div>
         </div>
-        <session-table :list="closeList" />
+        <session-table :list="closeList" :clusterName="id" type="close" />
       </div>
     </section>
   </main>

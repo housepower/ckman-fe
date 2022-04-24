@@ -69,7 +69,7 @@ export default {
         cancelButtonText: this.$t('common.Cancel'),
         text: "warning",
       });
-      await PackageApi.deletePackage({ packageVersion: item.version });
+      await PackageApi.deletePackage({ packageVersion: item.version, pkgType: item.pkgType });
       this.$message.success(`${item.version} ${this.$t('common.Version')} ${this.$t('common.Delete')} ${this.$t('common.Success')}`);
       this.fetchData();
     },

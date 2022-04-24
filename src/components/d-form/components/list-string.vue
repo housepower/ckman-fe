@@ -2,8 +2,8 @@
   <div class="flex flex-column list-string mb-20 ml-10" v-if="formData.length > 0" style="line-height: 30px; margin-top: -10px;">
     <div class="content">
       <div v-for="(item, index) in formData" :key="item.$$id" class="flex flex-vcenter mb-10">
-        <el-input size="medium" v-model="item.value" class="width-350" @change="onChange"></el-input>
-        <i class="fa fa-trash pointer fs-16 fc-red ml-10" @click="deleteItem(index)"></i>
+        <el-input size="medium" :disabled="schema.editable === 'false'" v-model="item.value" class="width-350" @change="onChange"></el-input>
+        <i class="fa fa-trash pointer fs-16 fc-red ml-10" v-if="schema.editable === 'true'" @click="deleteItem(index)"></i>
       </div>
     </div>
   </div>

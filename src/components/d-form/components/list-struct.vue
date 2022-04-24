@@ -4,7 +4,7 @@
       <el-collapse-item v-for="(item, index) in formModel" :key="item.$$id" :name="item.$$id" size="medium">
         <template slot="title" class="flex flex-vcenter pl-10">
           <span class="flex-1 pl-10">{{`${formModel[index].Name || originName}[${index}]`}}</span>
-          <i class="fa fa-trash pointer fs-16 fc-red ml-10" style="margin: 8px 10px 8px auto;" @click.stop="deleteItem(index)"></i>
+          <i class="fa fa-trash pointer fs-16 fc-red ml-10" style="margin: 8px 10px 8px auto;" v-if="schema.editable === 'true'" @click.stop="deleteItem(index)"></i>
         </template>
         <div v-for="(child, key) in schema.struct" :key="key" style="line-height: 40px;">
           <DFormItem v-model="formModel[index]" :schema="child" :origin-name="key" :prop-name="`${PropName}.${index}.${key}`">
@@ -18,7 +18,7 @@
           <DFormItem v-model="formModel[index]" :schema="child" :origin-name="key" :prop-name="`${PropName}.${index}.${key}`" :is-cascade="isCascade">
           </DFormItem>
         </div>
-        <i class="fa fa-trash pointer fs-16 fc-red ml-10 absolute" style="right: 15px; top: 10px;" @click.stop="deleteItem(index)"></i>
+        <i class="fa fa-trash pointer fs-16 fc-red ml-10 absolute" style="right: 15px; top: 10px;" v-if="schema.editable === 'true'" @click.stop="deleteItem(index)"></i>
       </div>
     </div>
   </div>

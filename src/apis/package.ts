@@ -3,8 +3,8 @@ import axios from 'axios';
 const url = '/api/v1';
 
 export const PackageApi = {
-  getList() {
-    return axios.get(`${url}/package`);
+  getList(packageType) {
+    return axios.get(`${url}/package?pkgType=${packageType || 'all'}`);
   },
   upload(params, opt) {
     return axios.post(`${url}/package`, params, opt);

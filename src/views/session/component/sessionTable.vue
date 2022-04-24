@@ -22,6 +22,16 @@
           <span v-if="col.prop === 'startTime'">{{ row.startTime * 1000 | formatDate }}</span>
           <span v-else>{{ row[col.prop] }}</span>
         </vxe-column>
+        <vxe-column
+          v-if="type === 'open'"
+          fixed="right"
+          align="center"
+          :title="$t('tables.Action')"
+          width="140">
+          <template slot-scope="scope">
+            <el-button  type="text" size="small" @click="killSession(scope.row)">{{$t('session.Kill')}}</el-button>
+          </template>
+        </vxe-column>
     </vxe-table>
     <vxe-pager
       :current-page="pagination.currentPage"
@@ -34,12 +44,19 @@
   </div>
 </template>
 <script>
+import { SessionApi } from '@/apis';
 export default {
   props: {
     list: {
       type: Array,
       default: [],
     },
+    type: {
+      type: String,
+    },
+    clusterName: {
+      type: String,
+    }
   },
   data() {
     return {
@@ -101,6 +118,11 @@ export default {
           sortable: true
         },
         {
+          prop: "host",
+          label: this.$t('session.Node Host'),
+          sortable: true
+        },
+        {
           prop: "address",
           label: this.$t('session.Initial Address'),
           sortable: true
@@ -155,6 +177,16 @@ export default {
     handlePageChange(pager) {
       this.pagination.currentPage = pager.currentPage;
     },
+    async killSession(item) {
+      // todo 终止会话 需测试
+      const { clusterName } = this;
+      const { host, queryId } = item;
+      const { data: { entity } } = await SessionApi.kill(clusterName, {
+        host,
+        queryId
+      });
+      this.$message.success(`${this.$t('common.Action Success')}`);
+    }
   },
 };
 </script>

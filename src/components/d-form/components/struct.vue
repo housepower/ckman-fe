@@ -4,7 +4,6 @@
       <DFormItem v-model="formModel" v-for="(item, key) in schema" :key="key" :schema="item" :origin-name="key" :prop-name="`${PropName}.${key}`">
       </DFormItem>
     </div>
-    
   </div>
 </template>
 <script>
