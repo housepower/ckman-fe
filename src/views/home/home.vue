@@ -81,7 +81,7 @@
 <script>
 import ImportCk from "./modals/importCk";
 import { $modal } from "@/services";
-import { ClusterApi, PackageApi } from "@/apis";
+import { ClusterApi } from "@/apis";
 export default {
   name: "Home",
   data() {
@@ -104,7 +104,6 @@ export default {
     }
   },
   mounted() {
-    this.fetchVersionData();
     this.fetchData();
   },
   methods: {
@@ -119,15 +118,6 @@ export default {
         item.zkNodes = item.zkNodes.join(",");
         this.list.unshift(item);
       });
-    },
-    async fetchVersionData() {
-      const {
-        data: { entity },
-      } = await PackageApi.getList();
-      this.versionOptions = entity.map((item) => ({
-        value: item,
-        label: item,
-      }));
     },
     createCk() {
       this.$router.push({

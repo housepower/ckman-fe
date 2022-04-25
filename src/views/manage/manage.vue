@@ -127,6 +127,7 @@ export default {
       list: {
         status: "green",
         version: "",
+        pkgType:'',
         nodes: [],
       },
       clusterStatus: [],
@@ -208,8 +209,8 @@ export default {
     this.clusterStatus = Object.keys(ClusterStatus)
       .filter((item) => item !== "upgrade")
       .map((v) => upperFirst(v));
-    this.fetchVersionData();
     this.fetchData();
+    // this.fetchVersionData();
   },
   methods: {
     async fetchData() {
@@ -219,7 +220,8 @@ export default {
       this.list = entity;
       this.mode = entity.mode;
       this.needPassword = entity.needPassword;
-      this.packageType = entity.packageType;
+      this.packageType = entity.pkgType;
+      this.fetchVersionData();
     },
     async fetchVersionData() {
       const { packageType } = this;

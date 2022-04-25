@@ -48,7 +48,7 @@ export default {
       this.list = [];
       const {
         data: { entity },
-      } = await PackageApi.getList();
+      } = await PackageApi.getList('all');
       this.list = entity;
     },
     async chooseFile() {

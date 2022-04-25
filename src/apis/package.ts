@@ -4,7 +4,7 @@ const url = '/api/v1';
 
 export const PackageApi = {
   getList(packageType) {
-    return axios.get(`${url}/package?pkgType=${packageType || 'all'}`);
+    return axios.get(`${url}/package?pkgType=${packageType}`);
   },
   upload(params, opt) {
     return axios.post(`${url}/package`, params, opt);
