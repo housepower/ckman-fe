@@ -68,6 +68,7 @@ const messages = {
       'Settings': 'Settings',
       'Logout Success': 'Logout Success',
       'Document': 'Document',
+      'API': 'Swagger'
     },
     home: {
       'Create or import a ClickHouse Cluster': 'Create or import a ClickHouse Cluster',
@@ -292,6 +293,7 @@ const messages = {
       'Settings': '设置',
       'Logout Success': '成功登出',
       'Document': '文档',
+      'API':'接口说明',
     },
     home: {
       'Create or import a ClickHouse Cluster': '创建或导入集群',
