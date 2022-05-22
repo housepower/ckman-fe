@@ -44,7 +44,7 @@
           width="140">
           <template slot-scope="scope">
             <el-button  type="text" size="small" @click="viewDetail(scope.row)">{{$t('task.View')}}</el-button>
-            <el-button  type="text" size="small" :disabled="!['Success', 'Failed'].includes(scope.row.Status)" @click="deleteTask(scope.row.TaskId)">{{$t('common.Delete')}}</el-button>
+            <el-button  type="text" size="small" :disabled="!['Success', 'Failed', 'Stopped'].includes(scope.row.Status)" @click="deleteTask(scope.row.TaskId)">{{$t('common.Delete')}}</el-button>
             <el-button  type="text" size="small" :disabled="!['Running', 'Waiting'].includes(scope.row.Status)" @click="stopTask(scope.row)">{{$t('task.Stop')}}</el-button>
           </template>
         </vxe-column>
@@ -114,7 +114,8 @@ export default {
           { label: 'Waiting', value: 'Waiting' },
           { label: 'Running', value: 'Running' },
           { label: 'Failed', value: 'Failed' },
-          { label: 'Success', value: 'Success' }
+          { label: 'Success', value: 'Success' },
+          { label: 'Stopped', value: 'Stopped'}
         ] },
         { prop: 'Message', label: this.$t('task.Message')},
         { prop: 'CreateTime', label: this.$t('task.Create Time') },
@@ -213,7 +214,7 @@ export default {
         });
 
       this.tableData = entity;
-      if (entity.filter(task => !['Success', 'Failed'].includes(task.Status)).length === 0) {
+      if (entity.filter(task => !['Success', 'Failed', 'Stopped'].includes(task.Status)).length === 0) {
         this.timerId && clearInterval(this.timerId);
       }
     },
@@ -272,9 +273,9 @@ export default {
         }
       } else {
         const msg = results.some(x => x.status === 'rejected') ? $message.warning : $message.success;
-        msg(`${this.$t('common.Action Success')}，${this.$t('common.Success')}${
+        msg(`${this.$t('common.Action Success')}, ${this.$t('common.Success')}${
           results.filter(x => x.status === 'fulfilled').length
-        }，${this.$t('common.Failed')}${
+        }, ${this.$t('common.Failed')}${
           results.filter(x => x.status === 'rejected').length
         }`);
       }
