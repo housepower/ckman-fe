@@ -57,6 +57,7 @@ export default class TimeFilter extends VueComponentBase {
   @Prop() readonly hideRefresh: boolean;
   @Prop() readonly value: (string | number)[];
   @Prop() refreshDuration: string;
+  @Prop() localKey: string;
 
   readonly TimeUnits = TimeUnits;
   relativeTimes = [
@@ -153,6 +154,50 @@ export default class TimeFilter extends VueComponentBase {
     }
   }
 
+  created() {
+    // 从本地缓存中读取缓存
+    const { localKey } = this;
+    if (!localKey) return;
+    const localData = this.readLocal();
+    if (localData) {
+      const { refreshDuration, timeRange } = localData;
+      this.$emit('update:refreshDuration', refreshDuration);
+      if (timeRange) {
+        this.$emit('input', timeRange);
+      }
+      if (refreshDuration) {
+        this.setRefresh(refreshDuration);
+      }
+    } else {
+      if (this.refreshDuration) {
+        this.setRefresh(this.refreshDuration);
+      }
+    }
+  }
+
+  setLocal(obj) {
+    const { localKey } = this;
+    if (!localKey) return;
+    const localData = this.readLocal();
+    localStorage.setItem(localKey, JSON.stringify({
+      ...localData,
+      ...obj,
+    }));
+  }
+
+  readLocal() {
+    const { localKey } = this;
+    if (!localKey) return;
+    try {
+      const localCache = JSON.parse(localStorage.getItem(localKey));
+      if (typeof localCache === 'object') {
+        return localCache;
+      }
+    } catch(e) {
+      return null;
+    }
+  }
+
   destroyed() {
     clearInterval(this.refreshPromise);
   }
@@ -163,16 +208,19 @@ export default class TimeFilter extends VueComponentBase {
     if (t) {
       const duration = +parseDuration(t);
       this.$emit('update:refreshDuration', t);
+      this.setLocal({ refreshDuration: t });
       this.refreshPromise = setInterval($event => {
         this.$emit('on-refresh', $event);
       }, duration);
     } else {
       this.$emit('update:refreshDuration', null);
+      this.setLocal({ refreshDuration: null });
     }
   }
 
   setRelative(t: string) {
     this.$emit('input', ['now-' + t, 'now']);
+    this.setLocal({ timeRange: ['now-' + t, 'now'] });
   }
 
   initRelative() {
@@ -195,7 +243,9 @@ export default class TimeFilter extends VueComponentBase {
   }
 
   setAbsolute() {
-    this.$emit('input', this.absoluteValue.map(x => +new Date(x)));
+    const range = this.absoluteValue.map(x => +new Date(x));
+    this.$emit('input', range);
+    this.setLocal({ timeRange: range });
   }
 
   initAbsolute() {

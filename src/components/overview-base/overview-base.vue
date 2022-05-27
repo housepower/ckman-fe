@@ -7,6 +7,7 @@
         <div class="title flex flex-vcenter flex-between">
           <span class="fs-18 font-bold mtb-20">{{$t('ClickHouseEcharts.' + item.title)}}</span>
           <time-filter v-model="timeFilter"
+                       localKey="overviewBaseTimeFilter"
                        :refreshDuration.sync="refresh"
                        @input="timeFilterChange"
                        @on-refresh="timeFilterRefresh"

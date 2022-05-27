@@ -4,6 +4,7 @@
       <span class="fs-20 font-bold mr-10">{{$t('tables.Table Metrics')}}</span>
       <time-filter v-model="timeFilter"
           ref="timeFilter"
+          localKey="tableMetricsTimeFilter"
           :refreshDuration.sync="refresh"
           @input="timeFilterChange"
           @on-refresh="timeFilterRefresh" />
@@ -70,7 +71,8 @@ export default {
   data() {
     return {
       timeFilter: null,
-      refresh: '',
+      localeKey: 'TABLE_METRICS',
+      refresh: '5s',
       loading: false,
       tableData: [],
       searchKey: '',
@@ -225,9 +227,6 @@ export default {
   },
   created() {
     this.fetchData();
-  },
-  mounted() {
-    this.$refs.timeFilter.setRefresh('5s');
   },
   methods: {
     byteConvert: byteConvert,
