@@ -1,14 +1,14 @@
 <template>
   <main class="home-package">
     <breadcrumb :data="['package']"></breadcrumb>
-    <section class="rpms">
-      <el-divider content-position="left">{{$t('homePackage.ClickHouse RPMs')}}</el-divider>
-      <rpm-list />
+    <section class="pkgs">
+      <el-divider content-position="left">{{$t('homePackage.ClickHouse Packages')}}</el-divider>
+      <pkg-list />
     </section>
   </main>
 </template>
 <script>
-import RpmList from "./component/rpms";
+import PkgList from "./component/pkgs";
 
 export default {
     name: "homePackage",
@@ -18,7 +18,7 @@ export default {
     };
   },
   components: {
-    RpmList,
+    PkgList,
   },
 };
 </script>

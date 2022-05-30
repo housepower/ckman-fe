@@ -7,9 +7,9 @@
                :file-list="fileList"
                :on-change="changeFile"
                :on-remove="removeFile"
-               accept=".rpm">
+               accept=".rpm, .deb, .tgz">
       <el-button type="primary"
-                 class="mb-15">{{$t('homePackage.Upload RPMs')}}</el-button>
+                 class="mb-15">{{$t('homePackage.Upload Packages')}}</el-button>
     </el-upload>
     <el-progress :text-inside="true"
                  :stroke-width="15"
@@ -50,7 +50,7 @@ export default {
           });
         });
         await Promise.all(resAll);
-        this.$message.success("rpm包上传成功");
+        this.$message.success("安装包上传成功");
       } else {
         this.$message.warning("请选取文件");
         return Promise.reject();

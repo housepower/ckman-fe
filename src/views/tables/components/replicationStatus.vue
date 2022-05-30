@@ -204,12 +204,13 @@ export default {
       let nextOrder = order === '0' ? '1' : '0';
       const nextValue = row[name + '_' + nextOrder];
       if (!nextValue) return;
-      if (name.indexOf('F') === '-1') {
+      if (value.indexOf('F') == '-1') {
         return;
       }
-      const num = parseInt(value.replace('F', ''), 10);
+
+      const num = parseInt(value.match(/F\[(\d+)\]/)[1], 10);
       if (!nextValue) return;
-      const nextNum = parseInt(nextValue.replace('L', ''), 10);
+      const nextNum = parseInt(nextValue.match(/[M]L\[(\d+)\]/)[1], 10);
       if (num < nextNum) {
         return 'yellow'
       }

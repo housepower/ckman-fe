@@ -72,7 +72,6 @@ export default {
     return {
       timeFilter: null,
       localeKey: 'TABLE_METRICS',
-      refresh: '5s',
       loading: false,
       tableData: [],
       searchKey: '',

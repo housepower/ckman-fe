@@ -1,8 +1,8 @@
 <template>
-  <section class="rpms text-right">
+  <section class="pkgs text-right">
     <el-button type="primary"
                class="mb-15"
-               @click="chooseFile">{{$t('homePackage.Upload RPMs')}}</el-button>
+               @click="chooseFile">{{$t('homePackage.Upload Packages')}}</el-button>
     <el-table :data="list"
               border>
       <el-table-column prop="version"

@@ -183,8 +183,8 @@ const messages = {
       'No Sql': 'No Sql',
     },
     homePackage: {
-      'Upload RPMs': 'Upload RPMs',
-      'ClickHouse RPMs': 'ClickHouse RPMs',
+      'Upload Packages': 'Upload Packages',
+      'ClickHouse Packages': 'ClickHouse Packages',
     },
     ClickHouseEcharts: {
       'ClickHouse Table KPIs': 'ClickHouse Database KPIs',
@@ -409,8 +409,8 @@ const messages = {
       'No Sql': '请输入sql语句',
     },
     homePackage: {
-      'Upload RPMs': '上传RPM包',
-      'ClickHouse RPMs': 'ClickHouse RPM包管理',
+      'Upload Packages': '上传安装包',
+      'ClickHouse Packages': 'ClickHouse 安装包管理',
     },
     ClickHouseEcharts: {
       'ClickHouse Table KPIs': 'ClickHouse 数据库性能指标',

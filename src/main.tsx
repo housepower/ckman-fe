@@ -16,8 +16,6 @@ Component.registerHooks([
 ]);
 
 import ElementUI from 'element-ui';
-import zhCN from 'vxe-table/lib/locale/lang/zh-CN';
-import enUS from 'vxe-table/lib/locale/lang/en-US';
 import VXETable from 'vxe-table';
 VXETable.setup({
   i18n: (key, args) => $i18n.t(key, args) as string,
