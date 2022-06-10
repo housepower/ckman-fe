@@ -19,10 +19,12 @@
           </el-form-item>
           <el-form-item label="Password"
                         prop="pass">
-            <el-input type="password"
+            <el-input :type="isPasswordType ? 'password' : 'text'"
                       v-model="info.pass"
                       autocomplete="off"
-                      class="width-300"></el-input>
+                      class="width-300">
+                      <i slot="suffix" class="fa" :class="{ 'fa-eye-slash': isPasswordType, 'fa-eye': !isPasswordType }" @click="isPasswordType = !isPasswordType"></i>
+                      </el-input>
           </el-form-item>
           <el-button type="primary"
                      @click.prevent="login"
@@ -41,6 +43,7 @@ const md5 = require("blueimp-md5");
 export default {
   data() {
     return {
+      isPasswordType: true,
       info: {
         pass: "",
         user: "",
