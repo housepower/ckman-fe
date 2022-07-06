@@ -190,7 +190,7 @@ export default {
       const {
         data: { entity },
       } = await ClusterApi.getCluster();
-      this.clusters = Object.keys(entity).map(x => {
+      this.clusters = (Object.keys(entity)||[]).map(x => {
         return {
           label: x,
           value: x
@@ -262,7 +262,7 @@ export default {
         cancelButtonText: this.$t("common.Cancel"),
       });
       // @ts-ignore
-      const results:{ status: string, value: any}[] = await Promise.allSettled(selectRecords.map(x => {
+      const results:{ status: string, value: any}[] = await Promise.allSettled((selectRecords||[]).map(x => {
         return TaskApi.deleteTask(x.TaskId);
       }));
       if (results.length === 1) {

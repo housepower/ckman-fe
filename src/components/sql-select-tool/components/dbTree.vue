@@ -53,17 +53,17 @@ export default {
     async getTableList() {
       const { id: clusterName } = this.$route.params;
       const { data: { entity } } = await SqlQueryApi.getTableLists(clusterName);
-      const treeData = Object.keys(entity).map(dbName => {
+      const treeData = (Object.keys(entity)||[]).map(dbName => {
         const db = {
           id: dbName,
           label: dbName,
           icon: 'fa fa-database',
-          children: Object.keys(entity[dbName]).map(tableName => {
+          children: (Object.keys(entity[dbName])||[]).map(tableName => {
             const table = {
               id: tableName,
               label: tableName,
               icon: 'fa fa-table',
-              children: entity[dbName][tableName].map(columnName => {
+              children: (entity[dbName][tableName]||[]).map(columnName => {
                 return {
                   id: columnName,
                   label: columnName,
