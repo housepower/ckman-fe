@@ -109,7 +109,7 @@ export default {
       if (entity.length) {
         this.columns = entity[0];
         entity.splice(0, 1);
-        Object.values(entity).map((item, index) => {
+        (Object.values(entity)||[]).map((item, index) => {
           let dataItem = {};
           item.forEach((v, i) => {
             dataItem[this.columns[i]] = v;

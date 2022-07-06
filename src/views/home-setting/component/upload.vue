@@ -37,7 +37,7 @@ export default {
     },
     async onOk() {
       if (this.fileList.length) {
-        const resAll = this.fileList.map((file) => {
+        const resAll = (this.fileList||[]).map((file) => {
           let formData = new FormData();
           formData.append("package", file.raw);
           return PackageApi.upload(formData, {

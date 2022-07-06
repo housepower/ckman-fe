@@ -55,10 +55,10 @@ export default {
     };
   },
   mounted() {
-    this.chartMetrics = this.metrics.map(({ title, metrics }) => {
+    this.chartMetrics = (this.metrics||[]).map(({ title, metrics }) => {
       return {
         title,
-        metrics: metrics.map((item) => {
+        metrics: (metrics||[]).map((item) => {
           item["option"] = null;
           return item;
         }),
@@ -89,7 +89,7 @@ export default {
       this.$set(chart, "option", chartOption(entity, min, max));
       this.$nextTick(() => {
         this.$refs.Charts[index] && this.$refs.Charts[index].refreshChart();
-        const chartInstances = this.$refs.Charts.map((item) => item.chart);
+        const chartInstances = (this.$refs.Charts||[]).map((item) => item.chart);
         echarts.connect(chartInstances);
       });
     },

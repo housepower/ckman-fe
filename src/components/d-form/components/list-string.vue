@@ -52,7 +52,7 @@ export default {
 
   methods: {
     initData() {
-      this.formData = this.formModel.map(x => {
+      this.formData = (this.formModel||[]).map(x => {
         return {
           $$id: +new Date(),
           value: x

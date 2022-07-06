@@ -54,7 +54,7 @@ export default {
   methods: {
     initData() {
       const { formModel } = this;
-      this.formData = Object.entries(formModel).map(([key, value]) => {
+      this.formData = (Object.entries(formModel)||[]).map(([key, value]) => {
         return {
           key,
           value,

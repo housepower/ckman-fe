@@ -234,7 +234,7 @@ export default {
       const {
         data: { entity },
       } = await TablesApi.tableMetrics(this.$route.params.id).finally(() => this.loading = false);
-      this.tableData =  Object.freeze(Object.entries(entity).map(([key, values]) => {
+      this.tableData =  (Object.freeze(Object.entries(entity)||[]).map(([key, values]) => {
         values.readwrite_status = values.readwrite_status.toString().toUpperCase();
         values.queryCost = Object.values(values.queryCost).join(',');
         values.tableName = key;

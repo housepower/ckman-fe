@@ -142,7 +142,7 @@ export default {
         const shard = `shard${index + 1}`;
         const col = {
           label: shard,
-          children: item.map((v, index) => {
+          children: (item||[]).map((v, index) => {
             return {
               prop: `${shard}_${index}`,
               label: v,

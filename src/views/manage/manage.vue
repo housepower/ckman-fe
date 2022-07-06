@@ -228,7 +228,7 @@ export default {
       const {
         data: { entity },
       } = await PackageApi.getList(packageType);
-      this.versionOptions = entity.map((item) => ({
+      this.versionOptions = (entity||[]).map((item) => ({
         value: item.version,
         label: item.version,
         disabled: item.version === this.list.version,
