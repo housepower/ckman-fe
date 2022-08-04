@@ -54,22 +54,23 @@ export default {
     initData() {
       this.formData = (this.formModel||[]).map(x => {
         return {
-          $$id: +new Date(),
+          $$id: Math.floor(Math.random() * 1000000),
           value: x
         }
       });
     },
     addItem() {
       this.formData.push({
-        $$id: +new Date(),
+        $$id: Math.floor(Math.random() * 1000000),
         value: ''
       });
     },
     deleteItem(index) {
       this.formData.splice(index, 1);
+      this.$emit('change', this.formData.filter(x => x.value).map(x => x.value));
     },
     onChange() {
-      this.$emit('change', this.formData.filter(x => x.value).map(x => x.value))
+      this.$emit('change', this.formData.filter(x => x.value).map(x => x.value));
     }
   }
 }
