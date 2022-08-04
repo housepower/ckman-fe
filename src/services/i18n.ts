@@ -63,6 +63,7 @@ const messages = {
       'Package Type': 'Package Type',
       'Message Center': 'Message Center',
       'Action Success': 'Action Success',
+      'Refresh': 'Refresh',
     },
     layout: {
       'ClickHouse Management Console': 'ClickHouse Management Console',
@@ -297,6 +298,7 @@ const messages = {
       'Package Type': '安装包类型',
       'Message Center': '消息中心',
       'Action Success': '操作成功',
+      'Refresh': '刷新',
     },
     layout: {
       'ClickHouse Management Console': 'ckman管理平台',
