@@ -9,6 +9,7 @@ const messages = {
     ...enUS,
     common: {
       'Success': 'Success',
+      'Close': 'Close',
       'Create': 'Create',
       'Confirm': 'Confirm',
       'Cancel': 'Cancel',
@@ -124,6 +125,7 @@ const messages = {
       'Node Status': 'Node Status' ,
       'Online': 'Online',
       'Offline': 'Offline',
+      'View Log': 'View Log',
       'Start Cluster': 'Start Cluste',
       'Stop Cluster': 'Stop Cluster',
       'Destroy Cluster': 'Destroy Cluster',
@@ -132,6 +134,12 @@ const messages = {
       'New Node IP': 'New Node IP',
       'Node Shard': 'Node Shard',
       'Disk(Used/Total)': 'Disk(Used/Total)',
+      'clickhouse Log': 'clickhouse Log',
+      'Normal Log': 'Normal Log',
+      'Error Log': 'Error Log',
+      'Latest log': 'Latest log',
+      'Log Count': 'Log Count',
+      'Default: 1000': 'Default: 1000',
     },
     tables: {
       'Table Metrics': 'Table Metrics',
@@ -235,6 +243,7 @@ const messages = {
     ...zhCN,
     common: {
       'Success': '成功',
+      'Close': '关闭',
       'Create': '创建',
       'Confirm': '确定',
       'Cancel': '取消',
@@ -350,6 +359,7 @@ const messages = {
       'Node Status': '节点状态' , // （green-健康 red-离线  yellow-亚健康）
       'Online': '上线',
       'Offline': '下线',
+      'View Log': '查看日志',
       'Start Cluster': '开启集群',
       'Stop Cluster': '停止集群',
       'Destroy Cluster': '销毁集群',
@@ -358,6 +368,12 @@ const messages = {
       'New Node IP': '节点IP',
       'Node Shard': '分片编号',
       'Disk(Used/Total)': '磁盘(已用/总计)',
+      'clickhouse Log': 'clickhouse 日志',
+      'Normal Log': '正常日志',
+      'Error Log': '错误日志',
+      'Latest log': '最新日志',
+      'Log Count': '日志条数',
+      'Default: 1000': '默认值：1000',
     },
     tables: {
       'Table Metrics': '表指标',

@@ -97,11 +97,19 @@
             v-if="mode === 'deploy'"
             align="center">
             <template slot-scope="{ row, column }">
-              <el-button type="text" :disabled="row.status === 'green'" @click="onlineClusterNode(row)" :loading="row.onlineLoading">{{ $t('manage.Online') }}</el-button>
-              <el-button type="text" :disabled="row.status === 'red'" @click="offlineClusterNode(row)" :loading="row.offlineLoading">{{ $t('manage.Offline') }}</el-button>
-              <i class="fa fa-trash pointer fs-18 ml-10"
+              <i class="fa fa-trash pointer fs-18 mr-10"
                  v-tooltip="$t('common.Delete')"
                  @click="remove(row)" />
+              <el-dropdown placement="bottom-start" trigger="hover">
+                <span class="el-dropdown-link pointer fc-primary">
+                  <i class="el-icon-arrow-down el-icon--right"></i>
+                </span>
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item><el-button type="text" :disabled="row.status === 'green'" @click="onlineClusterNode(row)" :loading="row.onlineLoading">{{ $t('manage.Online') }}</el-button></el-dropdown-item>
+                  <el-dropdown-item><el-button type="text" :disabled="row.status === 'red'" @click="offlineClusterNode(row)" :loading="row.offlineLoading">{{ $t('manage.Offline') }}</el-button></el-dropdown-item>
+                  <el-dropdown-item><el-button type="text" @click="viewClusterLog(row)">{{ $t('manage.View Log') }}</el-button></el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
             </template>
             <template>
             </template>
@@ -119,6 +127,7 @@ import { $modal, $loading } from "@/services";
 import { ClusterStatus, ClusterTypeStatus } from "@/constants";
 import { ClusterApi, PackageApi } from "@/apis";
 import TaskDetail from '@/views/task/components/TaskDetail.vue';
+import ViewLogComponent from './modal/viewLog.vue';
 export default {
   data() {
     return {
@@ -428,7 +437,25 @@ export default {
     filterHandler(value, row, column) {
       const property = column['property'];
       return row[property] === value;
-    }
+    },
+
+    async viewClusterLog(row) {
+      const { ip } = row;
+      const { id: clusterName } = this.$route.params;
+      await $modal({
+        component: ViewLogComponent,
+        props: {
+          title: this.$t("manage.clickhouse Log"),
+          width: 800,
+          cancelText: null,
+          okText: null,
+        },
+        data: {
+          clusterName,
+          ip,
+        },
+      });
+    },
   },
 };
 </script>
