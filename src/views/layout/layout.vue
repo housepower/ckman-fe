@@ -10,7 +10,7 @@
           <el-badge is-dot></el-badge>
         </div>
 
-        <a href="https://github.com/housepower/ckman/blob/main/docs/ckman_v2.0.0.md" target="_blank" class="flex flex-vcenter mr-15 pointer">
+        <a href="/ckman_documentation.pdf" target="_blank" class="flex flex-vcenter mr-15 pointer">
           <i class="fa fa-book fs-20 mr-5" aria-hidden="true"></i>
           <span class="fs-16">{{$t('layout.Document')}}</span>
         </a>

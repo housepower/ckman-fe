@@ -5,7 +5,6 @@
       <time-filter v-model="timeFilter"
           ref="timeFilter"
           localKey="tableMetricsTimeFilter"
-          :refreshDuration.sync="refresh"
           @input="timeFilterChange"
           @on-refresh="timeFilterRefresh" />
     </div>
