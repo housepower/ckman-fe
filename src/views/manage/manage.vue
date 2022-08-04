@@ -83,7 +83,13 @@
             sortable
             align="center">
             <template slot-scope="{row, column}">
-              <div v-if="col.prop === 'status'"><span class="dot mr-5" :class="row.status"></span>{{row.status}}</div>
+              <div v-if="col.prop === 'status'" class="flex flex-between">
+                <span>
+                  <span class="dot mr-5" :class="row.status"></span>
+                  <span>{{row.status}}</span>
+                </span>
+                <span class="ml-10 pull-right">{{row.uptime}}</span>
+              </div>
               <span v-else>{{row[column.property]}}</span>
             </template>
           </vxe-column>
