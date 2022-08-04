@@ -52,9 +52,16 @@ export const ClusterApi = {
     return axios.delete(`${url}/node/${id}?password=${ password || '' }`, { params });
   },
   onlineClusterNode(clusterName, ip, password?) {
-    return axios.put(`${url}/node/start/${clusterName}?ip=${ ip }&password=${ password || ''}`);
+    return axios.put(`${url}/node/start/${ clusterName }?ip=${ ip }&password=${ password || ''}`);
   },
   offlineClusterNode(clusterName, ip, password?) {
-    return axios.put(`${url}/node/stop/${clusterName}?ip=${ ip }&password=${ password || ''}`);
+    return axios.put(`${url}/node/stop/${ clusterName }?ip=${ ip }&password=${ password || ''}`);
+  },
+  getNodeLog({ clusterName, ip, logType, lines = 1000, tail = true }) {
+    return axios.post(`${url}/node/log/${ clusterName }?ip=${ ip }`, {
+      lines,
+      logType,
+      tail,
+    });
   },
 };
