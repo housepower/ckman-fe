@@ -56,7 +56,17 @@
 import { TablesApi } from '@/apis';
 import { byteConvert } from '@/helpers/';
 import moment from 'moment';
-import { Table } from 'element-ui-eoi';
+interface Partition {
+  name: string;
+  database: string;
+  table: string;
+  rows: Number | string;
+  compressed: Number;
+  uncompressed: Number;
+  min_time: string;
+  max_time: string;
+  disk_name: string;
+}
 export default {
   props: {
     tableName: String,
@@ -76,14 +86,12 @@ export default {
       const { clusterName, tableName } = this;
       const { data: { entity } } = await TablesApi.getPartitions(clusterName, tableName);
       
-      this.list = Object.entries(entity).map(([key, value]) => {
-        return {
-          ...value,
-          max_time: moment(value.max_time).format('YYYY-MM-DD HH:mm:SS'),
-          min_time: moment(value.min_time).format('YYYY-MM-DD HH:mm:SS'),
-          rows: value.rows.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), // 加入数字千分位分隔符
-          name: key,
-        }
+      this.list = (Object.freeze(Object.entries(entity)||[])).map(([key, values]: [string, Partition]) => {
+        values.max_time = moment(values.max_time).format('YYYY-MM-DD HH:mm:SS');
+        values.min_time = moment(values.min_time).format('YYYY-MM-DD HH:mm:SS');
+        values.rows = values.rows.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); // 加入数字千分位分隔符
+        values.name = key;
+        return values;
       });
     },
     async deleteItem(row) {
