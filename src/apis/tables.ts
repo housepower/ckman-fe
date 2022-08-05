@@ -22,4 +22,15 @@ export const TablesApi = {
   replicationStatus(name: string) {
     return axios.get(`${url}/zk/replicated_table/${name}`);
   },
+  getPartitions(clusterName, table) {
+    return axios.get(`${url}/ck/partition/${clusterName}?table=${table}`);
+  },
+  deletePartition(clusterName, { database, tables, begin, end }) {
+    return axios.post(`${url}/ck/purge_tables/${clusterName}`, {
+      database,
+      tables,
+      begin,
+      end,
+    });
+  },
 };
