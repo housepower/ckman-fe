@@ -161,6 +161,11 @@ const messages = {
       'Delete': 'Delete',
       'Action': 'Action',
       'RWStatus': 'RWStatus',
+      'View': 'View',
+      'Partition': 'Partition',
+      'Min Time': 'Min Time',
+      'Max Time': 'Max Time',
+      'Disk Name': 'Disk Name',
     },
     session: {
       'Open Sessions': 'Open Sessions',
@@ -396,6 +401,11 @@ const messages = {
       'Delete': '删除',
       'Action': '操作',
       'RWStatus': '读写状态',
+      'View': '查看',
+      'Partition': '分区名称',
+      'Min Time': '最小时间',
+      'Max Time': '最大时间',
+      'Disk Name': '磁盘名称'
     },
     session: {
       'Open Sessions': '正在执行的SQL会话',

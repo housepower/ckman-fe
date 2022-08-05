@@ -35,6 +35,10 @@
         
         <template slot-scope="{ row, column }">
           <span v-if="column.property.endsWith('compressed')">{{ byteConvert(row[column.property]) }}</span>
+          <span v-else-if="column.property === 'partitions'" class="flex flex-between flex-vcenter">
+            <span>{{ row[column.property] }}</span>
+            <el-button type="text" @click="viewPartitions(row)">{{$t('tables.View')}}</el-button>
+          </span>
           <span v-else>{{ row[column.property] }}</span>
         </template>
       </vxe-column>
@@ -66,6 +70,7 @@ import { TablesApi } from "@/apis";
 import { $modal } from "@/services";
 import { SqlCodeMirror } from '@/components/';
 import { byteConvert } from '@/helpers/';
+import TablePartitionsComponent from './tablePartitions.vue';
 export default {
   data() {
     return {
@@ -300,6 +305,26 @@ export default {
     },
     timeFilterRefresh() {
       this.fetchData();
+    },
+    // 查看分区数
+    viewPartitions(row) {
+      const { tableName } = row;
+      const clusterName = this.$route.params.id;
+      $modal({
+        component: TablePartitionsComponent,
+        props: {
+          title: this.$t("tables.Partitions"),
+          width: 800,
+          cancelText: null,
+          okText: null,
+        },
+        data: {
+          clusterName,
+          tableName,
+        },
+      }).finally(() => {
+        this.fetchData();
+      });
     },
   },
 };
