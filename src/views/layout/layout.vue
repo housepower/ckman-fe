@@ -10,7 +10,7 @@
           <el-badge is-dot></el-badge>
         </div>
 
-        <a href="/ckman_documentation.pdf" target="_blank" class="flex flex-vcenter mr-15 pointer">
+        <a href="/docs/ckman" target="_blank" class="flex flex-vcenter mr-15 pointer">
           <i class="fa fa-book fs-20 mr-5" aria-hidden="true"></i>
           <span class="fs-16">{{$t('layout.Document')}}</span>
         </a>
