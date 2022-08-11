@@ -7,6 +7,7 @@ clear:
 	rm -rf ${DEST}/*
 
 build: clear
+	yarn install
 	node_modules/.bin/vue-cli-service build src/main.tsx --dest ${DEST}
 
 lint:
