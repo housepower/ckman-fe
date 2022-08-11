@@ -19,6 +19,11 @@ export const $router = new Router({
       component: () => import('@/views/login/login.vue'),
     },
     {
+      path: '/docs/:path',
+      name: 'Docs',
+      component: () => import('@/views/docs/docs.vue'),
+    },
+    {
       path: '/',
       name: 'Layout',
       redirect: 'home',
