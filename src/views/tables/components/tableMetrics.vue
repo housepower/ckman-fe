@@ -5,6 +5,7 @@
       <time-filter v-model="timeFilter"
           ref="timeFilter"
           localKey="tableMetricsTimeFilter"
+          :refreshDuration.sync="refresh"
           @input="timeFilterChange"
           @on-refresh="timeFilterRefresh" />
     </div>
@@ -75,6 +76,7 @@ export default {
   data() {
     return {
       timeFilter: null,
+      refresh: null,
       localeKey: 'TABLE_METRICS',
       loading: false,
       tableData: [],
