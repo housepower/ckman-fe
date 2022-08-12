@@ -15,6 +15,7 @@
           <div class="fs-18 font-bold pull-left">{{$t('session.Slow Sessions')}}</div>
           <div class="pull-right">
             <time-filter v-model="timeFilter"
+              :refreshDuration.sync="refresh"
               localKey="sessionTimeFilter"
               @input="timeFilterChange"
               @on-refresh="timeFilterRefresh" />
