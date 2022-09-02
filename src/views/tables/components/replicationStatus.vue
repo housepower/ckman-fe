@@ -183,7 +183,7 @@ export default {
       
       this.headerData = cloneDeep(header);
       const tableData = [];
-      tables.forEach(({ name, values }) => {
+      (tables || []).forEach(({ name, values }) => {
         let tableItem = {
           name
         };
