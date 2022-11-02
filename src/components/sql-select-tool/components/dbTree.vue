@@ -101,6 +101,10 @@ export default {
 </style>
 
 <style>
+.ztree {
+  overflow-y: auto;
+  flex: 1;
+}
 .ztree * {
   font-size: 14px;
   color: #606266;
