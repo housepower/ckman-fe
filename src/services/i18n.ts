@@ -127,7 +127,7 @@ const messages = {
       'Online': 'Online',
       'Offline': 'Offline',
       'View Log': 'View Log',
-      'Start Cluster': 'Start Cluste',
+      'Start Cluster': 'Start Cluster',
       'Stop Cluster': 'Stop Cluster',
       'Destroy Cluster': 'Destroy Cluster',
       'Rebalance Cluster': 'Rebalance Cluster',
