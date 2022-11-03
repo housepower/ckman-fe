@@ -58,7 +58,7 @@
 </template>
 <script>
 import { Menus, LoaderMenus } from "@/constants";
-import { PackageApi, ClusterApi, TaskApi } from "@/apis";
+import { PackageApi, ClusterApi } from "@/apis";
 
 export default {
   name: "Layout",
@@ -77,17 +77,13 @@ export default {
     this.user = JSON.parse(localStorage.getItem("user") || "{}").username;
     this.fetchVersion();
   },
-
-  created() {
-    this.onChangeCluster();
-  },
-
   methods: {
     async onChangeCluster() {
       const { path } = this.$route;
-      this.currentMenu = path.split('/').lastItem;
+      const currentMenu = path.split('/').pop();
       const clusterName = this.$route.params.id;
-      if (!clusterName) return false;
+      if (!clusterName || this.currentMenu === currentMenu) return false;
+      this.currentMenu = currentMenu;
       const { data: { entity } } = await ClusterApi.getCluster();
       const { mode } = entity[clusterName];
 
@@ -96,7 +92,6 @@ export default {
 
     async handleMenuClick(item) {
       if (item.name === 'Settings') {
-
         if (this.mode === 'import') {
           this.$message.warning(this.$t("home.The imported cluster does not support editing"));
           return;
@@ -127,9 +122,12 @@ export default {
       });
     }
   },
+  created() {
+    this.onChangeCluster();
+  },
   watch: {
     $route: {
-      handler(route, prevRoute) {
+      handler(route) {
         this.menus = route.meta === "loader" ? LoaderMenus : Menus;
         this.onChangeCluster();
       },
