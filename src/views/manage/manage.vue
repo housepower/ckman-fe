@@ -117,6 +117,7 @@
         </vxe-table>
       </div>
     </section>
+    <RebalanceFormComponent :visible.sync="reBalanceDialogVisible" :password="password" @close="reBalanceDialogVisible=false" />
   </main>
 </template>
 <script>
@@ -128,13 +129,16 @@ import { ClusterStatus, ClusterTypeStatus } from "@/constants";
 import { ClusterApi, PackageApi } from "@/apis";
 import TaskDetail from '@/views/task/components/TaskDetail.vue';
 import ViewLogComponent from './modal/viewLog.vue';
+import RebalanceFormComponent from './modal/rebalanceForm.vue';
 export default {
   components: {
     AddNodeDialog,
+    RebalanceFormComponent,
   },
   data() {
     return {
       addNodeDialogVisible: false,
+      reBalanceDialogVisible: false,
       mode: "",
       versionOptions: [
         {
@@ -359,7 +363,15 @@ export default {
       if (this.needPassword) {
         password = await this.openPasswordDialog();
       }
+
+      this.password = password;
       type = lowerFirst(type);
+
+      if (type === 'rebalance') {
+        this.reBalanceDialogVisible = true;
+        return;
+      }
+
       await this.$confirm(this.$t('common.' + ClusterStatus[type]), this.$t('common.tips'), {
         confirmButtonText: this.$t("common.Confirm"),
         cancelButtonText: this.$t("common.Cancel"),

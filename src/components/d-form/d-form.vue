@@ -8,9 +8,9 @@
       :prop-name="key"
       v-model="formData">
     </DFormItem>
-    <el-form-item class="sticky-bottom">
+    <el-form-item class="sticky-bottom" v-if="!noFooter">
       <el-checkbox class="mr-20" v-model="force">{{$t('common.Force Override')}}</el-checkbox>
-      <el-button v-if="isShowSubmit" :loading="loading" @click="submit" type="primary">{{ submitText || $t("common.Create")}}</el-button>
+      <el-button v-if="isShowSubmit" :loading="loading" @click="validate" type="primary">{{ submitText || $t("common.Create")}}</el-button>
       <el-button v-if="isShowCancel" @click="cancel">{{ cancelText || $t("common.Cancel")}}</el-button>
     </el-form-item>
   </el-form>
@@ -36,6 +36,10 @@ export default {
       default() {
         return null;
       }
+    },
+    noFooter: {
+      type: Boolean,
+      default: false,
     },
     isShowSubmit: {
       type: Boolean,
@@ -69,15 +73,16 @@ export default {
   },
 
   methods: {
-    submit() {
+    validate(cb) {
       const form = this.$refs.form;
       form.clearValidate();
       try {
-        form.validate((valid) => {
+        return form.validate((valid) => {
           if (valid) {
             const { schema, formData, force } = this;
             const data = getPostData(cloneDeep(formData), schema);
             this.$emit('submit', { data, force } );
+            cb  & cb({ data, force });
           } else {
             const fields = form.fields.filter(item => item.validateState === 'error');
             const field = form.fields.find(item => item.validateState === 'error');
