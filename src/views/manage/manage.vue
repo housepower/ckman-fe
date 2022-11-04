@@ -97,7 +97,7 @@
             v-if="mode === 'deploy'"
             width="250"
             align="center">
-            <template slot-scope="{ row, column }">
+            <template slot-scope="{ row }">
               <el-button type="text" v-if="row.status === 'green'" @click="offlineClusterNode(row)" :loading="row.offlineLoading">{{ $t('manage.Offline') }}</el-button>
               <el-button type="text" v-if="row.status === 'red'" @click="onlineClusterNode(row)" :loading="row.onlineLoading">{{ $t('manage.Online') }}</el-button>
               <el-button type="text" @click="viewClusterLog(row)">{{ $t('manage.View Log') }}</el-button>
