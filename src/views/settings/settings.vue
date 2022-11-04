@@ -47,7 +47,6 @@ export default {
       const { data: { entity } } = await ClusterApi.getClusterConfig(clusterName);
       this.mode = entity.mode;
       const data = (new Function("return " + entity.config))();
-      console.log(data);
       this.formModel = data;
     },
 
