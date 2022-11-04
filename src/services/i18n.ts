@@ -64,6 +64,7 @@ const messages = {
       'Message Center': 'Message Center',
       'Action Success': 'Action Success',
       'Refresh': 'Refresh',
+      'Force Override': 'Force Override',
     },
     layout: {
       'ClickHouse Management Console': 'ClickHouse Management Console',
@@ -306,6 +307,7 @@ const messages = {
       'Message Center': '消息中心',
       'Action Success': '操作成功',
       'Refresh': '刷新',
+      'Force Override': '强制覆盖',
     },
     layout: {
       'ClickHouse Management Console': 'ckman管理平台',

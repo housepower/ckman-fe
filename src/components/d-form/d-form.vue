@@ -9,6 +9,7 @@
       v-model="formData">
     </DFormItem>
     <el-form-item class="sticky-bottom">
+      <el-checkbox class="mr-20" v-model="force">{{$t('common.Force Override')}}</el-checkbox>
       <el-button v-if="isShowSubmit" :loading="loading" @click="submit" type="primary">{{ submitText || $t("common.Create")}}</el-button>
       <el-button v-if="isShowCancel" @click="cancel">{{ cancelText || $t("common.Cancel")}}</el-button>
     </el-form-item>
@@ -57,7 +58,8 @@ export default {
 
   data() {
     return {
-      formData: {}
+      formData: {},
+      force: false,
     }
   },
 
@@ -73,9 +75,9 @@ export default {
       try {
         form.validate((valid) => {
           if (valid) {
-            const { schema, formData } = this;
+            const { schema, formData, force } = this;
             const data = getPostData(cloneDeep(formData), schema);
-            this.$emit('submit', data);
+            this.$emit('submit', { data, force } );
           } else {
             const fields = form.fields.filter(item => item.validateState === 'error');
             const field = form.fields.find(item => item.validateState === 'error');

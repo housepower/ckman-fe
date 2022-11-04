@@ -44,9 +44,9 @@ export default {
       }
     },
 
-    async onSubmit(data) {
+    async onSubmit({ data, force }) {
       this.loading = true;
-      const { data: { entity: taskId } } = await ClusterApi.createCluster(data).finally(() => this.loading = false);
+      const { data: { entity: taskId } } = await ClusterApi.createCluster(data, force).finally(() => this.loading = false);
       await $modal({
         component: TaskDetail,
         props: {
