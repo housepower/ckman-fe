@@ -7,6 +7,7 @@
     <vxe-toolbar zoom custom class="pull-right">
       <template #buttons>
         <el-input size="medium" :placeholder="$t('common.keyword search')" v-model="searchKey" class="width-250 mr-10" suffix-icon="el-icon-search"></el-input>
+        <el-button size="mini" @click="fetchData(true)" circle icon="el-icon-refresh" class="fs-16 fc-black" style="border-color: #dcdfe6;"></el-button>
       </template>
     </vxe-toolbar>
 
@@ -57,11 +58,11 @@
 <script>
 import { uniqWith, isEqual, cloneDeep } from "lodash-es";
 import { TablesApi } from "@/apis";
+import store from '@/store';
 export default {
   data() {
     return {
-      tableData: [],
-      headerData: [],
+      clusterName: '',
       timeFilter: null,
       refresh: null,
       currentPage: 1,
@@ -104,7 +105,7 @@ export default {
   computed: {
     queryList() {
       const { searchKey, tableData, sort: { property, order } } = this;
-      const result = tableData.filter(row => {
+      const result = tableData?.filter(row => {
         return row.name.includes(searchKey)
           || row.shard1_0.includes(searchKey)
           || row.shard1_1.includes(searchKey)
@@ -133,12 +134,12 @@ export default {
           }
         }
       });
-      return result;
+      return result || [];
     },
     cols() {
       const cols = [{ prop: "name", label: this.$t('tables.Table Name'), children: [] }];
       const { headerData } = this;
-      headerData.forEach((item, index) => {
+      headerData?.forEach((item, index) => {
         const shard = `shard${index + 1}`;
         const col = {
           label: shard,
@@ -156,7 +157,21 @@ export default {
     currentPageData() {
       const { pagination: { currentPage, pageSize }, queryList } = this;
       return this.queryList.slice((currentPage - 1)*pageSize, currentPage*pageSize);
+    },
+    replicationStatusEntity() {
+      const { clusterName } = this;
+      return store.getters['clusterTable/getReplicationStatusByClusterName'](clusterName);
+    },
+    tableData() {
+      return this.replicationStatusEntity?.tableData;
+    },
+    headerData() {
+      return this.replicationStatusEntity?.header || [];
     }
+  },
+  created() {
+    const { id: clusterName } = this.$route.params;
+    this.clusterName = clusterName;
   },
   mounted() {
     this.fetchData();
@@ -172,30 +187,37 @@ export default {
     handlePageChange(pager) {
       this.pagination.currentPage = pager.currentPage;
     },
-    async fetchData() {
-      this.loading = true;
-      const {
-        data: {
-          entity: { header = [], tables = [] },
-        },
-      } = await TablesApi.replicationStatus(this.$route.params.id)
-        .finally(() => this.loading = false);
-      
-      this.headerData = cloneDeep(header);
-      const tableData = [];
-      (tables || []).forEach(({ name, values }) => {
-        let tableItem = {
-          name
-        };
-        values.forEach((val, index) => {
-          const shard = `shard${index + 1}`;
-          val.forEach((v, index) => {
-            tableItem[`${shard}_${index}`] = v;
+    async fetchData(forceRefresh = false) {
+      if (!this.tableData || forceRefresh) {
+        const { clusterName } = this;
+        this.loading = true;
+        const {
+          data: {
+            entity: { header = [], tables = [] },
+          },
+        } = await TablesApi.replicationStatus(clusterName)
+          .finally(() => this.loading = false);
+
+        let tableData = [];
+        (tables || []).forEach(({ name, values }) => {
+          let tableItem = {
+            name
+          };
+          values.forEach((val, index) => {
+            const shard = `shard${index + 1}`;
+            val.forEach((v, index) => {
+              tableItem[`${shard}_${index}`] = v;
+            });
           });
+          tableData.push(tableItem);
         });
-        tableData.push(tableItem);
-      });
-      this.tableData = uniqWith(tableData, isEqual);
+        tableData = uniqWith(tableData, isEqual);
+        store.commit('clusterTable/setReplicationStatus', {
+          clusterName,
+          tableData,
+          header,
+        });
+      }
     },
 
     getClassName(row, property) {
