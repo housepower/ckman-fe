@@ -57,6 +57,14 @@
             @click="addNode">{{$t('manage.Add Node')}}</el-button>
         </div>
 
+        
+        <AddNodeDialog
+          :visible.sync="addNodeDialogVisible"
+          @close="addNodeDialogVisible = false"
+          @onOk="onAddNodeSuccess"
+          :numberRange="numberRange"
+          :password="password" />
+
         <vxe-toolbar zoom custom class="pull-right">
           <template #buttons>
             <el-input v-model="input"
@@ -113,7 +121,7 @@
 </template>
 <script>
 import { upperFirst, lowerFirst, cloneDeep, head, last } from "lodash-es";
-import AddNode from "./modal/addNode";
+import AddNodeDialog from "./modal/addNode";
 import InputPassword from "./modal/inputPassword";
 import { $modal, $loading } from "@/services";
 import { ClusterStatus, ClusterTypeStatus } from "@/constants";
@@ -121,8 +129,12 @@ import { ClusterApi, PackageApi } from "@/apis";
 import TaskDetail from '@/views/task/components/TaskDetail.vue';
 import ViewLogComponent from './modal/viewLog.vue';
 export default {
+  components: {
+    AddNodeDialog,
+  },
   data() {
     return {
+      addNodeDialogVisible: false,
       mode: "",
       versionOptions: [
         {
@@ -160,7 +172,8 @@ export default {
         },
         filterConfig: {
         },
-      }
+      },
+      numberRange: []
     };
   },
   computed: {
@@ -229,6 +242,7 @@ export default {
       this.needPassword = entity.needPassword;
       this.packageType = entity.pkgType;
       this.fetchVersionData();
+      this.numberRange = this.getNumberRange();
     },
     async fetchVersionData() {
       const { packageType } = this;
@@ -253,7 +267,7 @@ export default {
         return true;
       return false;
     },
-    numberRange() {
+    getNumberRange() {
       let { nodes } = this.list;
       nodes = nodes.sort((a, b) => a.shardNumber - b.shardNumber);
       const range =
@@ -288,36 +302,28 @@ export default {
         password = await this.openPasswordDialog();
       }
 
-      await $modal({
-        component: AddNode,
+      this.password = password;
+
+      this.addNodeDialogVisible = true;
+    },
+
+    onAddNodeSuccess(taskId) {
+      this.addNodeDialogVisible = false;
+      $modal({
+        component: TaskDetail,
         props: {
-          title: this.$t("manage.Add Node"),
-          width: 600,
-          cancelText: this.$t("common.Cancel"),
-          okText: this.$t("common.Save"),
+          title: this.$t('task.View Task'),
+          width: 800,
+          cancelText: this.$t("task.Close"),
+          okText: null,
         },
         data: {
-          numberRange: this.numberRange(),
-          password,
+          taskId: taskId,
+          refresh: true
         },
-      }).then((taskId) => {
-        if (taskId) {
-          $modal({
-            component: TaskDetail,
-            props: {
-              title: this.$t('task.View Task'),
-              width: 800,
-              cancelText: this.$t("task.Close"),
-              okText: null,
-            },
-            data: {
-              taskId: taskId,
-              refresh: true
-            },
-          }).finally(() => this.fetchData());
-        }
-      });
+      }).finally(() => this.fetchData());
     },
+
     async remove(item) {
       let password = '';
       if (this.needPassword) {

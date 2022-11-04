@@ -13,8 +13,8 @@ export const ClusterApi = {
   getClusterConfig(clusterName: string) {
     return axios.get(`${url}/config/${clusterName}`);
   },
-  saveClusterConfig(clusterName: string, data) {
-    return axios.post(`${url}/config/${clusterName}`, data);
+  saveClusterConfig(clusterName: string, data, force) {
+    return axios.post(`${url}/config/${clusterName}?force=${force}`, data);
   },
   getClusterCreateFormSchema() {
     return axios.get(`/api/v1/ui/schema?type=deploy`);
@@ -25,8 +25,8 @@ export const ClusterApi = {
   importCluster(params) {
     return axios.post(`${url}/cluster`, params);
   },
-  createCluster(params) {
-    return axios.post(`${createUrl}/`, params);
+  createCluster(params, force) {
+    return axios.post(`${createUrl}/?force=${ force }`, params);
   },
   updateCluster(params) {
     return axios.put(`${url}/cluster`, params);
@@ -45,8 +45,8 @@ export const ClusterApi = {
   getClusterInfo(id) {
     return axios.get(`${url}/get/${id}`);
   },
-  addClusterNode(id, params, password?) {
-    return axios.post(`${url}/node/${id}?password=${password || ''}`, params);
+  addClusterNode(id, params, force, password?) {
+    return axios.post(`${url}/node/${id}?password=${password || ''}&force=${force}`, params);
   },
   deleteClusterNode(id, params, password?) {
     return axios.delete(`${url}/node/${id}?password=${ password || '' }`, { params });

@@ -61,10 +61,10 @@ export default {
       }
     },
 
-    async onSubmit(data) {
+    async onSubmit({ data, force }) {
       this.loading = true;
       const clusterName = this.$route.params.id;
-      const { data: { entity: taskId } } = await ClusterApi.saveClusterConfig(clusterName, data).finally(() => this.loading = false);
+      const { data: { entity: taskId } } = await ClusterApi.saveClusterConfig(clusterName, data, force).finally(() => this.loading = false);
       await $modal({
         component: TaskDetail,
         props: {
