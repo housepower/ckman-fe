@@ -54,10 +54,10 @@ export default {
   methods: {
     initData() {
       const { formModel } = this;
-      this.formData = (Object.entries(formModel)||[]).map(([key, value]) => {
+      this.formData = (Object.keys(formModel)||[]).sort().map((key) => {
         return {
           key,
-          value,
+          value: formModel[key],
         }
       })
     },
