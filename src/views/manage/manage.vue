@@ -95,21 +95,13 @@
           </vxe-column>
           <vxe-column :title="$t('home.Actions')"
             v-if="mode === 'deploy'"
+            width="250"
             align="center">
             <template slot-scope="{ row, column }">
-              <i class="fa fa-trash pointer fs-18 mr-10"
-                 v-tooltip="$t('common.Delete')"
-                 @click="remove(row)" />
-              <el-dropdown placement="bottom-start" trigger="hover">
-                <span class="el-dropdown-link pointer fc-primary">
-                  <i class="el-icon-arrow-down el-icon--right"></i>
-                </span>
-                <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item><el-button type="text" :disabled="row.status === 'green'" @click="onlineClusterNode(row)" :loading="row.onlineLoading">{{ $t('manage.Online') }}</el-button></el-dropdown-item>
-                  <el-dropdown-item><el-button type="text" :disabled="row.status === 'red'" @click="offlineClusterNode(row)" :loading="row.offlineLoading">{{ $t('manage.Offline') }}</el-button></el-dropdown-item>
-                  <el-dropdown-item><el-button type="text" @click="viewClusterLog(row)">{{ $t('manage.View Log') }}</el-button></el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
+              <el-button type="text" v-if="row.status === 'green'" @click="offlineClusterNode(row)" :loading="row.offlineLoading">{{ $t('manage.Offline') }}</el-button>
+              <el-button type="text" v-if="row.status === 'red'" @click="onlineClusterNode(row)" :loading="row.onlineLoading">{{ $t('manage.Online') }}</el-button>
+              <el-button type="text" @click="viewClusterLog(row)">{{ $t('manage.View Log') }}</el-button>
+              <el-button type="text" @click="remove(row)">{{ $t('common.Delete') }}</el-button>
             </template>
             <template>
             </template>
