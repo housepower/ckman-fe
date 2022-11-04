@@ -238,7 +238,6 @@ export default {
   created() {
     const { id: clusterName } = this.$route.params;
     this.clusterName = clusterName;
-    console.log(clusterName);
     this.fetchData();
   },
   methods: {
