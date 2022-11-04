@@ -12,7 +12,7 @@
     <vxe-toolbar zoom custom class="pull-right">
       <template #buttons>
         <el-input size="medium" :placeholder="$t('common.keyword search')" v-model="searchKey" class="width-250 mr-10" suffix-icon="el-icon-search"></el-input>
-        <el-button size="mini" @click="fetchData" circle icon="el-icon-refresh" class="fs-16 fc-black" style="border-color: #dcdfe6;"></el-button>
+        <el-button size="mini" @click="fetchData(true)" circle icon="el-icon-refresh" class="fs-16 fc-black" style="border-color: #dcdfe6;"></el-button>
       </template>
     </vxe-toolbar>
 
@@ -72,14 +72,15 @@ import { $modal } from "@/services";
 import { SqlCodeMirror } from '@/components/';
 import { byteConvert } from '@/helpers/';
 import TablePartitionsComponent from './tablePartitions.vue';
+import store from '@/store';
 export default {
   data() {
     return {
+      clusterName: '',
       timeFilter: null,
       refresh: null,
       localeKey: 'TABLE_METRICS',
       loading: false,
-      tableData: [],
       searchKey: '',
       sort: {},
       pagination: {
@@ -194,7 +195,7 @@ export default {
     listData() {
       const { searchKey, sort: { property, order } } = this;
       const result = this.tableData
-        .filter(x => {
+        ?.filter(x => {
           let flag = true;
           if (!x.tableName?.includes(searchKey)) {
             flag = false;
@@ -228,25 +229,42 @@ export default {
     currentPageData() {
       const { pagination: { currentPage, pageSize } } = this;
       return this.listData?.slice((currentPage - 1)*pageSize, currentPage*pageSize);
+    },
+    tableData() {
+      const { clusterName } = this;
+      return store.getters['clusterTable/getTableDataByClusterName'](clusterName);
     }
   },
   created() {
+    const { id: clusterName } = this.$route.params;
+    this.clusterName = clusterName;
+    console.log(clusterName);
     this.fetchData();
   },
   methods: {
     byteConvert: byteConvert,
-    async fetchData() {
-      this.loading = true;
-      const {
-        data: { entity },
-      } = await TablesApi.tableMetrics(this.$route.params.id).finally(() => this.loading = false);
-      this.tableData =  (Object.freeze(Object.entries(entity)||[]).map(([key, values]) => {
-        values.readwrite_status = values.readwrite_status.toString().toUpperCase();
-        values.queryCost = Object.values(values.queryCost).join(',');
-        values.tableName = key;
-        values.rows = values.rows.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); // 加入数字千分位分隔符
-        return values;
-      }));
+    async fetchData(forceRefresh = false) {
+      if (!this.tableData || forceRefresh) {
+        this.loading = true;
+        const { clusterName } = this;
+        const {
+          data: { entity },
+        } = await TablesApi.tableMetrics(clusterName).finally(() => this.loading = false);
+
+        const tableData =  (Object.freeze(Object.entries(entity)||[]).map(([key, values]) => {
+          values.readwrite_status = values.readwrite_status.toString().toUpperCase();
+          values.queryCost = Object.values(values.queryCost).join(',');
+          values.tableName = key;
+          values.rows = values.rows.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); // 加入数字千分位分隔符
+          return values;
+        }));
+
+        store.commit('clusterTable/setTableData', {
+          clusterName,
+          tableData,
+        });
+      }
+      
       this.pagination.total = this.tableData.length;
     },
 
@@ -276,7 +294,7 @@ export default {
         tableName,
       });
       this.$message.success(`Table ${ key } ${ this.$t("common.Delete") }${ this.$t("common.Success") }`);
-      this.fetchData();
+      this.fetchData(true);
     },
 
     // 查看SQL
@@ -303,10 +321,10 @@ export default {
       });
     },
     timeFilterChange() {
-      this.fetchData();
+      this.fetchData(true);
     },
     timeFilterRefresh() {
-      this.fetchData();
+      this.fetchData(true);
     },
     // 查看分区数
     viewPartitions(row) {
@@ -325,7 +343,7 @@ export default {
           tableName,
         },
       }).finally(() => {
-        this.fetchData();
+        this.fetchData(true);
       });
     },
   },

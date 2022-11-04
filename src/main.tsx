@@ -2,7 +2,7 @@ import 'core-js';
 import Vue from 'vue';
 // import Vuex from 'vuex';
 // Vue.use(Vuex);
-import '@/store/';
+import '@/store';
 import '@/app';
 import '@/components';
 import '@/directives';
