@@ -195,6 +195,8 @@ const messages = {
       'Copy': 'Copy',
       'No Data': 'No Data',
       'No Sql': 'No Sql',
+      'Node': 'Node',
+      'Random': 'Random',
     },
     homePackage: {
       'Upload Packages': 'Upload Packages',
@@ -435,6 +437,8 @@ const messages = {
       'Copy': '复制',
       'No Data': '暂无数据',
       'No Sql': '请输入sql语句',
+      'Node': '节点',
+      'Random': '随机',
     },
     homePackage: {
       'Upload Packages': '上传安装包',
