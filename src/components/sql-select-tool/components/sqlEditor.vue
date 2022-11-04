@@ -4,6 +4,12 @@
       <el-button size="mini" type="primary" @click="run()">{{$t('queryExecution.Execute Query')}}( F8 )</el-button>
       <el-button size="mini" type="primary" @click="run('schedule')">{{$t('queryExecution.Execute Explain')}}( F9 )</el-button>
       <el-button size="mini" type="primary" @click="format">{{$t('queryExecution.Format')}}( F10 )</el-button>
+      <div class="pull-right">
+        {{$t('queryExecution.Node')}}：
+        <el-select v-model="selectHost" size="mini" :placeholder="$t('queryExecution.Random')" :clearable="true">
+          <el-option v-for="host in hosts" :key="host" :label="host" :value="host"></el-option>
+        </el-select>
+      </div>
     </div>
     <div class="sql-editor-main flex-1">
       <sql-code-mirror v-model="sql" ref="sqlCodeEditor" :read-only="false" style="height: 100%;"></sql-code-mirror>
@@ -12,9 +18,8 @@
 </template>
 <script>
 import { SqlCodeMirror } from '@/components/';
-import { SqlQueryApi } from '@/apis';
+import { SqlQueryApi, ClusterApi } from '@/apis';
 import store from '@/store';
-import moment from 'moment';
 import { $message } from '@/services';
 export default {
   components: {
@@ -23,12 +28,18 @@ export default {
 
   data() {
     return {
-      sql: ''
+      sql: '',
+      clusterName: '',
+      hosts: [],
+      selectHost: '',
     }
   },
 
   created() {
-    //
+    const { id: clusterName } = this.$route.params;
+    this.clusterName = clusterName;
+
+    this.fetchNodeList();
   },
 
   mounted() {
@@ -42,8 +53,7 @@ export default {
   methods: {
     async run(type) {
       const selectSql = this.$refs.sqlCodeEditor.sqlEditor.getSelection();
-      const { id: clusterName } = this.$route.params;
-      const { sql } = this;
+      const { sql, clusterName, selectHost } = this;
       if (!selectSql && !sql) {
         $message.warning(this.$t('queryExecution.No Sql'));
         return;
@@ -52,7 +62,8 @@ export default {
       store.commit('sqlSelect/setStatus', 'loading');
       const { data: { entity } } = await SqlQueryApi[type === 'schedule' ? 'queryExplain' : 'query']({
         clusterName,
-         query: selectSql || sql,
+        query: selectSql || sql,
+        host: selectHost,
       }).finally(() => {
         store.commit('sqlSelect/setStatus', '');
       });
@@ -80,6 +91,12 @@ export default {
 
     addSql(str) {
       this.$refs.sqlCodeEditor.sqlEditor.setValue(this.sql + (this.sql ? '\n\n' : '') + str);
+    },
+
+    async fetchNodeList() {
+      const { clusterName } = this;
+      const { data: { entity } } = await ClusterApi.getClusterByName(clusterName);
+      this.hosts = entity.hosts || [];
     }
   }
 }
