@@ -46,7 +46,7 @@ const messages = {
       'No': 'No',
       'Please fill out': 'Please fill out',
       'Please choose': 'Please choose',
-      'Input error, please check the rules and re-enter': 'Input error, please check the rules and re-enter',
+      'Input error, please check the rules and re-enter': 'Input error, please check the rules {rule} and re-enter',
       'Field Name': 'Field Name',
       'Field Type': 'Field Type',
       'Defaults': 'Defaults',
@@ -142,6 +142,7 @@ const messages = {
       'Latest log': 'Latest log',
       'Log Count': 'Log Count',
       'Default: 1000': 'Default: 1000',
+      'All Table Rebalance': 'All Table Rebalance',
     },
     tables: {
       'Table Metrics': 'Table Metrics',
@@ -289,7 +290,7 @@ const messages = {
       'No': '否',
       'Please fill out': '请输入',
       'Please choose': '请选择',
-      'Input error, please check the rules and re-enter': '输入错误，请查看规则重新输入',
+      'Input error, please check the rules and re-enter': '输入错误，请根据规则{rule}重新输入',
       'Field Name': '字段名称',
       'Field Type': '字段类型',
       'Defaults': '默认值',
@@ -385,6 +386,7 @@ const messages = {
       'Latest log': '最新日志',
       'Log Count': '日志条数',
       'Default: 1000': '默认值：1000',
+      'All Table Rebalance': '所有表均参与均衡',
     },
     tables: {
       'Table Metrics': '表指标',

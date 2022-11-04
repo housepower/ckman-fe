@@ -22,6 +22,9 @@ export const ClusterApi = {
   getClusterUpdateFormSchema() {
     return axios.get(`/api/v1/ui/schema?type=config`);
   },
+  getReBalanceFormSchema() {
+    return axios.get(`/api/v1/ui/schema?type=rebalance`);
+  },
   importCluster(params) {
     return axios.post(`${url}/cluster`, params);
   },
@@ -41,6 +44,9 @@ export const ClusterApi = {
     } else {
       return axios.put(`${url}/${type}/${clusterName}?password=${ password || '' }`,{ packageVersion, skip, policy });
     }
+  },
+  rebalanceCluster({ clusterName, params, all, password }) {
+    return axios.put(`${url}/rebalance/${clusterName}?password=${ password || '' }&all=${all}`, params);
   },
   getClusterInfo(id) {
     return axios.get(`${url}/get/${id}`);

@@ -265,7 +265,8 @@ export default {
           }
 
           if (regexp && !dataTypes.includes(value) && !new RegExp(regexp.slice(1, -1)).test(value)) {
-            return new Error(this.$t('common.Input error, please check the rules and re-enter'));
+            // 必须匹配 ${ regex } 规则
+            return new Error(this.$t('common.Input error, please check the rules and re-enter', { rule: regexp }));
           }
 
           if (!(range && !dataTypes.includes(value))) return true;
@@ -321,11 +322,11 @@ export default {
 </script>
 <style lang="scss" scoped>
 
-::v-deep .el-form-item__error {
-  top: 8px;
-  left: 356px;
-  width: 100%;
-}
+// ::v-deep .el-form-item__error {
+//   top: 8px;
+//   left: 356px;
+//   width: 100%;
+// }
 ::v-deep .el-form-item__content {
   line-height: inherit;
 }
@@ -341,10 +342,10 @@ export default {
   }
 
 
-  &.list-string, &.list-struct, &.struct, &.map {
-    ::v-deep .el-form-item__error {
-      top: -50px;
-      left: 356px;
+  &.list-struct, &.list-string, &.struct, &.map {
+    ::v-deep >.el-form-item__content > .el-form-item__error {
+      top: -30px;
+      left: 260px;
     }
   }
 
@@ -356,10 +357,10 @@ export default {
   }
 
   &.struct {
-    ::v-deep .el-form-item__error {
-      top: -40px;
-      left: 356px;
-    }
+    // ::v-deep .el-form-item__error {
+    //   top: -40px;
+    //   left: 356px;
+    // }
 
     >.el-form-item__label .error-message {
       left: 260px;
@@ -386,8 +387,7 @@ export default {
 .normal-item {
   display: flex;
   ::v-deep .el-form-item__error {
-    top: 8px !important;
-    left: 356px;
+    top: 36px;
   }
 }
 

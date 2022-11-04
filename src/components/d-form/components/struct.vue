@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-column" style="line-height: 34px;">
+  <div class="flex flex-column">
     <div class="pt-15 pr-20 pb-5 struct">
       <DFormItem v-model="formModel" v-for="(item, key) in schema" :key="key" :schema="item" :origin-name="key" :prop-name="`${PropName}.${key}`">
       </DFormItem>
