@@ -13,6 +13,7 @@ export const sqlSelect = {
     history: [],
     sql: '',
     status: '',
+    queryDuration: 0
   }),
   mutations: {
     setResult(state, data) {
@@ -20,6 +21,9 @@ export const sqlSelect = {
       state.pagination.total = data.length - 1;
       state.pagination.currentPage = 1;
       data = null;
+    },
+    setDuration(state, duration) {
+      state.queryDuration = duration;
     },
     changePageSize(state, pageSize) {
       state.pagination.pageSize = pageSize;
