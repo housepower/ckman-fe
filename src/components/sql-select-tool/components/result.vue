@@ -26,19 +26,22 @@
         </vxe-column>
       </vxe-table>
     </div>
-    
-    <vxe-pager
-      :current-page="pagination.currentPage"
-      :page-size.sync="pagination.pageSize"
-      :page-sizes="pagination.pageSizes"
-      :total="pagination.total"
-      :layouts="['PrevPage', 'JumpNumber', 'NextPage', 'FullJump', 'Sizes', 'Total']"
-      @page-change="handlePageChange">
-    </vxe-pager>
+    <div class="flex pr-10" :style="{ 'align-items': 'center', 'justify-content': 'flex-end' }">
+      <vxe-pager
+        :current-page="pagination.currentPage"
+        :page-size.sync="pagination.pageSize"
+        :page-sizes="pagination.pageSizes"
+        :total="pagination.total"
+        :layouts="['PrevPage', 'JumpNumber', 'NextPage', 'FullJump', 'Sizes', 'Total']"
+        @page-change="handlePageChange">
+      </vxe-pager>
+      <span>耗时 {{queryDuration}} ms</span>
+    </div>
   </div>
 </template>
 <script>
 import store from '@/store';
+import { parseDurationBySplit } from '@/helpers';
 export default {
   data() {
     return {
@@ -56,7 +59,7 @@ export default {
         },
         filterConfig: {
         },
-      }
+      },
     }
   },
   computed: {
@@ -99,7 +102,10 @@ export default {
     },
     status() {
       return store.state.sqlSelect.status;
-    }
+    },
+    queryDuration() {
+      return parseDurationBySplit(store.state.sqlSelect.queryDuration);
+    },
   },
   watch: {
     status(newStatus) {

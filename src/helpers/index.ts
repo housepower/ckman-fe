@@ -7,3 +7,4 @@ export * from './parseDuration';
 export * from './parseTime';
 export * from './lineFeed';
 export * from './byteConvert';
+export * from './parseDurationBySplit';

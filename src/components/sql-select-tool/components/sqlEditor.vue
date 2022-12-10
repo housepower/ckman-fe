@@ -60,12 +60,15 @@ export default {
       }
       this.$emit('startRun');
       store.commit('sqlSelect/setStatus', 'loading');
+      const start = new Date().getTime();
       const { data: { entity } } = await SqlQueryApi[type === 'schedule' ? 'queryExplain' : 'query']({
         clusterName,
         query: selectSql || sql,
         host: selectHost,
       }).finally(() => {
+        const end = new Date().getTime();
         store.commit('sqlSelect/setStatus', '');
+        store.commit('sqlSelect/setDuration', end - start);
       });
       store.dispatch('sqlSelect/retrieveHistory', clusterName);
       store.commit('sqlSelect/setResult', entity);
