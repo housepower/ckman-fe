@@ -32,6 +32,27 @@
 import SessionTable from "./component/sessionTable";
 import { SessionApi } from "@/apis";
 import { convertTimeBounds } from "@/helpers";
+
+
+function numberShow(number, split=',') {
+  const str = number.toString();
+  const len = str.length;
+  if (len < 4) {
+    return str;
+  }
+  const n = Math.ceil(len / 3);
+  const arr = new Array(n);
+  for(let i = n - 1; i >= 0; i-- ) {
+    const cur = len - (n - i) * 3;
+    let step = 3;
+    if (cur < 0) {
+      cur = 0;
+      step = len % 3;
+    }
+    arr[i] = str.slice(cur, cur + step);
+  }
+  return arr.join(split)
+}
 export default {
   data() {
     return {
@@ -70,7 +91,10 @@ export default {
         start: parseInt(min / 1000),
         end: parseInt(max / 1000),
       });
-      this.closeList = closeList;
+      this.closeList = closeList.map(x => {
+        x.queryDuration = numberShow(x.queryDuration);
+        return x;
+      });
     },
     timeFilterRefresh() {
       this.getSlowSessionList();
