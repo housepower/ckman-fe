@@ -59,6 +59,7 @@ export default {
       indentWithTabs: true,
       smartIndent: true,
       lineNumbers: true,
+      lineWrapping: true,
       matchBrackets : true,
       autofocus: true,
       hintOptions: {
