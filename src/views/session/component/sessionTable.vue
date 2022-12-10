@@ -11,7 +11,7 @@
           v-for="(col, index) in columns"
           show-header-overflow
           show-footer-overflow
-          :show-overflow="true"
+          :show-overflow="col.showOverflow"
           :key="index"
           :field="col.prop"
           :title="col.label"
@@ -20,6 +20,7 @@
           sortable
           #default="{ row }">
           <span v-if="col.prop === 'startTime'">{{ row.startTime * 1000 | formatDate }}</span>
+          <span v-else-if="col.prop === 'query'" @dblclick="onCopy(row.query)">{{row.query}}</span>
           <span v-else>{{ row[col.prop] }}</span>
         </vxe-column>
         <vxe-column
@@ -95,12 +96,14 @@ export default {
         {
           prop: "startTime",
           label: this.$t('session.Query Start Time'),
-          sortable: true
+          sortable: true,
+          showOverflow: true
         },
         {
           prop: "queryDuration",
           label: this.$t('session.Query Duration'),
-          sortable: true
+          sortable: true,
+          showOverflow: true
         },
         {
           prop: "query",
@@ -110,22 +113,26 @@ export default {
         {
           prop: "user",
           label: this.$t('session.Initial User'),
-          sortable: true
+          sortable: true,
+          showOverflow: true
         },
         {
           prop: "queryId",
           label: this.$t('session.Initial Query ID'),
-          sortable: true
+          sortable: true,
+          showOverflow: true
         },
         {
           prop: "host",
           label: this.$t('session.Node Host'),
-          sortable: true
+          sortable: true,
+          showOverflow: true
         },
         {
           prop: "address",
           label: this.$t('session.Initial Address'),
-          sortable: true
+          sortable: true,
+          showOverflow: true
         },
         {
           prop: "threads",
@@ -186,6 +193,24 @@ export default {
         queryId
       });
       this.$message.success(`${this.$t('common.Action Success')}`);
+    },
+    onCopy(str) {
+      try {
+        let input = document.createElement('textarea');
+        input.value = str;
+        input.style.border = '0';
+        input.style.padding = '0';
+        input.style.margin  = '0';
+        input.style.right = '999999em';
+        input.style.position = 'absolute';
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        this.$message.success(this.$t('queryExecution.Copy Success'));
+        input = null;
+      } catch (e) {
+        //
+      }
     }
   },
 };
