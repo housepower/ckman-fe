@@ -118,6 +118,7 @@
       </div>
     </section>
     <RebalanceFormComponent :visible.sync="reBalanceDialogVisible" :password="password" @close="reBalanceDialogVisible=false" />
+    <DeleteNodeComponent :visible.sync="deleteNodeDialogVisible" :password="password" :ip="deleteIp" @onOk="onAddNodeSuccess" @close="deleteNodeDialogVisible = false" />
   </main>
 </template>
 <script>
@@ -130,15 +131,18 @@ import { ClusterApi, PackageApi } from "@/apis";
 import TaskDetail from '@/views/task/components/TaskDetail.vue';
 import ViewLogComponent from './modal/viewLog.vue';
 import RebalanceFormComponent from './modal/rebalanceForm.vue';
+import DeleteNodeComponent from './modal/deleteNode.vue';
 export default {
   components: {
     AddNodeDialog,
+    DeleteNodeComponent,
     RebalanceFormComponent,
   },
   data() {
     return {
       addNodeDialogVisible: false,
       reBalanceDialogVisible: false,
+      deleteNodeDialogVisible: false,
       mode: "",
       versionOptions: [
         {
@@ -177,7 +181,8 @@ export default {
         filterConfig: {
         },
       },
-      numberRange: []
+      numberRange: [],
+      deleteIp: '',
     };
   },
   computed: {
@@ -333,30 +338,32 @@ export default {
       if (this.needPassword) {
         password = await this.openPasswordDialog();
       }
-      await this.$confirm(this.$t("common.Confirm Delete"),  this.$t("common.tips"), {
-        confirmButtonText: this.$t("common.Delete"),
-        cancelButtonText: this.$t("common.Cancel"),
-        text: "warning",
-      });
-      const { data: { entity: taskId } } = await ClusterApi.deleteClusterNode(this.$route.params.id, {
-        ip: item.ip,
-      }, password);
+      this.deleteIp = item.ip;
+      this.deleteNodeDialogVisible = true;
+      // await this.$confirm(this.$t("common.Confirm Delete"),  this.$t("common.tips"), {
+      //   confirmButtonText: this.$t("common.Delete"),
+      //   cancelButtonText: this.$t("common.Cancel"),
+      //   text: "warning",
+      // });
+      // const { data: { entity: taskId } } = await ClusterApi.deleteClusterNode(this.$route.params.id, {
+      //   ip: item.ip,
+      // }, password);
 
-      if (taskId) {
-        $modal({
-          component: TaskDetail,
-          props: {
-            title: this.$t('task.View Task'),
-            width: 800,
-            cancelText: this.$t("task.Close"),
-            okText: null,
-          },
-          data: {
-            taskId: taskId,
-            refresh: true
-          },
-        }).finally(() => this.fetchData());
-      }
+      // if (taskId) {
+      //   $modal({
+      //     component: TaskDetail,
+      //     props: {
+      //       title: this.$t('task.View Task'),
+      //       width: 800,
+      //       cancelText: this.$t("task.Close"),
+      //       okText: null,
+      //     },
+      //     data: {
+      //       taskId: taskId,
+      //       refresh: true
+      //     },
+      //   }).finally(() => this.fetchData());
+      // }
     },
     async clusterOperation(type) {
       let password = '';

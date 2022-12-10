@@ -65,6 +65,7 @@ const messages = {
       'Action Success': 'Action Success',
       'Refresh': 'Refresh',
       'Force Override': 'Force Override',
+      'Force Delete': 'Force Delete',
     },
     layout: {
       'ClickHouse Management Console': 'ClickHouse Management Console',
@@ -309,6 +310,7 @@ const messages = {
       'Action Success': '操作成功',
       'Refresh': '刷新',
       'Force Override': '强制覆盖',
+      'Force Delete': '强制删除',
     },
     layout: {
       'ClickHouse Management Console': 'ckman管理平台',
