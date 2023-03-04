@@ -21,7 +21,7 @@
           :key="index"
           sortable>
           <template slot-scope="{row, column}">
-            <span class="text-ellipsis">{{row[column.property]}}</span>
+            <span class="text-ellipsis" @dblclick="copy(row[column.property])">{{row[column.property]}}</span>
           </template>
         </vxe-column>
       </vxe-table>
@@ -133,6 +133,24 @@ export default {
         order
       };
     },
+    copy(str) {
+      try {
+        let input = document.createElement('textarea');
+        input.value = str;
+        input.style.border = '0';
+        input.style.padding = '0';
+        input.style.margin  = '0';
+        input.style.right = '999999em';
+        input.style.position = 'absolute';
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        this.$message.success(this.$t('queryExecution.Copy Success'));
+        input = null;
+      } catch (e) {
+        //
+      }
+    }
   }
 }
 </script>
