@@ -318,6 +318,7 @@ export default {
 
     onAddNodeSuccess(taskId) {
       this.addNodeDialogVisible = false;
+      this.deleteNodeDialogVisible = false;
       $modal({
         component: TaskDetail,
         props: {
