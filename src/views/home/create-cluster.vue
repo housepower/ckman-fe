@@ -53,7 +53,7 @@ export default {
           title: this.$t('task.View Task'),
           width: 800,
           cancelText: this.$t("task.Close"),
-          okText: '关闭',
+          okText: this.$t("common.Close"),
           cancelText: null
         },
         data: {

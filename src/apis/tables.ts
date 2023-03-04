@@ -33,4 +33,7 @@ export const TablesApi = {
       end,
     });
   },
+  archiveTables(clusterName, params) {
+    return axios.post(`${url}/ck/archive/${clusterName}`, params);
+  },
 };

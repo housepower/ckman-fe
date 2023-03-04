@@ -47,9 +47,10 @@
         fixed="right"
         align="center"
         :title="$t('tables.Action')"
-        width="140">
+        width="200">
         <template slot-scope="scope">
           <el-button @click="viewSql(scope.row.tableName)" type="text" size="small">{{ $t('tables.Schema') }}</el-button>
+          <el-button type="text" size="small" @click="archiveTable(scope.row.tableName)">{{ $t('tables.Archive') }}</el-button>
           <el-button type="text" size="small" @click="onDelete(scope.row.tableName)">{{ $t('tables.Delete') }}</el-button>
         </template>
       </vxe-column>
@@ -72,6 +73,8 @@ import { $modal } from "@/services";
 import { SqlCodeMirror } from '@/components/';
 import { byteConvert } from '@/helpers/';
 import TablePartitionsComponent from './tablePartitions.vue';
+import ArchiveModal from './ArchiveModal.vue';
+import TaskDetail from '@/views/task/components/TaskDetail.vue';
 import store from '@/store';
 export default {
   data() {
@@ -317,6 +320,42 @@ export default {
         data: {
           sql: create_table_query,
         },
+      });
+    },
+    // 备份表
+    async archiveTable(key) {
+      const [ database, tableName ] = key.split('.');
+      const { id: clusterName } = this.$route.params;
+
+      await $modal({
+        component: ArchiveModal,
+        props: {
+          title: this.$t("tables.Archive"),
+          width: 800,
+          cancelText: this.$t("common.Cancel"),
+          okText: this.$t("common.Confirm"),
+        },
+        data: {
+          database,
+          tables: [tableName],
+          clusterName,
+        },
+      }).then(async(taskId) => {
+
+        await $modal({
+          component: TaskDetail,
+          props: {
+            title: this.$t('task.View Task'),
+            width: 800,
+            cancelText: this.$t("task.Close"),
+            okText: this.$t("common.Close"),
+            cancelText: null
+          },
+          data: {
+            taskId: taskId,
+            refresh: true
+          },
+        })
       });
     },
     timeFilterChange() {
