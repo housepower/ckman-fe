@@ -40,6 +40,10 @@
             <span>{{ row[column.property] }}</span>
             <el-button type="text" @click="viewPartitions(row)">{{$t('tables.View')}}</el-button>
           </span>
+          <span v-else-if="column.property === 'readwrite_status'">
+            <span>{{ row[column.property] }}</span>
+            <el-button class="ml-4" v-if="row[column.property] === 'FALSE'" type="text" @click="resumeTable(row.tableName)">{{$t('tables.Resume')}}</el-button>
+          </span>
           <span v-else>{{ row[column.property] }}</span>
         </template>
       </vxe-column>
@@ -252,7 +256,6 @@ export default {
         const {
           data: { entity },
         } = await TablesApi.tableMetrics(clusterName).finally(() => this.loading = false);
-
         const tableData =  (Object.freeze(Object.entries(entity)||[]).map(([key, values]) => {
           values.readwrite_status = values.readwrite_status.toString().toUpperCase();
           values.queryCost = Object.values(values.queryCost).join(',');
@@ -280,6 +283,17 @@ export default {
 
     handlePageChange(pager) {
       this.pagination.currentPage = pager.currentPage;
+    },
+
+    // 恢复表
+    async resumeTable(table) {
+      const { id: clusterName } = this.$route.params;
+      const { data: { retCode, retMsg } } = await TablesApi.resumeTable(clusterName, table);
+      if (retCode !== '0000') {
+        this.$message.error(retMsg);
+      } else {
+        this.$message.success(this.$t('common.Action Success'));
+      }
     },
 
     // 删除

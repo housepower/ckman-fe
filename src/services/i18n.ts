@@ -190,6 +190,7 @@ const messages = {
       'Current Month': 'Current Month',
       'So far this year': 'So far this year',
       'Last six months': 'Last six months',
+      'Resume': 'Resume'
     },
     session: {
       'Open Sessions': 'Open Sessions',
@@ -456,6 +457,7 @@ const messages = {
       'Current Month': '本月',
       'So far this year': '今年至今',
       'Last six months': '最近六个月',
+      'Resume': '恢复'
     },
     session: {
       'Open Sessions': '正在执行的SQL会话',
