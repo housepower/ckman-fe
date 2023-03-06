@@ -37,6 +37,6 @@ export const TablesApi = {
     return axios.post(`${url}/ck/archive/${clusterName}`, params);
   },
   resumeTable(clusterName, table) {
-    return axios.put(`${url}/ck/table/readonly/${clusterName}`, {table});
+    return axios.put(`${url}/ck/table/readonly/${clusterName}?table=${table}`);
   },
 };
