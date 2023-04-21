@@ -93,6 +93,9 @@ export default {
         values.name = key;
         return values;
       });
+      this.list.sort(function (a, b) {
+        return b.name - a.name;
+      })
     },
     async deleteItem(row) {
       await this.$confirm(this.$t("common.Confirm Delete"), this.$t("common.tips"), {
