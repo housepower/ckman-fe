@@ -15,5 +15,5 @@ export const SessionApi = {
     return axios.put(`${url}/open_sessions/${clusterName}`, {
       params,
     });
-  }
+  },
 };
