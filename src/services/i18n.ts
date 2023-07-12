@@ -104,7 +104,7 @@ const messages = {
       'Actions': 'Actions',
       'Go to cluster': 'Go to Cluster',
       'ClickHouse Version': 'ClickHouse Version',
-      'Overview': 'OverView',
+      'Overview': 'Overview',
       'Manage': 'Manage',
       'Tables': 'Tables',
       'Session': 'Session',
