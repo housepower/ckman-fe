@@ -113,6 +113,9 @@ const messages = {
       'The imported cluster does not support editing': 'The imported cluster does not support editing',
       'Address': 'Address',
       'Port': 'Port',
+      'ClickHouse HTTP Port': 'HTTP Port',
+      'ClickHouse Protocol': 'Protocol',
+      'TLS Secure': 'TLS Secure',
     },
     manage: {
       'Upgrade Cluster': 'Upgrade Cluster',
@@ -380,6 +383,9 @@ const messages = {
       'The imported cluster does not support editing': '导入的集群不支持编辑',
       'Address': '地址',
       'Port': '端口',
+      'ClickHouse HTTP Port': 'HTTP 端口',
+      'ClickHouse Protocol': '连接协议',
+      'TLS Secure': 'TLS 安全认证',
     },
     manage: {
       'Upgrade Cluster': '升级集群',

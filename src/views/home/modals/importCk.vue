@@ -23,11 +23,30 @@
                   :placeholder="$t('common.placeholderIp')"
                   class="width-350" />
       </el-form-item>
+      <el-form-item :label="$t('home.ClickHouse Protocol') + ':'"
+                    prop="protocol"
+                    required>
+        <el-select v-model="formModel.protocol"
+                  class="width-350">
+          <el-option value="native">native</el-option>
+          <el-option value="http">http</el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item :label="$t('home.ClickHouse TCP Port') + ':'"
                     prop="port"
                     required>
         <el-input v-model="formModel.port"
                   class="width-350" />
+      </el-form-item>
+      <el-form-item :label="$t('home.ClickHouse HTTP Port') + ':'"
+                    prop="httpPort"
+                    required>
+        <el-input v-model="formModel.httpPort"
+                  class="width-350" />
+      </el-form-item>
+      <el-form-item :label="$t('home.TLS Secure') + ':'"
+                    prop="secure">
+        <el-switch v-model="formModel.secure" />
       </el-form-item>
 
       <el-form-item :label="$t('home.Zookeeper Node List') + ':'"
@@ -93,7 +112,10 @@ export default {
         zkNodes: "",
         user: "",
         password: "",
+        protocol: "native",
         port: 9000,
+        httpPort: 8123,
+        secure: false,
         zkPort: 2181,
         zkStatusPort:8080,
         prom_host: '127.0.0.1',
@@ -111,7 +133,10 @@ export default {
         zkNodes,
         user,
         password,
+        protocol,
         port,
+        httpPort,
+        secure,
         zkPort,
         zkStatusPort,
         prom_host,
@@ -121,7 +146,10 @@ export default {
         cluster,
         logic_cluster,
         hosts: getCirdOrRangeIps(lineFeed(hosts)),
+        protocol,
         port: +port,
+        httpPort: +httpPort,
+        secure,
         user,
         password,
         zkNodes: getCirdOrRangeIps(lineFeed(zkNodes)),
