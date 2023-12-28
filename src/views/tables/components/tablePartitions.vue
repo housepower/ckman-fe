@@ -54,7 +54,7 @@
 
 <script lang="ts">
 import { TablesApi } from '@/apis';
-import { byteConvert } from '@/helpers/';
+import { byteConvert, percentiles } from '@/helpers/';
 import moment from 'moment';
 interface Partition {
   name: string;

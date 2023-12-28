@@ -36,6 +36,7 @@
         
         <template slot-scope="{ row, column }">
           <span v-if="column.property.endsWith('compressed')">{{ byteConvert(row[column.property]) }}</span>
+          <span v-else-if="column.property === 'rows'">{{ percentiles(row[column.property]) }}</span>
           <span v-else-if="column.property === 'partitions'" class="flex flex-between flex-vcenter">
             <span>{{ row[column.property] }}</span>
             <el-button type="text" @click="viewPartitions(row)">{{$t('tables.View')}}</el-button>
@@ -76,6 +77,7 @@ import { TablesApi } from "@/apis";
 import { $modal } from "@/services";
 import { SqlCodeMirror } from '@/components/';
 import { byteConvert } from '@/helpers/';
+import { percentiles } from '@/helpers/';
 import TablePartitionsComponent from './tablePartitions.vue';
 import ArchiveModal from './ArchiveModal.vue';
 import TaskDetail from '@/views/task/components/TaskDetail.vue';
@@ -249,6 +251,7 @@ export default {
   },
   methods: {
     byteConvert: byteConvert,
+    percentiles: percentiles,
     async fetchData(forceRefresh = false) {
       if (!this.tableData || forceRefresh) {
         this.loading = true;
@@ -260,7 +263,7 @@ export default {
           values.readwrite_status = values.readwrite_status.toString().toUpperCase();
           values.queryCost = Object.values(values.queryCost).join(',');
           values.tableName = key;
-          values.rows = values.rows.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); // 加入数字千分位分隔符
+          //values.rows = values.rows.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); // 加入数字千分位分隔符
           return values;
         }));
 
