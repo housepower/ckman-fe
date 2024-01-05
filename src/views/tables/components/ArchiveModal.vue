@@ -167,7 +167,7 @@ export default {
       ],
       targetOptions: [
         { label: 'local', value: 'local' },
-        { label: 'hdfs', value: 'hdfs' },
+        //{ label: 'hdfs', value: 'hdfs' },
         { label: 's3', value: 's3' }
       ],
       compressionOptions: [
