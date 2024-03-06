@@ -6,6 +6,9 @@
     @close="close"
     >
     <d-form :loading="loading" v-if="schema" :noFooter="true" :schema="schema" :form-model="formModel" ref="form"></d-form>
+    <el-text style="color: red;" type="warning">
+      {{$t('manage.Disabled Writing')}}
+    </el-text>
     <span slot="footer" class="dialog-footer">
       <el-checkbox v-model="balanceAll" class="mr-20">{{ $t('manage.All Table Rebalance') }}</el-checkbox>
       <el-button @click="close">{{$t("common.Cancel")}}</el-button>

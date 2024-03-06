@@ -147,6 +147,7 @@ const messages = {
       'Log Count': 'Log Count',
       'Default: 1000': 'Default: 1000',
       'All Table Rebalance': 'All Table Rebalance',
+      'Disabled Writing': 'Warning: During load balancing, data changes are prohibited. Please stop all write operations!',
     },
     tables: {
       'Table Metrics': 'Table Metrics',
@@ -417,6 +418,7 @@ const messages = {
       'Log Count': '日志条数',
       'Default: 1000': '默认值：1000',
       'All Table Rebalance': '所有表均参与均衡',
+      'Disabled Writing': '注意：负载均衡期间禁止更改数据，请停止所有写入操作!',
     },
     tables: {
       'Table Metrics': '表指标',
