@@ -198,6 +198,7 @@ const messages = {
     },
     session: {
       'Open Sessions': 'Open Sessions',
+      'DDL Queue':'Distributed DDL Queue',
       'Slow Sessions': 'Slow Sessions',
       'Limit Count': 'Limit Count',
       'Query Start Time': 'Query Start Time',
@@ -469,6 +470,7 @@ const messages = {
     },
     session: {
       'Open Sessions': '正在执行的SQL会话',
+      'DDL Queue': '分布式DDL查询',
       'Slow Sessions': '慢SQL查询',
       'Limit Count': '查询条数',
       'Query Start Time': 'SQL开始时间',

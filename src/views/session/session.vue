@@ -12,6 +12,10 @@
         <h3 class="mb-10">{{$t('session.Open Sessions')}}</h3>
         <session-table :list="openList" :clusterName="id" type="open" />
         <div class="mb-10 mt-50" style="overflow: hidden;">
+          <div class="fs-18 font-bold pull-left">{{$t('session.DDL Queue')}}</div>
+        </div>
+        <session-table :list="ddlQueue" :clusterName="id" type="queue" />
+        <div class="mb-10 mt-50" style="overflow: hidden;">
           <div class="fs-18 font-bold pull-left">{{$t('session.Slow Sessions')}}</div>
           <div class="pull-right">
             <time-filter v-model="timeFilter"
@@ -40,6 +44,7 @@ export default {
       refresh: null,
       openList: [],
       closeList: [],
+      ddlQueue: [],
       timeFilter: ["now-7d", "now"],
       limit: 10,
     };
@@ -59,7 +64,17 @@ export default {
       
       this.openList = openList;
 
+      this.getDDLQueue();
+
       this.getSlowSessionList();
+    },
+    async getDDLQueue() {
+      const {id} = this;
+      const {
+        data:{entity: ddlQueue},
+      } = await SessionApi.ddl_queue(id);
+
+      this.ddlQueue = ddlQueue;
     },
     async getSlowSessionList() {
       const { min, max } = convertTimeBounds(this.timeFilter);

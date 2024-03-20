@@ -24,13 +24,13 @@
           <span v-else>{{ row[col.prop] }}</span>
         </vxe-column>
         <vxe-column
-          v-if="type === 'open'"
+          v-if="type === 'open' || type === 'queue'"
           fixed="right"
           align="center"
           :title="$t('tables.Action')"
           width="140">
           <template slot-scope="scope">
-            <el-button  type="text" size="small" @click="killSession(scope.row)">{{$t('session.Kill')}}</el-button>
+            <el-button  type="text" size="small" @click="killSession(type, scope.row)">{{$t('session.Kill')}}</el-button>
           </template>
         </vxe-column>
     </vxe-table>
@@ -184,13 +184,14 @@ export default {
     handlePageChange(pager) {
       this.pagination.currentPage = pager.currentPage;
     },
-    async killSession(item) {
+    async killSession(type, item) {
       // todo 终止会话 需测试
       const { clusterName } = this;
       const { host, queryId } = item;
       const { data: { entity } } = await SessionApi.kill(clusterName, {
         host,
-        queryId
+        queryId,
+        type
       });
       this.$message.success(`${this.$t('common.Action Success')}`);
     },
