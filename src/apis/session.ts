@@ -11,10 +11,9 @@ export const SessionApi = {
       params,
     });
   },
-  kill(clusterName, params: { host: string; query_id: string; type:string }) {
-    return axios.put(`${url}/open_sessions/${clusterName}`, {
-      params,
-    });
+  kill(clusterName:string, host: string, queryId: string,type:string) {
+    return axios.put(`${url}/open_sessions/${clusterName}?host=${host}&queryId=${queryId}&type=${type}`);
+  
   },
   ddl_queue(name: string) {
     return axios.get(`${url}/ddl_queue/${name}`);

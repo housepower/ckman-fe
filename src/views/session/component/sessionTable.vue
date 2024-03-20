@@ -188,11 +188,7 @@ export default {
       // todo 终止会话 需测试
       const { clusterName } = this;
       const { host, queryId } = item;
-      const { data: { entity } } = await SessionApi.kill(clusterName, {
-        host,
-        queryId,
-        type
-      });
+      const { data: { entity } } = await SessionApi.kill(clusterName, host, queryId, type);
       this.$message.success(`${this.$t('common.Action Success')}`);
     },
     onCopy(str) {
