@@ -98,6 +98,11 @@
                 </span>
                 <span class="ml-10 pull-right">{{row.uptime}}</span>
               </div>
+              <div v-else-if="col.prop === 'ip'">
+                <el-button type="text" @click="openHttpWeb(row.ip, httpPort)">
+                    {{ row.ip }}
+                </el-button>
+              </div>
               <span v-else>{{row[column.property]}}</span>
             </template>
           </vxe-column>
@@ -144,6 +149,7 @@ export default {
       reBalanceDialogVisible: false,
       deleteNodeDialogVisible: false,
       mode: "",
+      httpPort: 8123,
       versionOptions: [
         {
           value: "",
@@ -248,6 +254,7 @@ export default {
       } = await ClusterApi.getClusterInfo(this.$route.params.id);
       this.list = entity;
       this.mode = entity.mode;
+      this.httpPort = entity.httpPort;
       this.needPassword = entity.needPassword;
       this.packageType = entity.pkgType;
       this.fetchVersionData();
@@ -455,6 +462,10 @@ export default {
     filterHandler(value, row, column) {
       const property = column['property'];
       return row[property] === value;
+    },
+
+    async openHttpWeb(ip, httpPort) {
+      window.open("http://"+ip+":"+httpPort+"/play")
     },
 
     async viewClusterLog(row) {
