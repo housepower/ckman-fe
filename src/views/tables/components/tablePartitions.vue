@@ -10,6 +10,10 @@
         :label="$t('tables.Partition')">
       </el-table-column>
       <el-table-column
+        prop="parts"
+        :label="$t('tables.Parts')">
+      </el-table-column>
+      <el-table-column
         prop="rows"
         :label="$t('tables.Rows')">
       </el-table-column>
