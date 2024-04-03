@@ -180,24 +180,24 @@ export default {
           minWidth: 120,
           sortable: true
         },
-        {
-          prop: "completedQueries",
-          label: this.$t('tables.Completed Queries in last 24h'),
-          minWidth: 250,
-          sortable: true
-        },
-        {
-          prop: "failedQueries",
-          label: this.$t('tables.Failed Queries in last 24h'),
-          minWidth: 220,
-          sortable: true
-        },
-        {
-          prop: "queryCost",
-          label: this.$t('tables.Last 7 days info'),
-          minWidth: 340,
-          sortable: true
-        },
+        // {
+        //   prop: "completedQueries",
+        //   label: this.$t('tables.Completed Queries in last 24h'),
+        //   minWidth: 250,
+        //   sortable: true
+        // },
+        // {
+        //   prop: "failedQueries",
+        //   label: this.$t('tables.Failed Queries in last 24h'),
+        //   minWidth: 220,
+        //   sortable: true
+        // },
+        // {
+        //   prop: "queryCost",
+        //   label: this.$t('tables.Last 7 days info'),
+        //   minWidth: 340,
+        //   sortable: true
+        // },
       ];
       return columns
     },
@@ -261,7 +261,7 @@ export default {
         } = await TablesApi.tableMetrics(clusterName).finally(() => this.loading = false);
         const tableData =  (Object.freeze(Object.entries(entity)||[]).map(([key, values]) => {
           values.readwrite_status = values.readwrite_status.toString().toUpperCase();
-          values.queryCost = Object.values(values.queryCost).join(',');
+          //values.queryCost = Object.values(values.queryCost).join(',');
           values.tableName = key;
           //values.rows = values.rows.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); // 加入数字千分位分隔符
           return values;
