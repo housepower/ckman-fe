@@ -35,7 +35,7 @@
           :min-width="minWidth || 140">
           
           <template slot-scope="{ row, column }">
-            <span v-if="column.property.endsWith('compressed')">{{ byteConvert(row[column.property]) }}</span>
+            <span v-if="column.property.endsWith('compressed') || column.property === 'memory_usage'">{{ byteConvert(row[column.property]) }}</span>
             <span v-else-if="column.property === 'rows' || column.property === 'elapsed'">{{ percentiles(row[column.property]) }}</span>
             <span v-else>{{ row[column.property] }}</span>
           </template>
