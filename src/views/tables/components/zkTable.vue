@@ -4,6 +4,12 @@
       <span class="fs-20 font-bold">{{$t('tables.Zookeeper Status')}}</span>
     </div>
 
+    <vxe-toolbar zoom custom class="pull-right">
+      <template #buttons>
+        <el-button size="mini" @click="fetchData(true)" circle icon="el-icon-refresh" class="fs-16 fc-black" style="border-color: #dcdfe6;"></el-button>
+      </template>
+    </vxe-toolbar>
+
     <table cellspacing="0" class="el-table width-full reverse-table el-table--border el-table--enable-row-hover el-table--enable-row-transition">
       <tr>
         <th></th>
