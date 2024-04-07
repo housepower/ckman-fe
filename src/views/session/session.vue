@@ -75,6 +75,10 @@ export default {
       } = await SessionApi.ddl_queue(id);
 
       this.ddlQueue = ddlQueue;
+      this.ddlQueue = ddlQueue.map(x => {
+        x.queryDuration = parseDurationBySplit(x.queryDuration);
+        return x;
+      });
     },
     async getSlowSessionList() {
       const { min, max } = convertTimeBounds(this.timeFilter);
