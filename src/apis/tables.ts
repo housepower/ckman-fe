@@ -9,6 +9,9 @@ export const TablesApi = {
   tableMetrics(name: string) {
     return axios.get(`${url}/ck/table_metric/${name}`);
   },
+  tableMerges(name: string) {
+    return axios.get(`${url}/ck/table_merges/${name}`);
+  },
   deleteTable(name: string, params: { tableName: string; database: string }) {
     return axios.delete(`${url}/ck/table/${name}`, {
       params,

@@ -194,7 +194,16 @@ const messages = {
       'Current Month': 'Current Month',
       'So far this year': 'So far this year',
       'Last six months': 'Last six months',
-      'Resume': 'Resume'
+      'Resume': 'Resume',
+      'Table Merges': 'Table Merges',
+      'Elapsed': 'Elapsed',
+      'MergeStart': 'MergeStart',
+      'Progress': 'CPU',
+      'MemUsage': 'Memory',
+      'NumParts': 'NumParts',
+      'ResultPartName': 'ResultPartName',
+      'SourcePartNames': 'SourcePartNames',
+      'Algorithm': 'Algorithm'
     },
     session: {
       'Open Sessions': 'Open Sessions',
@@ -466,7 +475,16 @@ const messages = {
       'Current Month': '本月',
       'So far this year': '今年至今',
       'Last six months': '最近六个月',
-      'Resume': '恢复'
+      'Resume': '恢复',
+      'Table Merges': '合并指标',
+      'Elapsed': '耗时',
+      'MergeStart': '合并开始时间',
+      'Progress': 'CPU',
+      'MemUsage': '内存',
+      'NumParts': '合并Part个数',
+      'ResultPartName': '合并后Part名',
+      'SourcePartNames': '合并前Part名',
+      'Algorithm': '合并算法'
     },
     session: {
       'Open Sessions': '正在执行的SQL会话',
