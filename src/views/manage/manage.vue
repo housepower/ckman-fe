@@ -102,6 +102,7 @@
                 <el-button type="text" @click="openHttpWeb(row.ip, httpPort)">
                     {{ row.ip }}
                 </el-button>
+                <el-button  class="no-border" icon="el-icon-monitor" @click="openDashboard(row.ip, httpPort)"></el-button>
               </div>
               <span v-else>{{row[column.property]}}</span>
             </template>
@@ -468,6 +469,10 @@ export default {
       window.open("http://"+ip+":"+httpPort+"/play")
     },
 
+    async openDashboard(ip, httpPort) {
+      window.open("http://" + ip + ":" + httpPort + "/dashboard")
+    },
+
     async viewClusterLog(row) {
       const { ip } = row;
       const { id: clusterName } = this.$route.params;
@@ -505,5 +510,11 @@ export default {
   &.red {
     background-color: #f50600;
   }
+}
+</style>
+
+<style scoped>
+.no-border {
+  border: none;
 }
 </style>
