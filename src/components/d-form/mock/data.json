@@ -140,19 +140,6 @@
         "candidates": null,
         "default": "2181"
     },
-    "ZkStatusPort": {
-        "label_en": "Zookeeper Status Port",
-        "label_zh": "Zookeeper监控端口",
-        "description_en": "expose to commands/mntr, zookeeper support it after 3.5.0",
-        "description_zh": "暴露给mntr等四字命令的端口，zookeeper 3.5.0 以上支持",
-        "visiable": "true",
-        "required": "true",
-        "editable": "true",
-        "type": "int",
-        "input_type": "text",
-        "candidates": null,
-        "default": "8080"
-    },
     "PromHost": {
         "label_en": "Prometheus Host",
         "label_zh": "Promethues 地址",

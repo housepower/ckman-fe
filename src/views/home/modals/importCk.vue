@@ -64,12 +64,6 @@
         <el-input v-model="formModel.zkPort"
                   class="width-350" />
       </el-form-item>
-      <el-form-item :label="$t('home.ZK Status Port') + ':'"
-                    prop="zkStatusPort"
-                    required>
-        <el-input v-model="formModel.zkStatusPort"
-                  class="width-350" />
-      </el-form-item>
 
       <el-form-item :label="`Prometheus ${$t('home.Address')}:`"
                     prop="prom_host">
@@ -117,7 +111,6 @@ export default {
         httpPort: 8123,
         secure: false,
         zkPort: 2181,
-        zkStatusPort:8080,
         prom_host: '127.0.0.1',
         prom_port: '9090',
       },
@@ -138,7 +131,6 @@ export default {
         httpPort,
         secure,
         zkPort,
-        zkStatusPort,
         prom_host,
         prom_port,
       } = this.formModel;
@@ -154,7 +146,6 @@ export default {
         password,
         zkNodes: getCirdOrRangeIps(lineFeed(zkNodes)),
         zkPort: +zkPort,
-        zkStatusPort: +zkStatusPort,
         prom_host,
         prom_port,
       });

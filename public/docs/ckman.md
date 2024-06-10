@@ -733,8 +733,6 @@ nacos:
 >    -   `ClickHouse`集群依赖的`zookeeper`集群，该集群也要提前存在
 >-   `zkPort`
 >    -   `zookeeper`端口，默认是`2181`
->-   `zkStatusPort`
->    -   监控`zookeeper`指标的端口，默认是`8080`，`3.5.0`以上版本支持
 
 请求参数示例：
 
@@ -755,8 +753,7 @@ nacos:
     "192.168.0.2",
     "192.168.0.3"
   ],
-  "zkPort": 2181,
-  "zkStatusPort": 8080
+  "zkPort": 2181
 }
 ```
 
@@ -780,7 +777,6 @@ nacos:
 		"cluster": "test",
 		"zkNodes": ["192.168.0.1", "192.168.0.2", "192.168.0.3"],
 		"zkPort": 2181,
-		"zkStatusPort": 8080,
 		"isReplica": false,
 		"version": "21.3.9.83",
 		"sshUser": "root",
@@ -1284,8 +1280,6 @@ nacos:
 >           -   `ClickHouse`集群依赖的`zookeeper`集群
 >       -   `zkPort`
 >           -   `zookeeper`集群的端口，默认为`2181`
->       -   `zkStatusPort`
->           -   监控`zookeeper`的端口，默认为`8080`
 >   -   `hosts`
 >       -   集群列表
 >   -   `password`
@@ -1336,8 +1330,7 @@ nacos:
       "192.168.0.2",
       "192.168.0.3"
     ],
-    "zkPort": 2181,
-    "zkStatusPort": 8080
+    "zkPort": 2181
   },
   "hosts": [
     "192.168.0.1",
