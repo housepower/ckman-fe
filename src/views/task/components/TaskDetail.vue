@@ -2,38 +2,28 @@
   <div class="task-detail">
     <div v-if="detail" class="mb-20">
       <label>{{$t('task.Task ID')}}：</label><span class="fc-black">{{detail.TaskId}}</span>
-      <label class="ml-20">{{$t('task.Cluster Name')}}：</label><span class="fc-black">{{detail.ClusterName}}</span>
+      <label class="ml-20">{{$t('task.Cluster Name')}}：</label><span
+        class="fc-black">{{detail.ClusterName}} [{{ detail.Type}}]</span>
       <label class="ml-20">{{$t('task.Current Action')}}：</label><span class="fc-black">{{detail.Option[lang] }}</span>
     </div>
 
-    <vxe-table
-        style="clear: both;"
-        ref="xTable"
-        v-bind="gridOptions"
-        size="mini"
-        :columns="columns"
-        :data="currentPageData"
-      >
-        <vxe-column fixed="right" align="center" :title="$t('task.Node')" field="Host"></vxe-column>
-        <vxe-column fixed="right" align="center" :title="$t('task.Status')" field="Status">
-          <template slot-scope="scope">
-            <div class="flex flex-vcenter flex-center">
-              <img src="/images/5-130H2191322-50.gif" v-if="loading" class="mr-20" />
-              <span class="status" :class="scope.row.Status.EN">{{scope.row.Status[lang]}}</span>
-            </div>
-          </template>
-        </vxe-column>
-      </vxe-table>
+    <vxe-table style="clear: both;" ref="xTable" v-bind="gridOptions" size="mini" :columns="columns"
+      :data="currentPageData">
+      <vxe-column fixed="right" align="center" :title="$t('task.Node')" field="Host"></vxe-column>
+      <vxe-column fixed="right" align="center" :title="$t('task.Status')" field="Status">
+        <template slot-scope="scope">
+          <div class="flex flex-vcenter flex-center">
+            <img src="/images/5-130H2191322-50.gif" v-if="loading" class="mr-20" />
+            <span class="status" :class="scope.row.Status.EN">{{scope.row.Status[lang]}}</span>
+          </div>
+        </template>
+      </vxe-column>
+    </vxe-table>
 
-      <vxe-pager
-        align="center"
-        :current-page="pagination.currentPage"
-        :page-size.sync="pagination.pageSize"
-        :page-sizes="pagination.pageSizes"
-        :total="pagination.total"
-        :layouts="['PrevPage', 'JumpNumber', 'NextPage', 'Total']"
-        @page-change="handlePageChange">
-      </vxe-pager>
+    <vxe-pager align="center" :current-page="pagination.currentPage" :page-size.sync="pagination.pageSize"
+      :page-sizes="pagination.pageSizes" :total="pagination.total"
+      :layouts="['PrevPage', 'JumpNumber', 'NextPage', 'Total']" @page-change="handlePageChange">
+    </vxe-pager>
   </div>
 </template>
 <script>
