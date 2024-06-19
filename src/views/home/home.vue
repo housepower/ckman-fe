@@ -61,9 +61,6 @@
                          show-overflow-tooltip
                          sortable
                          :label="$t('home.ClickHouse Node Count')" />
-        <el-table-column prop="zkNodes"
-                         show-overflow-tooltip
-                         :label="$t('home.Zookeeper Node List')" />
         <el-table-column :label="$t('home.Actions')"
                          #default="{ row }">
           <el-link type="primary"
@@ -98,8 +95,7 @@ export default {
         return item.cluster.includes(key)
           || item.mode.includes(key)
           || item.logic_cluster?.includes(key)
-          || item.hosts.includes(key)
-          || item.zkNodes.includes(key);
+          || item.hosts.includes(key);
       });
     }
   },
@@ -115,7 +111,6 @@ export default {
       Object.entries(entity).forEach(([name, item]) => {
         item.count = item.hosts.length;
         item.hosts = item.hosts.join(",");
-        item.zkNodes = item.zkNodes.join(",");
         this.list.unshift(item);
       });
     },
