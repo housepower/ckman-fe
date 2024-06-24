@@ -61,6 +61,9 @@
                          show-overflow-tooltip
                          sortable
                          :label="$t('home.ClickHouse Node Count')" />
+        <el-table-column prop="comment"
+                         show-overflow-tooltip
+                         :label="$t('home.Comment')" />
         <el-table-column :label="$t('home.Actions')"
                          #default="{ row }">
           <el-link type="primary"

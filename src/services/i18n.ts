@@ -101,6 +101,7 @@ const messages = {
       'Mode': 'Mode',
       'ClickHouse Node IP': 'ClickHouse Node IP',
       'ClickHouse Node Count': 'ClickHouse Node Count',
+      'Comment': 'Comment',
       'Actions': 'Actions',
       'Go to cluster': 'Go to Cluster',
       'ClickHouse Version': 'ClickHouse Version',
@@ -236,6 +237,7 @@ const messages = {
       'No Sql': 'No Sql',
       'Node': 'Node',
       'Random': 'Random',
+      'Export to Excel': 'Export to Excel',
     },
     homePackage: {
       'Upload Packages': 'Upload Packages',
@@ -382,6 +384,7 @@ const messages = {
       'Mode': '集群模式',
       'ClickHouse Node IP': 'ClickHouse节点IP',
       'ClickHouse Node Count': 'ClickHouse节点数量',
+      'Comment': '备注',
       'Actions': '操作',
       'Go to cluster': '进入集群',
       'ClickHouse Version': 'ClickHouse版本',
@@ -517,6 +520,7 @@ const messages = {
       'No Sql': '请输入sql语句',
       'Node': '节点',
       'Random': '随机',
+      'Export to Excel': '导出到Excel'
     },
     homePackage: {
       'Upload Packages': '上传安装包',
