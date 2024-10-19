@@ -70,7 +70,7 @@
                    underline
                    @click.prevent="toCluster(row)"
                    :to="'/clusters/' + row.cluster">{{$t('home.Go to cluster')}}</el-link>
-          <i class="fa fa-trash pointer fs-18 ml-15"
+          <i class="fa fa-trash pointer fs-18 ml-35"
              v-tooltip="$t('common.Delete')"
              @click="remove(row)" />
         </el-table-column>
