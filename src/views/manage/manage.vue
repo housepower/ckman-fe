@@ -273,7 +273,7 @@ export default {
       }));
     },
     isStatusDisable(item) {
-      if ( this.mode === "import")
+      if ( this.mode === "import" && lowerFirst(item) != "rebalance")
         return true;
       if (
         ["start", "destroy"].includes(lowerFirst(item)) &&
@@ -375,18 +375,18 @@ export default {
       // }
     },
     async clusterOperation(type) {
-      let password = '';
-      if (this.needPassword) {
-        password = await this.openPasswordDialog();
-      }
-
-      this.password = password;
       type = lowerFirst(type);
 
       if (type === 'rebalance') {
         this.reBalanceDialogVisible = true;
         return;
       }
+      let password = '';
+      if (this.needPassword) {
+        password = await this.openPasswordDialog();
+      }
+
+      this.password = password; 
 
       await this.$confirm(this.$t('common.' + ClusterStatus[type]), this.$t('common.tips'), {
         confirmButtonText: this.$t("common.Confirm"),
