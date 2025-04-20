@@ -226,16 +226,6 @@ export default {
       let nextOrder = order === '0' ? '1' : '0';
       const nextValue = row[name + '_' + nextOrder];
       if (!nextValue) return;
-      if (value.indexOf('F') == '-1') {
-        return;
-      }
-
-      const num = parseInt(value.match(/F\[(\d+)\]/)[1], 10);
-      if (!nextValue) return;
-      const nextNum = parseInt(nextValue.match(/[M]L\[(\d+)\]/)[1], 10);
-      if (num < nextNum) {
-        return 'yellow'
-      }
     }
   },
 };
@@ -244,10 +234,5 @@ export default {
 <style lang="scss" scoped>
 .replication-status {
   border-bottom: 1px solid var(--color-gray);
-}
-
-.yellow {
-  color: #fff;
-  background: #d4b433;
 }
 </style>
