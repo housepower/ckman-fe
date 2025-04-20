@@ -45,8 +45,11 @@ export const ClusterApi = {
       return axios.put(`${url}/${type}/${clusterName}?password=${ password || '' }`,{ packageVersion, skip, policy });
     }
   },
-  rebalanceCluster({ clusterName, params, all, password }) {
-    return axios.put(`${url}/rebalance/${clusterName}?password=${ password || '' }&all=${all}`, params);
+  rebalanceInfo({clusterName, params}){
+    return axios.post(`${url}/rebalance_info/${clusterName}`, params);
+  },
+  rebalanceCluster({ clusterName, params, password }) {
+    return axios.put(`${url}/rebalance/${clusterName}?password=${ password || '' }`, params);
   },
   getClusterInfo(id) {
     return axios.get(`${url}/get/${id}`);

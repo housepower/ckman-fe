@@ -147,7 +147,8 @@ const messages = {
       'Latest log': 'Latest log',
       'Log Count': 'Log Count',
       'Default: 1000': 'Default: 1000',
-      'All Table Rebalance': 'All Table Rebalance',
+      'View Status': 'View Status',
+      'Rebalance Info': 'Rebalance Info',
       'Disabled Writing': 'Warning: During load balancing, data changes are prohibited. Please stop all write operations!',
     },
     tables: {
@@ -430,7 +431,8 @@ const messages = {
       'Latest log': '最新日志',
       'Log Count': '日志条数',
       'Default: 1000': '默认值：1000',
-      'All Table Rebalance': '所有表均参与均衡',
+      'View Status': '查看当前状态',
+      'Rebalance Info': '均衡信息',
       'Disabled Writing': '注意：负载均衡期间禁止更改数据，请停止所有写入操作!',
     },
     tables: {
