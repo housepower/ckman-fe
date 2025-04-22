@@ -37,6 +37,7 @@
           <template slot-scope="{ row, column }">
             <span v-if="column.property.endsWith('compressed') || column.property === 'memory_usage'">{{ byteConvert(row[column.property]) }}</span>
             <span v-else-if="column.property === 'rows' || column.property === 'elapsed'">{{ percentiles(row[column.property]) }}</span>
+            <span v-else-if="column.property === 'progress'">{{ formatProgress(row[column.property]) }}</span>
             <span v-else>{{ row[column.property] }}</span>
           </template>
         </vxe-column>
@@ -105,38 +106,38 @@
           {
             prop: "table",
             label: this.$t('tables.Table Name'),
-            minWidth: 150,
+            minWidth: 250,
             fixed: 'left',
             sortable: true
           },
           {
             prop: "host",
             label: this.$t('session.Node Host'),
-            width: 100,
+            width: 80,
             sortable: true
           },
           {
             prop: "elapsed",
             label: this.$t('tables.Elapsed'),
-            width: 100,
+            width: 80,
             sortable: true
           },
           {
             prop: "merge_start",
             label: this.$t('tables.MergeStart'),
-            width: 140,
+            width: 150,
             sortable: true
           },
           {
             prop: "progress",
-            label: this.$t('tables.Progress'),
-            width: 100,
+            label: this.$t('tables.Merge Progress'),
+            width: 80,
             sortable: true
           },
           {
             prop: "memory_usage",
             label: this.$t('tables.MemUsage'),
-            minWidth: 100,
+            minWidth: 80,
             sortable: true
           },
           {
@@ -232,6 +233,14 @@
     methods: {
       byteConvert: byteConvert,
       percentiles: percentiles,
+      formatProgress(value) {
+        let valueStr = (value * 100).toString();
+        let decimalIndex = valueStr.indexOf('.');
+        if (decimalIndex !== -1) {
+        valueStr = valueStr.substring(0, decimalIndex + 3);
+        }
+        return valueStr + '%';
+      },
       async fetchData() {
         this.loading = true;
         const { clusterName } = this;
