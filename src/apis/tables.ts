@@ -25,6 +25,9 @@ export const TablesApi = {
   replicationStatus(name: string) {
     return axios.get(`${url}/zk/replicated_table/${name}`);
   },
+  replicatedQueue(name, tableName, node) {
+    return axios.get(`${url}/zk/replicated_queue/${name}?table=${tableName}&node=${node}`);
+  },
   getPartitions(clusterName, table) {
     return axios.get(`${url}/ck/partition/${clusterName}?table=${table}`);
   },
