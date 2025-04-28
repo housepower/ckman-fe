@@ -153,6 +153,7 @@ const messages = {
     },
     tables: {
       'Table Metrics': 'Table Metrics',
+      'Vm Metrics': 'Materialized View',
       'Table Name': 'Table Name',
       'Columns': 'Columns',
       'Rows': 'Rows',
@@ -164,6 +165,8 @@ const messages = {
       'Completed Queries in last 24h': 'Completed Queries in last 24h',
       'Failed Queries in last 24h': 'Failed Queries in last 24h',
       'Last 7 days info': 'Queries cost(0.5,0.99,max)in last 7 days(ms)',
+      'Source Table': 'Source Table',
+      'As Select': 'As Select',
       'Table Replication Status': 'Table Replication Status',
       'Zookeeper Status': 'Zookeeper Status',
       'Schema': 'Schema',
@@ -450,6 +453,7 @@ const messages = {
     },
     tables: {
       'Table Metrics': '表指标',
+      'Vm Metrics': '物化视图',
       'Table Name': '表名',
       'Columns': '列数',
       'Rows': '行数',
@@ -461,6 +465,8 @@ const messages = {
       'Completed Queries in last 24h': '过去24小时成功的SQL数量',
       'Failed Queries in last 24h': '过去24小时失败的SQL数量',
       'Last 7 days info': '过去7天（0.5,0.99,max）SQL耗时(ms)',
+      'Source Table': '来源表',
+      'As Select': '查询语句',
       'Table Replication Status': '复制表状态',
       'Zookeeper Status': 'Zookeeper状态',
       'Schema': '查看建表语句',

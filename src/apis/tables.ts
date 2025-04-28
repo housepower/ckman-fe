@@ -9,6 +9,9 @@ export const TablesApi = {
   tableMetrics(name: string) {
     return axios.get(`${url}/ck/table_metric/${name}`);
   },
+  vmMetrics(name: string) {
+    return axios.get(`${url}/ck/vm/${name}`);
+  },
   tableMerges(name: string) {
     return axios.get(`${url}/ck/table_merges/${name}`);
   },

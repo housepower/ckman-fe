@@ -1,73 +1,60 @@
 <template>
   <div class="table-metric pb-20">
     <div class="title flex flex-between flex-vcenter ptb-10 pull-left">
-      <span class="fs-20 font-bold mr-10">{{$t('tables.Table Metrics')}}</span>
-      <time-filter v-model="timeFilter"
-          ref="timeFilter"
-          localKey="tableMetricsTimeFilter"
-          :refreshDuration.sync="refresh"
-          @input="timeFilterChange"
-          @on-refresh="timeFilterRefresh" />
+      <span class="fs-20 font-bold mr-10 tab-item" :class="{ active: activeTab === 'table' }" @click="switchTab('table')">
+        {{ $t('tables.Table Metrics') }}
+      </span>
+      <span class="fs-20 font-bold mr-10">|</span>
+      <span class="fs-20 font-bold mr-10 tab-item" :class="{ active: activeTab === 'vm' }" @click="switchTab('vm')">
+        {{ $t('tables.Vm Metrics') }}
+      </span>
+      <time-filter v-model="timeFilter" ref="timeFilter" localKey="tableMetricsTimeFilter"
+        :refreshDuration.sync="refresh" @input="timeFilterChange" @on-refresh="timeFilterRefresh" />
     </div>
     <vxe-toolbar zoom custom class="pull-right">
       <template #buttons>
-        <el-input size="medium" :placeholder="$t('common.keyword search')" v-model="searchKey" class="width-250 mr-10" suffix-icon="el-icon-search"></el-input>
-        <el-button size="mini" @click="fetchData(true)" circle icon="el-icon-refresh" class="fs-16 fc-black" style="border-color: #dcdfe6;"></el-button>
+        <el-input size="medium" :placeholder="$t('common.keyword search')" v-model="searchKey" class="width-250 mr-10"
+          suffix-icon="el-icon-search"></el-input>
+        <el-button size="mini" @click="fetchData(true)" circle icon="el-icon-refresh" class="fs-16 fc-black"
+          style="border-color: #dcdfe6;"></el-button>
       </template>
     </vxe-toolbar>
 
-    <vxe-table
-      style="clear: both;"
-      ref="xTable"
-      v-bind="gridOptions"
-      :columns="columns"
-      :data="currentPageData"
-      @sort-change="sortChangeEvent"
-    >
-      <vxe-column
-        v-for="{ prop, label, minWidth, fixed, filters } of columns"
-        :key="prop"
-        :fixed="fixed"
-        sortable
-        :field="prop"
-        :title="label"
-        :filters="filters || null"
-        :min-width="minWidth || 140">
-        
+    <vxe-table style="clear: both;" ref="xTable" v-bind="gridOptions" :columns="columns" :data="currentPageData"
+      @sort-change="sortChangeEvent">
+      <vxe-column v-for="{ prop, label, minWidth, fixed, filters } of columns" :key="prop" :fixed="fixed" sortable
+        :field="prop" :title="label" :filters="filters || null" :min-width="minWidth || 140">
+
         <template slot-scope="{ row, column }">
           <span v-if="column.property.endsWith('compressed')">{{ byteConvert(row[column.property]) }}</span>
           <span v-else-if="column.property === 'rows'">{{ percentiles(row[column.property]) }}</span>
           <span v-else-if="column.property === 'partitions'" class="flex flex-between flex-vcenter">
             <span>{{ row[column.property] }}</span>
-            <el-button type="text" @click="viewPartitions(row)">{{$t('tables.View')}}</el-button>
+            <el-button type="text" @click="viewPartitions(row)">{{ $t('tables.View') }}</el-button>
           </span>
           <span v-else-if="column.property === 'readwrite_status'">
             <span>{{ row[column.property] }}</span>
-            <el-button class="ml-4" v-if="row[column.property] === 'FALSE'" type="text" @click="resumeTable(row.tableName)">{{$t('tables.Resume')}}</el-button>
+            <el-button class="ml-4" v-if="row[column.property] === 'FALSE'" type="text"
+              @click="resumeTable(row.tableName)">{{ $t('tables.Resume') }}</el-button>
           </span>
           <span v-else>{{ row[column.property] }}</span>
         </template>
       </vxe-column>
-      <vxe-column
-        fixed="right"
-        align="center"
-        :title="$t('tables.Action')"
-        width="200">
+      <vxe-column fixed="right" align="center" :title="$t('tables.Action')" width="200">
         <template slot-scope="scope">
-          <el-button @click="viewSql(scope.row.tableName)" type="text" size="small">{{ $t('tables.Schema') }}</el-button>
-          <el-button type="text" size="small" @click="archiveTable(scope.row.tableName)">{{ $t('tables.Archive') }}</el-button>
-          <el-button type="text" size="small" @click="onDelete(scope.row.tableName)">{{ $t('tables.Delete') }}</el-button>
+          <el-button @click="viewSql(scope.row.tableName)" type="text" size="small">{{ $t('tables.Schema')
+            }}</el-button>
+          <el-button v-if="activeTab === 'table'" type="text" size="small" @click="archiveTable(scope.row.tableName)">{{ $t('tables.Archive')
+            }}</el-button>
+          <el-button v-if="activeTab === 'table'" type="text" size="small" @click="onDelete(scope.row.tableName)">{{ $t('tables.Delete')
+            }}</el-button>
         </template>
       </vxe-column>
     </vxe-table>
 
-    <vxe-pager
-      :current-page="pagination.currentPage"
-      :page-size.sync="pagination.pageSize"
-      :page-sizes="pagination.pageSizes"
-      :total="pagination.total"
-      :layouts="['PrevPage', 'JumpNumber', 'NextPage', 'FullJump', 'Sizes', 'Total']"
-      @page-change="handlePageChange">
+    <vxe-pager :current-page="pagination.currentPage" :page-size.sync="pagination.pageSize"
+      :page-sizes="pagination.pageSizes" :total="pagination.total"
+      :layouts="['PrevPage', 'JumpNumber', 'NextPage', 'FullJump', 'Sizes', 'Total']" @page-change="handlePageChange">
     </vxe-pager>
   </div>
 
@@ -85,6 +72,7 @@ import store from '@/store';
 export default {
   data() {
     return {
+      activeTab: 'table',
       clusterName: '',
       timeFilter: null,
       refresh: null,
@@ -126,80 +114,100 @@ export default {
   },
   computed: {
     columns() {
-      let columns = [
+      const baseColumns = [
         {
           prop: "tableName",
           label: this.$t('tables.Table Name'),
           minWidth: 250,
           fixed: 'left',
           sortable: true
-        },
-        {
-          prop: "columns",
-          label: this.$t('tables.Columns'),
-          width: 140,
-          sortable: true
-        },
-        {
-          prop: "rows",
-          label: this.$t('tables.Rows'),
-          width: 140,
-          sortable: true
-        },
-        {
-          prop: "partitions",
-          label: this.$t('tables.Partitions'),
-          width: 140,
-          sortable: true
-        },
-        {
-          prop: "parts",
-          label: this.$t('tables.Parts'),
-          width: 140,
-          sortable: true
-        },
-        {
-          prop: "uncompressed",
-          label: this.$t('tables.UnCompressed'),
-          minWidth: 220,
-          sortable: true
-        },
-        {
-          prop: "compressed",
-          label: this.$t('tables.Compressed'),
-          minWidth: 200,
-          sortable: true
-        },
-        {
-          prop: "readwrite_status",
-          label: this.$t('tables.RWStatus'),
-          filters: [
-            {label: 'TRUE', value: 'TRUE'},
-            {label: 'FALSE', value: 'FALSE'}
-          ],
-          minWidth: 120,
-          sortable: true
-        },
-        // {
-        //   prop: "completedQueries",
-        //   label: this.$t('tables.Completed Queries in last 24h'),
-        //   minWidth: 250,
-        //   sortable: true
-        // },
-        // {
-        //   prop: "failedQueries",
-        //   label: this.$t('tables.Failed Queries in last 24h'),
-        //   minWidth: 220,
-        //   sortable: true
-        // },
-        // {
-        //   prop: "queryCost",
-        //   label: this.$t('tables.Last 7 days info'),
-        //   minWidth: 340,
-        //   sortable: true
-        // },
+        }
       ];
-      return columns
+      if (this.activeTab === 'table') {
+        return [
+          ...baseColumns,
+          {
+            prop: "columns",
+            label: this.$t('tables.Columns'),
+            width: 140,
+            sortable: true
+          },
+          {
+            prop: "rows",
+            label: this.$t('tables.Rows'),
+            width: 140,
+            sortable: true
+          },
+          {
+            prop: "partitions",
+            label: this.$t('tables.Partitions'),
+            width: 140,
+            sortable: true
+          },
+          {
+            prop: "parts",
+            label: this.$t('tables.Parts'),
+            width: 140,
+            sortable: true
+          },
+          {
+            prop: "uncompressed",
+            label: this.$t('tables.UnCompressed'),
+            minWidth: 220,
+            sortable: true
+          },
+          {
+            prop: "compressed",
+            label: this.$t('tables.Compressed'),
+            minWidth: 200,
+            sortable: true
+          },
+          {
+            prop: "readwrite_status",
+            label: this.$t('tables.RWStatus'),
+            filters: [
+              { label: 'TRUE', value: 'TRUE' },
+              { label: 'FALSE', value: 'FALSE' }
+            ],
+            minWidth: 120,
+            sortable: true
+          },
+        ]
+      } else {
+        return [
+          ...baseColumns,
+          {
+            prop: "rows",
+            label: this.$t('tables.Rows'),
+            width: 80,
+            sortable: true
+          },
+          {
+            prop: "uncompressed",
+            label: this.$t('tables.UnCompressed'),
+            minWidth: 120,
+            sortable: true
+          },
+          {
+            prop: "compressed",
+            label: this.$t('tables.Compressed'),
+            minWidth: 120,
+            sortable: true
+          },
+          {
+            prop: "sourceTable",
+            label: this.$t('tables.Source Table'),
+            minWidth: 180,
+            sortable: false
+          },
+          {
+            prop: "querySQL",
+            label: this.$t('tables.As Select'),
+            minWidth: 300,
+            sortable: false
+          }
+        ]
+      }
     },
     listData() {
       const { searchKey, sort: { property, order } } = this;
@@ -221,9 +229,9 @@ export default {
             }
           } else if (type === 'string') {
             let flag;
-            if(prev[property].length === next[property].length){
+            if (prev[property].length === next[property].length) {
               flag = prev[property].localeCompare(next[property]);
-            } else{
+            } else {
               flag = prev[property].length - next[property].length;
             }
             if (order === 'asc') {
@@ -237,7 +245,7 @@ export default {
     },
     currentPageData() {
       const { pagination: { currentPage, pageSize } } = this;
-      return this.listData?.slice((currentPage - 1)*pageSize, currentPage*pageSize);
+      return this.listData?.slice((currentPage - 1) * pageSize, currentPage * pageSize);
     },
     tableData() {
       const { clusterName } = this;
@@ -252,19 +260,36 @@ export default {
   methods: {
     byteConvert: byteConvert,
     percentiles: percentiles,
+    switchTab(tab) {
+      this.activeTab = tab
+      this.fetchData(true)
+    },
     async fetchData(forceRefresh = false) {
       if (!this.tableData || forceRefresh) {
         this.loading = true;
         const { clusterName } = this;
+        const apiMethod = this.activeTab === 'table' ? TablesApi.tableMetrics : TablesApi.vmMetrics;
         const {
           data: { entity },
-        } = await TablesApi.tableMetrics(clusterName).finally(() => this.loading = false);
-        const tableData =  (Object.freeze(Object.entries(entity)||[]).map(([key, values]) => {
-          values.readwrite_status = values.readwrite_status.toString().toUpperCase();
-          //values.queryCost = Object.values(values.queryCost).join(',');
-          values.tableName = key;
-          //values.rows = values.rows.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); // 加入数字千分位分隔符
-          return values;
+        } = await apiMethod(clusterName).finally(() => this.loading = false);
+        const tableData = (Object.freeze(Object.entries(entity) || []).map(([key, values]) => {
+          return this.activeTab == 'table' ? {
+            tableName: key,
+            columns: values.columns,
+            rows: values.rows,
+            partitions: values.partitions,
+            parts: values.parts,
+            uncompressed: values.uncompressed,
+            compressed: values.compressed,
+            readwrite_status: values.readwrite_status.toString().toUpperCase(),
+          } :{
+            tableName: key,
+            rows: values.rows,
+            uncompressed: values.uncompressed,
+            compressed: values.compressed,
+            sourceTable: values.source_table,
+            querySQL: values.as_select,
+          }
         }));
 
         store.commit('clusterTable/setTableData', {
@@ -272,7 +297,7 @@ export default {
           tableData,
         });
       }
-      
+
       this.pagination.total = this.tableData.length;
     },
 
@@ -306,19 +331,19 @@ export default {
         cancelButtonText: this.$t("common.Cancel"),
         text: "warning",
       });
-      const [ database, tableName ] = key.split('.');
+      const [database, tableName] = key.split('.');
       const { id } = this.$route.params;
       await TablesApi.deleteTable(id, {
         database,
         tableName,
       });
-      this.$message.success(`Table ${ key } ${ this.$t("common.Delete") }${ this.$t("common.Success") }`);
+      this.$message.success(`Table ${key} ${this.$t("common.Delete")}${this.$t("common.Success")}`);
       this.fetchData(true);
     },
 
     // 查看SQL
     async viewSql(key) {
-      const [ database, tableName ] = key.split('.');
+      const [database, tableName] = key.split('.');
       const { id } = this.$route.params;
       const { data: { entity: { create_table_query } } } = await TablesApi.viewTableCreateSql(id, {
         database,
@@ -341,7 +366,7 @@ export default {
     },
     // 备份表
     async archiveTable(key) {
-      const [ database, tableName ] = key.split('.');
+      const [database, tableName] = key.split('.');
       const { id: clusterName } = this.$route.params;
 
       await $modal({
@@ -357,7 +382,7 @@ export default {
           tables: [tableName],
           clusterName,
         },
-      }).then(async(taskId) => {
+      }).then(async (taskId) => {
 
         await $modal({
           component: TaskDetail,
@@ -415,6 +440,46 @@ export default {
 
   .CodeMirror {
     height: 400px;
+  }
+}
+
+.tab-item {
+  cursor: pointer;
+  color: #000;
+  transition: all 0.3s;
+  position: relative;
+
+  &.active {
+    color: var(--primary-color);
+
+    /* 改为金黄色 */
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--primary-color);
+      /* 下划线也改为黄色 */
+      animation: underline 0.3s;
+    }
+  }
+
+  &:hover {
+    color: #ffdf40;
+    /* 悬停时使用浅黄色 */
+    opacity: 0.8;
+  }
+}
+
+@keyframes underline {
+  from {
+    width: 0
+  }
+
+  to {
+    width: 100%
   }
 }
 </style>
