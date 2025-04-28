@@ -18,7 +18,11 @@
       <tr v-for="field in fields">
         <td class="pl-10 is-center">{{field}}</td>
         <template v-for="column in columns">
-         <td class="pl-10 is-center">{{data[column.field][field]}}</td>
+         <td class="pl-10 is-center" 
+            :class="{'cell-warning': isAvgLatency(field, data[column.field][field]) === 1, 
+            'cell-danger': isAvgLatency(field, data[column.field][field]) === 2}">
+            {{data[column.field][field]}}
+          </td>
         </template>
       </tr>
     </table>
@@ -70,6 +74,14 @@ export default {
       } = await TablesApi.zkStatus(this.$route.params.id);
       this.tableData = Object.freeze(entity);
     },
+    isAvgLatency(field, value) {
+      if (field === 'avg_latency') {
+        const num = Number(value);
+        if (num > 30) return 2;
+        if (num > 10) return 1;
+      }
+      return 0;
+    }
   },
 };
 </script>
@@ -78,4 +90,11 @@ export default {
  .reverse-table tr td:first-child {
     background-color: #f8f8f9;
   }
+  // 添加样式规则
+.cell-warning {
+  background-color: #faecd8 !important;
+}
+.cell-danger {
+  background-color: #fde2e2 !important;
+}
 </style>
