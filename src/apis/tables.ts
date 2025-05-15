@@ -48,4 +48,7 @@ export const TablesApi = {
   resumeTable(clusterName, table) {
     return axios.put(`${url}/ck/table/readonly/${clusterName}?table=${table}`);
   },
+  backgroundpool(clusterName) {
+    return axios.get(`${url}/ck/backgroundpool/${clusterName}`);
+  },
 };
