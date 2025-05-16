@@ -141,6 +141,9 @@ export default {
     formatCsvValue(value) {
       if (value === null || value === undefined) return ''
       const stringValue = String(value)
+      if (typeof value === 'object' && !isNaN(value)) {
+        return `"\t${stringValue}"`
+      }
       // 处理包含逗号、换行符、双引号的情况
       if (/[",\n]/.test(stringValue)) {
         return `"${stringValue.replace(/"/g, '""')}"`
