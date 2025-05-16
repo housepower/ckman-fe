@@ -162,12 +162,13 @@ export default {
         second: '2-digit',
         hour12: false
       };
+      const { id: clusterName } = this.$route.params;
       const dateStr = new Date().toLocaleString('zh-CN', options)
-        .replace(/\//g, '-')    
-        .replace(/:/g, '-')     
+        .replace(/\//g, '-')
+        .replace(/:/g, '-')
         .replace(/\s/, 'T');
 
-      const filename = `ckman_query_${dateStr}.csv`;
+      const filename = `ckman_query_${clusterName}_${dateStr}.csv`;
       // 调用导出工具方法
       this.export2Csv({
         data,
