@@ -8,7 +8,9 @@
         <vxe-column v-for="(column, index) in columns" :field="column.prop" :title="column.label" :min-width="180"
           :key="index" sortable>
           <template slot-scope="{row, column}">
-            <span class="text-ellipsis" @dblclick="copy(row[column.property])">{{ row[column.property] }}</span>
+            <div class="space-wrapper" @dblclick="copy(row[column.property])">
+              <span class="text-ellipsis">{{ row[column.property] }}</span>
+            </div>
           </template>
         </vxe-column>
       </vxe-table>
@@ -148,7 +150,7 @@ export default {
       if (/[",\n]/.test(stringValue)) {
         return `"${stringValue.replace(/"/g, '""')}"`
       }
-      return stringValue
+      return stringValue.replace(/ /g, ' ');
     },
     exportCSV() {
       const columns = this.columns
@@ -240,5 +242,21 @@ export default {
   .vxe-table--empty-placeholder {
     height: 100% !important;
   }
+}
+.space-wrapper {
+  white-space: pre-wrap;  // 保留空白符
+  word-break: break-all;  // 允许单词内断行
+  
+  .text-ellipsis {
+    display: inline-block;
+    max-width: 100%;
+    vertical-align: top;
+    white-space: pre;     // 保留所有空白符
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+}
+.vxe-table-cell {
+  white-space: normal !important; // 覆盖默认样式
 }
 </style>
