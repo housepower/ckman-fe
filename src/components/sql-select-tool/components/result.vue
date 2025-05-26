@@ -8,8 +8,8 @@
         <vxe-column v-for="(column, index) in columns" :field="column.prop" :title="column.label" :min-width="180"
           :key="index" sortable>
           <template slot-scope="{row, column}">
-            <div class="space-wrapper" @dblclick="copy(row[column.property])">
-              <span class="text-ellipsis">{{ row[column.property] }}</span>
+            <div class="space-wrapper" @dblclick="copyField(row, column)">
+              <span class="text-ellipsis" title="">{{ getFieldValue(row, column) }}</span>
             </div>
           </template>
         </vxe-column>
@@ -30,6 +30,7 @@
 <script>
 import store from '@/store';
 import { parseDurationBySplit } from '@/helpers';
+import BigNumber from 'bignumber.js';
 export default {
   data() {
     return {
@@ -105,6 +106,34 @@ export default {
     }
   },
   methods: {
+    getFieldValue(row, column) {
+      const value = row[column.property];
+      if (value === null || value === undefined) return '';
+      console.log(value);
+      if (value instanceof BigNumber) {
+        return value.toString();
+      }
+      if (typeof value === 'object' &&!Array.isArray(value)) {
+        return JSON.stringify(value); 
+      }
+      return String(value);
+    },
+    // 双击复制
+    copyField(row, column) {
+      const value = row[column.property];
+      let copyText = '';
+      if (value === null || value === undefined) {
+        copyText = '';
+      } else if (value instanceof BigNumber) {
+        copyText = value.toString();
+      } else if (typeof value === 'object' && !Array.isArray(value)) {
+        copyText = JSON.stringify(value);
+      } else {
+        copyText = String(value);
+      }
+
+      this.copy(copyText); // 使用已有的 copy 方法
+    },
     export2Csv({ data, columns, filename = 'export.csv' }) {
       try {
         // 1. 构建CSV内容
@@ -142,15 +171,18 @@ export default {
     // CSV特殊字符处理
     formatCsvValue(value) {
       if (value === null || value === undefined) return ''
-      const stringValue = String(value)
-      if (typeof value === 'object' && !isNaN(value)) {
+      let stringValue = String(value)
+      if (value instanceof BigNumber) {
         return `"\t${stringValue}"`
+      }
+      if (typeof value === 'object' &&!Array.isArray(value)) {
+        stringValue = JSON.stringify(value)
       }
       // 处理包含逗号、换行符、双引号的情况
       if (/[",\n]/.test(stringValue)) {
         return `"${stringValue.replace(/"/g, '""')}"`
       }
-      return stringValue.replace(/ /g, ' ');
+      return stringValue;
     },
     exportCSV() {
       const columns = this.columns
@@ -243,19 +275,16 @@ export default {
     height: 100% !important;
   }
 }
+
 .space-wrapper {
-  white-space: pre-wrap;  // 保留空白符
-  word-break: break-all;  // 允许单词内断行
-  
+  white-space: pre-wrap; // 保留空白符
+  word-break: break-all; // 允许单词内断行
+
   .text-ellipsis {
-    display: inline-block;
-    max-width: 100%;
-    vertical-align: top;
-    white-space: pre;     // 保留所有空白符
-    text-overflow: ellipsis;
-    overflow: hidden;
+    white-space: pre;
   }
 }
+
 .vxe-table-cell {
   white-space: normal !important; // 覆盖默认样式
 }
