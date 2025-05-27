@@ -102,7 +102,7 @@
                 <el-button type="text" @click="openHttpWeb(row.ip, httpPort)">
                     {{ row.ip }}
                 </el-button>
-                <el-button  class="no-border" icon="el-icon-monitor" @click="openDashboard(row.ip, httpPort)"></el-button>
+                <!-- <el-button  class="no-border" icon="el-icon-monitor" @click="openDashboard(row.ip, httpPort)"></el-button> -->
               </div>
               <span v-else>{{row[column.property]}}</span>
             </template>

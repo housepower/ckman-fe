@@ -9,4 +9,7 @@ export const MetricApi = {
   queryRangeMetric(id, params) {
     return axios.get(`${url}/query_range/${id}`, { params });
   },
+  queryMetric(id, params) {
+    return axios.get(`${url}/query_metric/${id}`, { params });
+  },
 };
