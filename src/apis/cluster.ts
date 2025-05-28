@@ -66,8 +66,8 @@ export const ClusterApi = {
   offlineClusterNode(clusterName, ip, password?) {
     return axios.put(`${url}/node/stop/${ clusterName }?ip=${ ip }&password=${ password || ''}`);
   },
-  getNodeLog({ clusterName, ip, logType, lines = 1000, tail = true }) {
-    return axios.post(`${url}/node/log/${ clusterName }?ip=${ ip }`, {
+  getNodeLog(clusterName, ip, logType, tail, lines, password? ) {
+    return axios.post(`${url}/node/log/${ clusterName }?ip=${ ip }&password=${ password || ''}`, {
       lines,
       logType,
       tail,

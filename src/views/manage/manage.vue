@@ -39,6 +39,7 @@
               <el-option :label="$t('manage.Rolling')" value="Rolling"></el-option>
             </el-select>
             <el-checkbox v-model="skip" class="mr-50">{{$t('manage.skip same version')}}</el-checkbox>
+            <el-checkbox v-model="keeper" class="mr-50">{{$t('manage.skip keeper')}}</el-checkbox>
             <el-button type="primary"
               size="mini"
               class="fs-16"
@@ -167,6 +168,7 @@ export default {
       clusterStatus: [],
       packageVersion: "",
       skip: true,
+      keeper: false,
       policy: 'Full',
       needPassword: false,
       password: '',
@@ -349,30 +351,6 @@ export default {
       }
       this.deleteIp = item.ip;
       this.deleteNodeDialogVisible = true;
-      // await this.$confirm(this.$t("common.Confirm Delete"),  this.$t("common.tips"), {
-      //   confirmButtonText: this.$t("common.Delete"),
-      //   cancelButtonText: this.$t("common.Cancel"),
-      //   text: "warning",
-      // });
-      // const { data: { entity: taskId } } = await ClusterApi.deleteClusterNode(this.$route.params.id, {
-      //   ip: item.ip,
-      // }, password);
-
-      // if (taskId) {
-      //   $modal({
-      //     component: TaskDetail,
-      //     props: {
-      //       title: this.$t('task.View Task'),
-      //       width: 800,
-      //       cancelText: this.$t("task.Close"),
-      //       okText: null,
-      //     },
-      //     data: {
-      //       taskId: taskId,
-      //       refresh: true
-      //     },
-      //   }).finally(() => this.fetchData());
-      // }
     },
     async clusterOperation(type) {
       type = lowerFirst(type);
@@ -397,8 +375,8 @@ export default {
         clusterName: this.$route.params.id,
       };
       if (type === "upgrade") {
-        const { packageVersion, policy, skip } = this;
-        params = Object.assign(params, { packageVersion, policy, skip });
+        const { packageVersion, policy, skip, keeper } = this;
+        params = Object.assign(params, { packageVersion, policy, skip, skipKeeper: keeper });
       }
       const { data: { entity: taskId } } = await ClusterApi.manageCluster(type, params, password).finally(() =>
         $loading.decrease()
@@ -474,6 +452,10 @@ export default {
     },
 
     async viewClusterLog(row) {
+      let password = "";
+      if (this.needPassword) {
+        password = await this.openPasswordDialog();
+      }
       const { ip } = row;
       const { id: clusterName } = this.$route.params;
       await $modal({
@@ -487,6 +469,7 @@ export default {
         data: {
           clusterName,
           ip,
+          password,
         },
       });
     },
