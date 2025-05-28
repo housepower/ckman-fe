@@ -65,16 +65,6 @@
                   class="width-350" />
       </el-form-item>
 
-      <el-form-item :label="`Prometheus ${$t('home.Address')}:`"
-                    prop="prom_host">
-        <el-input v-model="formModel.prom_host"
-                  class="width-350" />
-      </el-form-item>
-      <el-form-item :label="`Prometheus ${$t('home.Port')}:`"
-                    prop="prom_port">
-        <el-input v-model="formModel.prom_port" class="width-350" />
-      </el-form-item>
-
       <el-form-item :label="$t('home.Cluster Username') + ':'"
                     prop="user"
                     required>
