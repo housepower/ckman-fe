@@ -74,27 +74,5 @@ export const chartOption = (data: MetricData[], min: number, max: number) => ({
     data: values.map(item => ([item[0] * 1000, Number(item[1]).toFixed(2).replace('.00', '')])),
     type: 'line',
     symbol: 'none',
-    lineStyle: {
-      color: '#C9A100', // 新增线条颜色配置
-      width: 2
-    },
-    itemStyle: {
-      color: '#C9A100' // 统一数据点颜色
-    },
-    
-    areaStyle: {
-      color: {
-        colorStops: [
-          {
-            offset: 0,
-            color: 'rgba(201, 161, 0, 0.3)', // 主题色#C9A100 + 原透明度
-          },
-          {
-            offset: 1,
-            color: 'rgba(201, 161, 0, 0.1)', // 主题色#C9A100 + 原透明度
-          }
-        ]
-      }
-    },
   })),
 });
