@@ -9,7 +9,9 @@
           :key="index" sortable>
           <template slot-scope="{row, column}">
             <div class="space-wrapper" @dblclick="copyField(row, column)">
-              <span class="text-ellipsis" title="">{{ getFieldValue(row, column) }}</span>
+              <span class="text-ellipsis" :title="getFieldValue(row, column)">
+                {{ getFieldValue(row, column) }}
+              </span>
             </div>
           </template>
         </vxe-column>
@@ -113,8 +115,8 @@ export default {
       if (value instanceof BigNumber) {
         return value.toString();
       }
-      if (typeof value === 'object' &&!Array.isArray(value)) {
-        return JSON.stringify(value); 
+      if (typeof value === 'object' && !Array.isArray(value)) {
+        return JSON.stringify(value);
       }
       return String(value);
     },
@@ -175,7 +177,7 @@ export default {
       if (value instanceof BigNumber) {
         return `"\t${stringValue}"`
       }
-      if (typeof value === 'object' &&!Array.isArray(value)) {
+      if (typeof value === 'object' && !Array.isArray(value)) {
         stringValue = JSON.stringify(value)
       }
       // 处理包含逗号、换行符、双引号的情况
