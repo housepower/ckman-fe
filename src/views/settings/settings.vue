@@ -14,6 +14,7 @@
 import { DForm } from '@/components/';
 import { ClusterApi } from '@/apis';
 import { $modal } from '@/services/';
+import InputPassword from '../manage/modal/inputPassword.vue';
 import TaskDetail from '@/views/task/components/TaskDetail.vue';
 export default {
   name: 'test',
@@ -59,11 +60,34 @@ export default {
 
       }
     },
+    async openPasswordDialog() {
+      const password = await $modal({
+        component: InputPassword,
+        props: {
+          title: this.$t("home.SSH Password"),
+          width: 300,
+          cancelText: this.$t("common.Cancel"),
+          okText: this.$t("common.Confirm"),
+        },
+        data: {
+          password: this.password,
+        }
+      }).then(password => {
+        return password;
+      });
 
+      return password;
+    },
     async onSubmit({ data, force }) {
+      let password = "";
+      console.log(data);
+      console.log(data["AuthenticateType"]);
+      if (data["AuthenticateType"] === 1) {
+        password = await this.openPasswordDialog();
+      }
       this.loading = true;
       const clusterName = this.$route.params.id;
-      const { data: { entity: taskId } } = await ClusterApi.saveClusterConfig(clusterName, data, force).finally(() => this.loading = false);
+      const { data: { entity: taskId } } = await ClusterApi.saveClusterConfig(clusterName, data, force, password).finally(() => this.loading = false);
       await $modal({
         component: TaskDetail,
         props: {

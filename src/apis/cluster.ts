@@ -13,8 +13,8 @@ export const ClusterApi = {
   getClusterConfig(clusterName: string) {
     return axios.get(`${url}/config/${clusterName}`);
   },
-  saveClusterConfig(clusterName: string, data, force) {
-    return axios.post(`${url}/config/${clusterName}?force=${force}`, data);
+  saveClusterConfig(clusterName: string, data, force, password?) {
+    return axios.post(`${url}/config/${clusterName}?force=${force}&password=${password || ''}`, data);
   },
   getClusterCreateFormSchema() {
     return axios.get(`/api/v1/ui/schema?type=deploy`);
