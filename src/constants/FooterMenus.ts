@@ -12,6 +12,10 @@ export const Menus = Object.freeze([
     name: 'Tables',
   },
   {
+    path: 'data-manage',
+    name: 'data-manage',
+  },
+  {
     path: 'session',
     name: 'Session',
   },

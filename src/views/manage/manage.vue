@@ -124,7 +124,6 @@
         </vxe-table>
       </div>
     </section>
-    <RebalanceFormComponent :visible.sync="reBalanceDialogVisible" :password="password" @close="reBalanceDialogVisible=false" />
     <DeleteNodeComponent :visible.sync="deleteNodeDialogVisible" :password="password" :ip="deleteIp" @onOk="onAddNodeSuccess" @close="deleteNodeDialogVisible = false" />
   </main>
 </template>
@@ -137,13 +136,11 @@ import { ClusterStatus, ClusterTypeStatus } from "@/constants";
 import { ClusterApi, PackageApi } from "@/apis";
 import TaskDetail from '@/views/task/components/TaskDetail.vue';
 import ViewLogComponent from './modal/viewLog.vue';
-import RebalanceFormComponent from './modal/rebalanceForm.vue';
 import DeleteNodeComponent from './modal/deleteNode.vue';
 export default {
   components: {
     AddNodeDialog,
     DeleteNodeComponent,
-    RebalanceFormComponent,
   },
   data() {
     return {
@@ -275,8 +272,6 @@ export default {
       }));
     },
     isStatusDisable(item) {
-      if ( this.mode === "import" && lowerFirst(item) != "rebalance")
-        return true;
       if (
         ["start", "destroy"].includes(lowerFirst(item)) &&
         this.list.status !== "red"
@@ -355,10 +350,6 @@ export default {
     async clusterOperation(type) {
       type = lowerFirst(type);
 
-      if (type === 'rebalance') {
-        this.reBalanceDialogVisible = true;
-        return;
-      }
       let password = '';
       if (this.needPassword) {
         password = await this.openPasswordDialog();

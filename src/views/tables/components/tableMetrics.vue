@@ -44,8 +44,8 @@
         <template slot-scope="scope">
           <el-button @click="viewSql(scope.row.tableName)" type="text" size="small">{{ $t('tables.Schema')
             }}</el-button>
-          <el-button v-if="activeTab === 'table'" type="text" size="small" @click="archiveTable(scope.row.tableName)">{{ $t('tables.Archive')
-            }}</el-button>
+          <!-- <el-button v-if="activeTab === 'table'" type="text" size="small" @click="archiveTable(scope.row.tableName)">{{ $t('tables.Archive')
+            }}</el-button> -->
           <el-button v-if="activeTab === 'table'" type="text" size="small" @click="onDelete(scope.row.tableName)">{{ $t('tables.Delete')
             }}</el-button>
         </template>

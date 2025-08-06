@@ -70,6 +70,11 @@ export const $router = new Router({
               component: () => import('@/views/tables/tables.vue'),
             },
             {
+              path: 'data-manage',
+              name: 'data-manage',
+              component: () => import('@/views/data-manage/data-manage.vue'),
+            },
+            {
               path: 'session',
               name: 'Session',
               component: () => import('@/views/session/session.vue'),

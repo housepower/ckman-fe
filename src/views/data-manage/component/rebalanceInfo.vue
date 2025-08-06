@@ -31,8 +31,6 @@
   
   <script lang="ts">
   import { ClusterApi } from '@/apis';
-  import { DForm } from '@/components/';
-import { it } from 'date-fns/locale';
   interface RebalanceInfo {
     database: string;
     table: string;
@@ -44,7 +42,7 @@ import { it } from 'date-fns/locale';
   export default {
     props: {
       clusterName: String,
-      schemaValue: Object,
+      formData: Object,
     },
     data() {
       return {
@@ -56,10 +54,10 @@ import { it } from 'date-fns/locale';
     },
     methods: {
       async getList() {
-        const { clusterName, schemaValue } = this;
+        const { clusterName, formData } = this;
         const { data: { entity } } = await ClusterApi.rebalanceInfo({
           clusterName,
-          params: schemaValue,
+          params: formData,
         });
 
         if (!entity) {
