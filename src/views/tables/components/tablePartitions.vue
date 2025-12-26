@@ -108,13 +108,11 @@ export default {
         text: "warning",
       });
       const { clusterName } = this;
-      const { min_time, table, database } = row;
-      const start = moment(min_time);
+      const { table, database, partition_id } = row;
       await TablesApi.deletePartition(clusterName, {
         database,
-        tables: [table],
-        begin: start.format('YYYY-MM-DD'),
-        end: start.add(1, 'day').format('YYYY-MM-DD'),
+        table: [table],
+        partitionId: partition_id
       });
 
       this.getList();

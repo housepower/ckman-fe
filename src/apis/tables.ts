@@ -34,13 +34,8 @@ export const TablesApi = {
   getPartitions(clusterName, table) {
     return axios.get(`${url}/ck/partition/${clusterName}?table=${table}`);
   },
-  deletePartition(clusterName, { database, tables, begin, end }) {
-    return axios.post(`${url}/ck/purge_tables/${clusterName}`, {
-      database,
-      tables,
-      begin,
-      end,
-    });
+  deletePartition(clusterName, { database, table, partitionId }) {
+    return axios.delete(`${url}/ck/partition/${clusterName}?database=${database}&table=${table}&partition_id=${partitionId}`);
   },
   archiveTables(clusterName, params) {
     return axios.post(`${url}/ck/archive/${clusterName}`, params);
