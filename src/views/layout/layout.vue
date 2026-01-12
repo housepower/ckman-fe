@@ -59,6 +59,7 @@
 <script>
 import { Menus, LoaderMenus } from "@/constants";
 import { PackageApi, ClusterApi } from "@/apis";
+import { ConfigApi } from "@/apis/config";
 
 export default {
   name: "Layout",
@@ -112,7 +113,7 @@ export default {
     async fetchVersion() {
       const {
         data: { entity },
-      } = await PackageApi.getVersion();
+      } = await ConfigApi.getVersion();
       this.version = entity;
     },
 

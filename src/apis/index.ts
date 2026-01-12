@@ -7,3 +7,4 @@ export * from './tables';
 export * from './session';
 export * from './task';
 export * from './dataManage';
+export * from './config';

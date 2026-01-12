@@ -413,7 +413,9 @@ const messages = {
       'Backup Failed': 'Backup Failed',
       'Unknown Error': 'Unknown Error',
       'Please check form': 'Please check form',
-      'Form Reset': 'Form has been reset'
+      'Form Reset': 'Form has been reset',
+      'Checksum': 'Checksum',
+      'Instance': 'Instance',
     },
     // History Component Translations
     history: {
@@ -948,7 +950,9 @@ const messages = {
       'Backup Failed': '备份失败',
       'Unknown Error': '未知错误',
       'Please check form': '请检查表单填写是否正确',
-      'Form Reset': '表单已重置'
+      'Form Reset': '表单已重置',
+      'Checksum': '是否校验MD5',
+      'Instance': '指定执行实例',
     },
     rebalance: {
       'Database': '数据库',

@@ -25,6 +25,24 @@
                     <li>{{ $t('backup.First day of each month at 0 AM') }}: <code>0 0 0 1 * *</code></li>
                 </ul>
             </div>
+            
+        </el-form-item>
+        <el-form-item v-if="form.scheduleType === 'scheduled'" :label="$t('backup.Instance')" prop="instance">
+            <el-select 
+                v-model="form.instance" 
+                :placeholder="$t('backup.Instance')" 
+                class="form-input"
+                filterable
+                clearable
+                >
+                <el-option
+                    v-for="item in instanceList"
+                    :key="item"
+                    :label="item"
+                    :value="item"
+                >
+                </el-option>
+            </el-select>
         </el-form-item>
 
         <!-- 数据库和表名 -->
@@ -144,6 +162,11 @@
             <el-switch v-model="form.clean"></el-switch>
         </el-form-item>
 
+        <!-- 是否校验md5 -->
+        <el-form-item :label="$t('backup.Checksum')" prop="checksum">
+            <el-switch v-model="form.checksum"></el-switch>
+        </el-form-item>
+
         <!-- 操作按钮 -->
         <el-form-item>
             <el-button type="primary" @click="onSubmit" :loading="submitLoading" :disabled="
@@ -155,18 +178,23 @@
 
 <script>
 
-import { DataManageApi } from '@/apis'; // 引入API模块
+import { DataManageApi, ConfigApi } from '@/apis'; // 引入API模块
 
 export default {
     name: 'BackupComponent',
+    created() {
+        this.fetchInstanceList();
+    },
     data() {
         return {
             cronHelpVisible: false,
             partitionOptions: [],
+            instanceList: [],
             submitLoading: false, // 添加提交加载状态
             form: {
                 scheduleType: 'immediate', // immediate 或 scheduled
                 crontab: '',
+                instance: '', // 实例名称
                 database: '',
                 tables: [{ index: 1, value: '' }], // 表名数组，按照系统中已有的模式
                 target: 's3', // local, s3
@@ -184,7 +212,8 @@ export default {
                 daysBefore: 7,          // 按时间段备份的天数
                 partitions: [],         // 按分区名备份的分区名称
                 backupStyle: 'full',    // 备份方式：全量备份(full)/增量备份(incremental)
-                clean: false            // 是否清理成功分区
+                clean: false,           // 是否清理成功分区
+                checksum: true
             },
             rules: {
                 scheduleType: [
@@ -229,6 +258,20 @@ export default {
                         validator: (rule, value, callback) => {
                             if (this.form.scheduleType === 'scheduled' && !value.trim()) {
                                 callback(new Error('请输入cron表达式'));
+                            } else {
+                                callback();
+                            }
+                        }
+                    }
+                ],
+                instance: [
+                    {
+                        required: true,
+                        message: '请选择实例',
+                        trigger: 'change',
+                        validator: (rule, value, callback) => {
+                            if (this.form.scheduleType === 'scheduled' && !value) {
+                                callback(new Error('请选择实例'));
                             } else {
                                 callback();
                             }
@@ -326,6 +369,22 @@ export default {
             this.form.tables.push({ index: newIndex, value: '' });
         },
 
+        async fetchInstanceList() {
+            try {
+                const response = await ConfigApi.getInstances();
+                if (response.data.retCode === '0000') {
+                    console.log(response.data.entity)
+                    this.instanceList = response.data.entity || [];
+                    console.log(this.instanceList)
+                } else {
+                    this.$message.error(response.data.retMsg || '获取实例列表失败');
+                }
+            } catch (error) {
+                console.error('获取实例列表失败:', error);
+                this.$message.error('获取实例列表失败');
+            }
+        },
+
         // 删除表名输入框
         delTable(index) {
             if (this.form.tables.length > 1) {
@@ -342,6 +401,7 @@ export default {
         handleBackupTypeChange(value) {
             if (value === 'immediate') {
                 this.form.crontab = '';
+                this.form.instance = '';
             } else if (value === 'scheduled') {
                 // 定时备份只支持增量备份
                 this.form.backupStyle = 'incremental';
@@ -403,11 +463,13 @@ export default {
                 days_before: this.form.daysBefore,
                 target: this.form.target,
                 Compression: this.form.compression,
-                clean: this.form.clean
+                clean: this.form.clean,
+                checksum: this.form.checksum,
             };
 
             if (this.form.scheduleType === 'scheduled') {
                 params.crontab = this.form.crontab;
+                params.instance = this.form.instance;
             }
 
             if (this.form.backupStyle === 'incremental' && this.form.backupType === 'partition') {
