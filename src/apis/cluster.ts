@@ -38,11 +38,11 @@ export const ClusterApi = {
     return axios.delete(`${url}/cluster/${id}`);
   },
   manageCluster(type, params, password?) {
-    const { clusterName, packageVersion, skip, policy } = params;
+    const { clusterName, packageVersion, skip, policy, skipKeeper } = params;
     if(!packageVersion) {
       return axios.put(`${url}/${type}/${clusterName}?password=${ password || '' }`);
     } else {
-      return axios.put(`${url}/${type}/${clusterName}?password=${ password || '' }`,{ packageVersion, skip, policy });
+      return axios.put(`${url}/${type}/${clusterName}?password=${ password || '' }`,{ packageVersion, skip, policy, skipKeeper });
     }
   },
   rebalanceInfo({clusterName, params}){
