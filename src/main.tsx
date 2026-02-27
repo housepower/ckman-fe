@@ -21,9 +21,15 @@ VXETable.setup({
   i18n: (key, args) => $i18n.t(key, args) as string,
 });
 import 'vxe-table/lib/style.css';
-import locale from 'element-ui/lib/locale/lang/en';
+import enLocale from 'element-ui/lib/locale/lang/en';
+import zhLocale from 'element-ui/lib/locale/lang/zh-CN';
+import ElementLocale from 'element-ui/lib/locale';
 
-Vue.use(ElementUI, { locale });
+// 根据当前语言设置 Element UI locale
+const currentLocale = localStorage.getItem('locale') || 'en';
+ElementLocale.use(currentLocale === 'zh' ? zhLocale : enLocale);
+
+Vue.use(ElementUI);
 Vue.use(VXETable);
 
 Vue.config.productionTip = false;

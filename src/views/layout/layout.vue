@@ -60,6 +60,9 @@
 import { Menus, LoaderMenus } from "@/constants";
 import { PackageApi, ClusterApi } from "@/apis";
 import { ConfigApi } from "@/apis/config";
+import ElementLocale from 'element-ui/lib/locale';
+import enLocale from 'element-ui/lib/locale/lang/en';
+import zhLocale from 'element-ui/lib/locale/lang/zh-CN';
 
 export default {
   name: "Layout",
@@ -138,6 +141,8 @@ export default {
       localStorage.setItem('locale', value);
       document.title = this.title;
       document.documentElement.lang = value;
+      // 同步更新 Element UI locale
+      ElementLocale.use(value === 'zh' ? zhLocale : enLocale);
     },
   },
   computed: {

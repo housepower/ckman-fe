@@ -37,6 +37,9 @@ export const TablesApi = {
   deletePartition(clusterName, { database, table, partitionId }) {
     return axios.delete(`${url}/ck/partition/${clusterName}?database=${database}&table=${table}&partition_id=${partitionId}`);
   },
+  operatePartition(clusterName, params) {
+    return axios.put(`${url}/ck/partition/${clusterName}`, params);
+  },
   archiveTables(clusterName, params) {
     return axios.post(`${url}/ck/archive/${clusterName}`, params);
   },
