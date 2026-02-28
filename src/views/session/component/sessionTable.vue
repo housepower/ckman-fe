@@ -133,11 +133,6 @@ export default {
           label: this.$t('session.Initial Address'),
           sortable: true,
           showOverflow: true
-        },
-        {
-          prop: "threads",
-          label: this.$t('session.Thread Numbers'),
-          sortable: true
         }
       ]
     },

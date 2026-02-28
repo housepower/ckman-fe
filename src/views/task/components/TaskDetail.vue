@@ -13,7 +13,7 @@
       <vxe-column fixed="right" align="center" :title="$t('task.Status')" field="Status">
         <template slot-scope="scope">
           <div class="flex flex-vcenter flex-center">
-            <img src="/images/5-130H2191322-50.gif" v-if="loading" class="mr-20" />
+            <span v-if="loading" class="native-spinner mr-20"></span>
             <span class="status" :class="scope.row.Status.EN">{{scope.row.Status[lang]}}</span>
           </div>
         </template>
@@ -123,4 +123,36 @@ export default {
     color: gray;
   }
 
+  .native-spinner {
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    position: relative;
+    
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background-color: #409EFF;
+      animation: spinnerFade 1.2s infinite ease-in-out;
+    }
+    
+    &::after {
+      animation-delay: -0.6s;
+    }
+  }
+
+  @keyframes spinnerFade {
+    0%, 100% {
+      transform: scale(0);
+      opacity: 0.5;
+    }
+    50% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
 </style>
