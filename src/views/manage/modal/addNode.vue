@@ -21,6 +21,17 @@
                           :min="numberRange[0]"
                           :max="numberRange[1]"></el-input-number>
         </el-form-item>
+        <el-form-item :label="$t('manage.Source Schema Host') + ':'"
+                      prop="sourceSchemaHost">
+          <el-select v-model="formModel.sourceSchemaHost" class="width-350">
+            <el-option
+              v-for="n in nodes"
+              :key="n.ip"
+              :label="`${n.ip} (${n.status})`"
+              :value="n.ip"
+              :disabled="n.status === 'red'" />
+          </el-select>
+        </el-form-item>
       </el-form>
     </section>
     <span slot="footer" class="dialog-footer">
@@ -37,26 +48,45 @@ export default {
   props: {
     "numberRange": Array,
     "password": String,
+    "nodes": { type: Array, default: () => [] },
   },
   data() {
     return {
       formModel: {
         ips: "",
         shard: 1,
+        sourceSchemaHost: "",
       },
       force: false,
     };
+  },
+  watch: {
+    nodes: {
+      immediate: true,
+      handler(list) {
+        if (this.formModel.sourceSchemaHost) return;
+        if (!list || list.length === 0) return;
+        const green = list.find(n => n.status === 'green');
+        const yellow = list.find(n => n.status === 'yellow');
+        this.formModel.sourceSchemaHost = (green && green.ip) || (yellow && yellow.ip) || '';
+      },
+    },
   },
   methods: {
     close() {
       this.$emit('close');
     },
     async onOk() {
-      const { ips, shard } = this.formModel;
+      const { ips, shard, sourceSchemaHost } = this.formModel;
+      if (!sourceSchemaHost) {
+        this.$message.error(this.$t('manage.Source Schema Host') + ' is required');
+        return;
+      }
       const { force, password } = this;
       const { data: { entity: taskId } } = await ClusterApi.addClusterNode(this.$route.params.id, {
         ips: getCirdOrRangeIps(lineFeed(ips)),
         shard: +shard,
+        sourceSchemaHost,
       }, force, password);
       this.$emit('onOk', taskId);
       return taskId;
