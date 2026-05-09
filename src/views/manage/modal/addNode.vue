@@ -62,7 +62,7 @@ export default {
       force: false,
       rules: {
         sourceSchemaHost: [
-          { required: true, message: this.$t('manage.Source Schema Host') + ' is required', trigger: 'change' },
+          { required: true, message: this.$t('manage.Source Schema Host required'), trigger: 'change' },
         ],
       },
     };
