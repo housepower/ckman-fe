@@ -61,6 +61,7 @@
         
         <AddNodeDialog
           :visible.sync="addNodeDialogVisible"
+          :nodes="list.nodes"
           @close="addNodeDialogVisible = false"
           @onOk="onAddNodeSuccess"
           :numberRange="numberRange"
