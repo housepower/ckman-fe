@@ -100,11 +100,16 @@
                 </span>
                 <span class="ml-10 pull-right">{{row.uptime}}</span>
               </div>
-              <div v-else-if="col.prop === 'ip'">
-                <el-button type="text" @click="openHttpWeb(row.ip, httpPort)">
-                    {{ row.ip }}
-                </el-button>
-                <!-- <el-button  class="no-border" icon="el-icon-monitor" @click="openDashboard(row.ip, httpPort)"></el-button> -->
+              <div v-else-if="col.prop === 'ip'" class="ip-cell">
+                <span class="ip-text">{{ row.ip }}</span>
+                <el-tooltip :content="$t('manage.Open Play UI')" placement="top">
+                  <el-button
+                    type="text"
+                    icon="el-icon-link"
+                    class="ip-action"
+                    @click="openHttpWeb(row.ip, httpPort)"
+                  />
+                </el-tooltip>
               </div>
               <span v-else>{{row[column.property]}}</span>
             </template>
@@ -491,5 +496,17 @@ export default {
 <style scoped>
 .no-border {
   border: none;
+}
+.ip-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.ip-cell .ip-text {
+  user-select: text;
+  cursor: text;
+}
+.ip-cell .ip-action {
+  padding: 0;
 }
 </style>
