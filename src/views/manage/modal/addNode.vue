@@ -2,11 +2,13 @@
   <el-dialog
     v-bind="$attrs"
     :title="$t('manage.Add Node')"
+    destroy-on-close
     @close="close"
     >
     <section class="add-node">
       <el-form ref="Form"
               :model="formModel"
+              :rules="rules"
               label-width="150px">
         <el-form-item :label="$t('manage.New Node IP') + ':'"
                       prop="ips">
@@ -58,6 +60,11 @@ export default {
         sourceSchemaHost: "",
       },
       force: false,
+      rules: {
+        sourceSchemaHost: [
+          { required: true, message: this.$t('manage.Source Schema Host') + ' is required', trigger: 'change' },
+        ],
+      },
     };
   },
   watch: {
@@ -77,11 +84,12 @@ export default {
       this.$emit('close');
     },
     async onOk() {
-      const { ips, shard, sourceSchemaHost } = this.formModel;
-      if (!sourceSchemaHost) {
-        this.$message.error(this.$t('manage.Source Schema Host') + ' is required');
+      try {
+        await this.$refs.Form.validate();
+      } catch (e) {
         return;
       }
+      const { ips, shard, sourceSchemaHost } = this.formModel;
       const { force, password } = this;
       const { data: { entity: taskId } } = await ClusterApi.addClusterNode(this.$route.params.id, {
         ips: getCirdOrRangeIps(lineFeed(ips)),
