@@ -1,9 +1,10 @@
 <template>
   <div class="history pb-20">
-    <el-tabs v-model="activeTab">
+    <el-tabs v-model="activeTab" type="">
       <el-tab-pane :label="$t('history.Policy List')" name="policies">
         <PolicyList
           v-if="activeTab === 'policies'"
+          ref="policyList"
           @view-run="handleViewRun"
           @go-backup="handleGoBackup"
           @edit-policy="handleEditPolicy"
@@ -13,53 +14,73 @@
       </el-tab-pane>
       <el-tab-pane :label="$t('history.Table Ledger')" name="ledger">
         <TableLedger
-          ref="tableLedger"
           v-if="activeTab === 'ledger'"
+          ref="tableLedger"
+          :init-database="ledgerDb"
+          :init-table="ledgerTable"
           @view-run="handleViewRun"
         />
       </el-tab-pane>
     </el-tabs>
-    <!-- T13: run-detail drawer / edit-modal will be mounted here -->
+
+    <!-- Run Detail Dialog -->
+    <RunDetail v-model="runDetailVisible" :run-id="currentRunId" />
+
+    <!-- Edit Policy Modal -->
+    <PolicyEditModal
+      v-model="editModalVisible"
+      :policy-id="currentEditPolicyId"
+      @updated="onPolicyUpdated"
+    />
   </div>
 </template>
 
 <script>
 import PolicyList from './policy-list.vue';
 import TableLedger from './table-ledger.vue';
+import RunDetail from './run-detail.vue';
+import PolicyEditModal from './policy-edit-modal.vue';
 
 export default {
   name: 'History',
-  components: { PolicyList, TableLedger },
+  components: { PolicyList, TableLedger, RunDetail, PolicyEditModal },
   data() {
     return {
       activeTab: 'policies',
+      runDetailVisible: false,
+      currentRunId: '',
+      editModalVisible: false,
+      currentEditPolicyId: '',
+      ledgerDb: '',
+      ledgerTable: '',
     };
   },
   methods: {
     handleViewRun(runId) {
-      // TODO T13: open run-detail drawer
-      console.log('TODO T13: open run detail', runId);
-    },
-    handleGoBackup() {
-      // TODO: switch to backup-data menu item in data-manage.vue
-      console.log('TODO: switch to backup-data menu');
+      this.currentRunId = runId;
+      this.runDetailVisible = true;
     },
     handleEditPolicy(policy) {
-      // TODO T13: open policy edit modal
-      console.log('TODO T13: open edit modal', policy);
+      this.currentEditPolicyId = policy.policy_id;
+      this.editModalVisible = true;
     },
     handleCopyPolicy(policy) {
-      // TODO T13: copy policy to new backup form
-      console.log('TODO T13: copy policy as new backup', policy);
+      this.$message.info(this.$t('history.Copy Policy Hint'));
+      console.log('TODO: copy policy', policy);
+    },
+    handleGoBackup() {
+      this.$message.info(this.$t('history.Go Backup Hint'));
+      console.log('TODO: switch to backup-data');
     },
     handleViewTableLedger({ database, table }) {
+      this.ledgerDb = database;
+      this.ledgerTable = table;
       this.activeTab = 'ledger';
-      this.$nextTick(() => {
-        if (this.$refs.tableLedger) {
-          this.$refs.tableLedger.selectedDatabase = database;
-          this.$refs.tableLedger.selectedTable = table;
-        }
-      });
+    },
+    onPolicyUpdated() {
+      if (this.$refs.policyList && this.$refs.policyList.fetchPolicies) {
+        this.$refs.policyList.fetchPolicies();
+      }
     },
   },
 };

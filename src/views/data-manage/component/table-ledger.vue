@@ -94,6 +94,16 @@ import { DataManageApi } from '@/apis';
 
 export default {
   name: 'TableLedger',
+  props: {
+    initDatabase: {
+      type: String,
+      default: '',
+    },
+    initTable: {
+      type: String,
+      default: '',
+    },
+  },
   data() {
     return {
       loading: false,
@@ -357,8 +367,22 @@ export default {
       }
     },
   },
+  watch: {
+    initDatabase(val) {
+      if (val) this.selectedDatabase = val;
+    },
+    initTable(val) {
+      if (val) this.selectedTable = val;
+    },
+  },
   mounted() {
-    // Mount without auto-query; user must fill db+table and click 查询
+    // Apply init props if provided
+    if (this.initDatabase) this.selectedDatabase = this.initDatabase;
+    if (this.initTable) this.selectedTable = this.initTable;
+    // Auto-query if both provided (navigated from policy-list via "View More 30 Days")
+    if (this.initDatabase && this.initTable) {
+      this.fetchLedger();
+    }
   },
 };
 </script>
