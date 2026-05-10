@@ -1,184 +1,291 @@
 <template>
-    <el-form ref="backupForm" :model="form" :rules="rules" label-width="120px" label-position="right">
-        <!-- 备份类型 -->
-        <el-form-item :label="$t('backup.Backup Type')" prop="scheduleType">
-            <el-radio-group v-model="form.scheduleType" @change="handleBackupTypeChange">
-                <el-radio-button label="immediate">{{ $t('backup.Immediate Backup') }}</el-radio-button>
-                <el-radio-button label="scheduled">{{ $t('backup.Scheduled Backup') }}</el-radio-button>
-            </el-radio-group>
-        </el-form-item>
+    <el-form ref="backupForm" :model="form" :rules="rules" label-width="130px" label-position="right">
 
-        <!-- 定时备份设置 -->
-        <el-form-item v-if="form.scheduleType === 'scheduled'" :label="$t('backup.Backup Interval')" prop="crontab">
-            <el-input v-model="form.crontab" :placeholder="$t('backup.Enter cron expression')" class="form-input">
-                <template #append>
-                    <el-button @click="showCronHelp">{{ $t('common.Help') }}</el-button>
-                </template>
-            </el-input>
-            <div v-if="cronHelpVisible" class="cron-help">
-                <p>{{ $t('backup.Common cron expressions') }}：</p>
-                <ul>
-                    <li>{{ $t('backup.Every minute') }}: <code>0 * * * * ?</code></li>
-                    <li>{{ $t('backup.Every hour') }}: <code>0 0 * * * ?</code></li>
-                    <li>{{ $t('backup.Daily at 0 AM') }}: <code>0 0 0 * * ?</code></li>
-                    <li>{{ $t('backup.Every Monday at 0 AM') }}: <code>0 0 0 * * 1</code></li>
-                    <li>{{ $t('backup.First day of each month at 0 AM') }}: <code>0 0 0 1 * *</code></li>
-                </ul>
-            </div>
-            
-        </el-form-item>
-        <el-form-item v-if="form.scheduleType === 'scheduled'" :label="$t('backup.Instance')" prop="instance">
-            <el-select 
-                v-model="form.instance" 
-                :placeholder="$t('backup.Instance')" 
-                class="form-input"
-                filterable
-                clearable
-                >
-                <el-option
-                    v-for="item in instanceList"
-                    :key="item"
-                    :label="item"
-                    :value="item"
-                >
-                </el-option>
-            </el-select>
-        </el-form-item>
+        <!-- ① 调度 -->
+        <div class="form-section">
+            <div class="form-section-title"><span class="section-num">1</span>{{ $t('backup.Schedule') }}</div>
 
-        <!-- 数据库和表名 -->
-        <el-form-item :label="$t('backup.Database')" prop="database">
-            <el-input v-model="form.database" :placeholder="$t('backup.Enter database name')" class="form-input"></el-input>
-        </el-form-item>
+            <el-form-item :label="$t('backup.Backup Type')" prop="scheduleType">
+                <el-radio-group v-model="form.scheduleType" @change="handleBackupTypeChange">
+                    <el-radio-button label="immediate">{{ $t('backup.Immediate Backup') }}</el-radio-button>
+                    <el-radio-button label="scheduled">{{ $t('backup.Scheduled Backup') }}</el-radio-button>
+                </el-radio-group>
+            </el-form-item>
 
-        <!-- 修改表名输入为列表形式 -->
-        <el-form-item :label="$t('backup.Table Name')" prop="tables">
-            <ul class="table-list-box">
-                <li class="table-list-item" v-for="tableData of form.tables" :key="tableData.index">
-                    <el-input v-model="tableData.value" :placeholder="$t('backup.Enter table name')" class="form-input" />
-                    <div class="table-list-icon">
-                        <i class="el-icon-circle-plus-outline fc-primary pointer" @click="addTable"></i>
-                        <i class="el-icon-remove-outline fc-red pointer" v-show="form.tables.length >= 2"
-                            @click="delTable(tableData.index)"></i>
+            <template v-if="form.scheduleType === 'scheduled'">
+                <el-form-item :label="$t('backup.Backup Interval')" prop="crontab">
+                    <el-input
+                        v-model="form.crontab"
+                        :placeholder="$t('backup.Enter cron expression')"
+                        class="form-input"
+                        @input="handleCronInput"
+                    >
+                        <template #append>
+                            <el-button @click="showCronHelp">{{ $t('common.Help') }}</el-button>
+                        </template>
+                    </el-input>
+                    <div v-if="nextTriggerText" class="next-trigger-hint">
+                        {{ $t('backup.Next Trigger') }}: <b>{{ nextTriggerText }}</b>
                     </div>
-                </li>
-            </ul>
-        </el-form-item>
+                    <div v-if="cronHelpVisible" class="cron-help">
+                        <p>{{ $t('backup.Common cron expressions') }}：</p>
+                        <ul>
+                            <li>{{ $t('backup.Every hour') }}: <code>0 * * * *</code></li>
+                            <li>{{ $t('backup.Daily at 0 AM') }}: <code>0 0 * * *</code></li>
+                            <li>{{ $t('backup.Every Monday at 0 AM') }}: <code>0 0 * * 1</code></li>
+                            <li>{{ $t('backup.First day of each month at 0 AM') }}: <code>0 0 1 * *</code></li>
+                        </ul>
+                    </div>
+                </el-form-item>
 
-        <!-- 备份方式 -->
-        <el-form-item :label="$t('backup.Backup Method')" prop="backupStyle">
-            <el-radio-group v-model="form.backupStyle" @change="handleBackupTypeChange">
-                <el-radio label="full" :disabled="form.scheduleType === 'scheduled'">{{ $t('backup.Full Backup') }}</el-radio>
-                <el-radio label="incremental">{{ $t('backup.Incremental Backup') }}</el-radio>
-            </el-radio-group>
-        </el-form-item>
+                <el-form-item :label="$t('backup.Instance')" prop="instance">
+                    <el-select
+                        v-model="form.instance"
+                        :placeholder="$t('backup.Instance')"
+                        class="form-input"
+                        filterable
+                        clearable
+                    >
+                        <el-option
+                            v-for="item in instanceList"
+                            :key="item"
+                            :label="item"
+                            :value="item"
+                        />
+                    </el-select>
+                </el-form-item>
+            </template>
+        </div>
 
-        <!-- 在备份方式选项下方添加 -->
-        <el-form-item v-if="form.backupStyle === 'incremental'" :label="$t('backup.Incremental Method')" prop="backupType">
-            <el-radio-group v-model="form.backupType" @change="handleBackupStyleChange">
-                <el-radio label="partition">{{ $t('backup.By Partition Name') }}</el-radio>
-                <el-radio label="daily">{{ $t('backup.By Time Period') }}</el-radio>
-            </el-radio-group>
-        </el-form-item>
+        <!-- ② 备份对象 -->
+        <div class="form-section">
+            <div class="form-section-title"><span class="section-num">2</span>{{ $t('backup.Backup Object') }}</div>
 
-        <!-- 按分区名输入框 -->
-        <el-form-item v-if="form.backupStyle === 'incremental' && form.backupType === 'partition'" :label="$t('backup.Partition Name')"
-            prop="partitions">
-            <el-select v-model="form.partitions" multiple filterable allow-create default-first-option
-                :placeholder="$t('backup.Enter partition names')" class="form-input"
-                @keyup.enter.native="handlePartitionInput">
-                <el-option v-for="item in partitionOptions" :key="item" :label="item" :value="item">
-                </el-option>
-            </el-select>
-        </el-form-item>
-
-        <!-- 按时间段选择 -->
-        <el-form-item v-if="form.backupStyle === 'incremental' && form.backupType === 'daily'" :label="$t('backup.Time Range')"
-            prop="daysBefore">
-            <el-select v-model="form.daysBefore" :placeholder="$t('backup.Select days')" style="width: 150px;">
-                <el-option v-for="day in [1, 3, 7, 14, 30]" :key="day" :label="$t('backup.Days Ago', { day })" :value="day"></el-option>
-            </el-select>
-            <span style="margin-left:10px">{{ $t('backup.Or enter directly') }}:
-                <el-input-number v-model="form.daysBefore" :min="1" :max="365" controls-position="right"
-                    style="width:120px" />
-                {{ $t('backup.Days Ago Text') }}
-            </span>
-        </el-form-item>
-
-        <!-- 备份目标 -->
-        <el-form-item :label="$t('backup.Backup Target')" prop="target">
-            <el-select v-model="form.target" :placeholder="$t('backup.Select backup target')" @change="handleTargetChange" class="form-input">
-                <!-- <el-option label="Local" value="local"></el-option> -->
-                <el-option label="AWS S3" value="s3"></el-option>
-            </el-select>
-        </el-form-item>
-
-        <!-- Local 配置 -->
-        <template v-if="form.target === 'local'">
-            <el-form-item :label="$t('backup.Backup Path')" prop="localPath">
-                <el-input v-model="form.localPath" :placeholder="$t('backup.Enter backup path')"
-                    class="form-input"></el-input>
-            </el-form-item>
-        </template>
-
-        <!-- AWS S3 配置 -->
-        <template v-if="form.target === 's3'">
-            <el-form-item :label="$t('backup.Endpoint')" prop="s3Endpoint">
-                <el-input v-model="form.s3Endpoint" :placeholder="$t('backup.Enter S3 endpoint')" class="form-input"></el-input>
+            <el-form-item :label="$t('backup.Database')" prop="database">
+                <el-input
+                    v-model="form.database"
+                    :placeholder="$t('backup.Enter database name')"
+                    class="form-input"
+                    @change="handleDatabaseChange"
+                />
             </el-form-item>
 
-            <el-form-item :label="$t('backup.AccessKeyID')" prop="s3AccessKeyId">
-                <el-input v-model="form.s3AccessKeyId" :placeholder="$t('backup.Enter AccessKeyID')" class="form-input"></el-input>
+            <el-form-item :label="$t('backup.Table Name')" prop="tables">
+                <el-select
+                    v-model="form.tables"
+                    multiple
+                    filterable
+                    :allow-create="tablesFallback"
+                    default-first-option
+                    :placeholder="$t('backup.Search tables')"
+                    class="form-input"
+                    :loading="tablesLoading"
+                    @change="handleTablesChange"
+                >
+                    <template v-if="!tablesFallback">
+                        <el-option
+                            v-for="tbl in tableList"
+                            :key="tbl.name"
+                            :label="tbl.name"
+                            :value="tbl.name"
+                        >
+                            <div class="ms-row-option">
+                                <span class="ms-option-name">{{ tbl.name }}</span>
+                                <span :class="['partition-tag', partitionTagClass(tbl.partition_format)]">
+                                    {{ partitionTagLabel(tbl.partition_format) }}
+                                </span>
+                                <span class="ms-option-size">{{ formatBytes(tbl.total_bytes) }}</span>
+                            </div>
+                        </el-option>
+                    </template>
+                </el-select>
+
+                <!-- 计数器 -->
+                <div v-if="form.tables.length > 0" class="selection-counter">
+                    {{ $t('backup.Selected Count', { count: form.tables.length, max: 100 }) }}
+                    <template v-if="!tablesFallback && selectedTotalBytes > 0">
+                        · {{ $t('backup.Total Size', { size: formatBytes(selectedTotalBytes) }) }}
+                    </template>
+                </div>
+
+                <!-- 不兼容警告 -->
+                <div v-if="incompatibleTables.length > 0" class="warn-hint">
+                    ⚠ {{ $t('backup.Incompatible Tables Warning', { count: incompatibleTables.length }) }}
+                    （{{ incompatibleTables.join('、') }}）
+                </div>
+
+                <!-- 降级提示 -->
+                <div v-if="tablesFallback" class="form-hint-text">
+                    {{ $t('backup.Tables Fallback Hint') }}
+                </div>
+            </el-form-item>
+        </div>
+
+        <!-- ③ 备份方式 -->
+        <div class="form-section">
+            <div class="form-section-title"><span class="section-num">3</span>{{ $t('backup.Backup Mode') }}</div>
+
+            <el-form-item :label="$t('backup.Backup Method')" prop="backupStyle">
+                <el-radio-group v-model="form.backupStyle" @change="handleBackupStyleChange">
+                    <el-radio label="full" :disabled="form.scheduleType === 'scheduled'">{{ $t('backup.Full Backup') }}</el-radio>
+                    <el-radio label="incremental">{{ $t('backup.Incremental Backup') }}</el-radio>
+                </el-radio-group>
             </el-form-item>
 
-            <el-form-item :label="$t('backup.SecretAccessKey')" prop="s3SecretAccessKey">
-                <el-input v-model="form.s3SecretAccessKey" type="password" :placeholder="$t('backup.Enter SecretAccessKey')"
-                    show-password class="form-input"></el-input>
+            <el-form-item v-if="form.backupStyle === 'incremental'" :label="$t('backup.Incremental Method')" prop="backupType">
+                <el-radio-group v-model="form.backupType" @change="handleIncrementalTypeChange">
+                    <el-radio label="partition">{{ $t('backup.By Partition Name') }}</el-radio>
+                    <el-tooltip
+                        :content="dailyDisabledReason"
+                        :disabled="!dailyDisabled"
+                        placement="top"
+                    >
+                        <el-radio label="daily" :disabled="dailyDisabled">{{ $t('backup.By Time Period') }}</el-radio>
+                    </el-tooltip>
+                </el-radio-group>
+                <div v-if="dailyDisabled" class="form-hint-text warn-text">
+                    {{ $t('backup.Daily Incompatible Hint') }}
+                </div>
             </el-form-item>
 
-            <el-form-item :label="$t('backup.Region')" prop="s3Region">
-                <el-input v-model="form.s3Region" :placeholder="$t('backup.Enter Region')" class="form-input"></el-input>
+            <!-- 按分区名输入 -->
+            <el-form-item
+                v-if="form.backupStyle === 'incremental' && form.backupType === 'partition'"
+                :label="$t('backup.Partition Name')"
+                prop="partitions"
+            >
+                <el-select
+                    v-model="form.partitions"
+                    multiple
+                    filterable
+                    allow-create
+                    default-first-option
+                    :placeholder="$t('backup.Enter partition names')"
+                    class="form-input"
+                >
+                    <el-option
+                        v-for="item in partitionOptions"
+                        :key="item"
+                        :label="item"
+                        :value="item"
+                    />
+                </el-select>
+                <div class="selection-counter">
+                    {{ $t('backup.Partition Count', { count: form.partitions.length, max: 200 }) }}
+                </div>
             </el-form-item>
 
-            <el-form-item :label="$t('backup.Bucket')" prop="s3Bucket">
-                <el-input v-model="form.s3Bucket" :placeholder="$t('backup.Enter Bucket name')" class="form-input"></el-input>
+            <!-- 按时间段 -->
+            <el-form-item
+                v-if="form.backupStyle === 'incremental' && form.backupType === 'daily'"
+                :label="$t('backup.Time Range')"
+                prop="daysBefore"
+            >
+                <el-select v-model="form.daysBefore" :placeholder="$t('backup.Select days')" style="width: 150px;">
+                    <el-option v-for="day in [1, 3, 7, 14, 30]" :key="day" :label="$t('backup.Days Ago', { day })" :value="day" />
+                </el-select>
+                <span style="margin-left:10px">{{ $t('backup.Or enter directly') }}:
+                    <el-input-number
+                        v-model="form.daysBefore"
+                        :min="1"
+                        :max="365"
+                        controls-position="right"
+                        style="width:120px"
+                    />
+                    {{ $t('backup.Days Ago Text') }}
+                </span>
             </el-form-item>
-        </template>
+        </div>
 
-        <el-form-item :label="$t('backup.Compression Format')" prop="compression">
-            <el-select v-model="form.compression" :placeholder="$t('backup.Select compression format')" class="form-input">
-                <el-option label="gzip" value="gzip"></el-option>
-                <el-option label="gz" value="gz"></el-option>
-                <el-option label="brotli" value="brotli"></el-option>
-                <el-option label="br" value="br"></el-option>
-                <el-option label="xz" value="xz"></el-option>
-                <el-option label="LZMA" value="LZMA"></el-option>
-                <el-option label="zstd" value="zstd"></el-option>
-                <el-option label="none" value="none"></el-option>
-            </el-select>
-        </el-form-item>
+        <!-- ④ 备份目标 -->
+        <div class="form-section">
+            <div class="form-section-title"><span class="section-num">4</span>{{ $t('backup.Backup Target Section') }}</div>
 
-        <!-- 是否清理成功分区 -->
-        <el-form-item :label="$t('backup.Clean Successful Partitions')" prop="clean">
-            <el-switch v-model="form.clean"></el-switch>
-        </el-form-item>
+            <el-form-item :label="$t('backup.Backup Target')" prop="target">
+                <el-select
+                    v-model="form.target"
+                    :placeholder="$t('backup.Select backup target')"
+                    @change="handleTargetChange"
+                    class="form-input"
+                >
+                    <el-option label="AWS S3" value="s3" />
+                </el-select>
+            </el-form-item>
 
-        <!-- 是否校验md5 -->
-        <el-form-item :label="$t('backup.Checksum')" prop="checksum">
-            <el-switch v-model="form.checksum"></el-switch>
-        </el-form-item>
+            <template v-if="form.target === 'local'">
+                <el-form-item :label="$t('backup.Backup Path')" prop="localPath">
+                    <el-input v-model="form.localPath" :placeholder="$t('backup.Enter backup path')" class="form-input" />
+                </el-form-item>
+            </template>
+
+            <template v-if="form.target === 's3'">
+                <el-form-item :label="$t('backup.Endpoint')" prop="s3Endpoint">
+                    <el-input v-model="form.s3Endpoint" :placeholder="$t('backup.Enter S3 endpoint')" class="form-input" />
+                </el-form-item>
+                <el-form-item :label="$t('backup.AccessKeyID')" prop="s3AccessKeyId">
+                    <el-input v-model="form.s3AccessKeyId" :placeholder="$t('backup.Enter AccessKeyID')" class="form-input" />
+                </el-form-item>
+                <el-form-item :label="$t('backup.SecretAccessKey')" prop="s3SecretAccessKey">
+                    <el-input
+                        v-model="form.s3SecretAccessKey"
+                        type="password"
+                        :placeholder="$t('backup.Enter SecretAccessKey')"
+                        show-password
+                        class="form-input"
+                    />
+                </el-form-item>
+                <el-form-item :label="$t('backup.Region')" prop="s3Region">
+                    <el-input v-model="form.s3Region" :placeholder="$t('backup.Enter Region')" class="form-input" />
+                </el-form-item>
+                <el-form-item :label="$t('backup.Bucket')" prop="s3Bucket">
+                    <el-input v-model="form.s3Bucket" :placeholder="$t('backup.Enter Bucket name')" class="form-input" />
+                </el-form-item>
+            </template>
+        </div>
+
+        <!-- ⑤ 选项 -->
+        <div class="form-section">
+            <div class="form-section-title"><span class="section-num">5</span>{{ $t('backup.Options') }}</div>
+
+            <el-form-item :label="$t('backup.Compression Format')" prop="compression">
+                <el-select v-model="form.compression" :placeholder="$t('backup.Select compression format')" class="form-input">
+                    <el-option label="gzip" value="gzip" />
+                    <el-option label="gz" value="gz" />
+                    <el-option label="brotli" value="brotli" />
+                    <el-option label="br" value="br" />
+                    <el-option label="xz" value="xz" />
+                    <el-option label="LZMA" value="LZMA" />
+                    <el-option label="zstd" value="zstd" />
+                    <el-option label="none" value="none" />
+                </el-select>
+            </el-form-item>
+
+            <el-form-item :label="$t('backup.Clean Successful Partitions')" prop="clean">
+                <el-switch v-model="form.clean" />
+            </el-form-item>
+
+            <el-form-item :label="$t('backup.Checksum')" prop="checksum">
+                <el-switch v-model="form.checksum" />
+            </el-form-item>
+        </div>
 
         <!-- 操作按钮 -->
         <el-form-item>
-            <el-button type="primary" @click="onSubmit" :loading="submitLoading" :disabled="
-                (form.scheduleType === 'scheduled' && form.backupStyle === 'full')">{{ $t('backup.Start Backup') }}</el-button>
+            <el-button
+                type="primary"
+                @click="onSubmit"
+                :loading="submitLoading"
+                :disabled="form.scheduleType === 'scheduled' && form.backupStyle === 'full'"
+            >
+                {{ $t('backup.Start Backup') }}
+            </el-button>
             <el-button @click="resetForm">{{ $t('common.Reset') }}</el-button>
         </el-form-item>
     </el-form>
 </template>
 
 <script>
-
-import { DataManageApi, ConfigApi } from '@/apis'; // 引入API模块
+import { DataManageApi, ConfigApi } from '@/apis';
 
 export default {
     name: 'BackupComponent',
@@ -188,62 +295,67 @@ export default {
     data() {
         return {
             cronHelpVisible: false,
+            nextTriggerText: '',
             partitionOptions: [],
             instanceList: [],
-            submitLoading: false, // 添加提交加载状态
+            submitLoading: false,
+            // Table summary state
+            tableList: [],          // [{name, partition_format, daily_compatible, total_bytes}]
+            tablesLoading: false,
+            tablesFallback: false,  // true = API failed, allow-create mode
             form: {
-                scheduleType: 'immediate', // immediate 或 scheduled
+                scheduleType: 'immediate',
                 crontab: '',
-                instance: '', // 实例名称
+                instance: '',
                 database: '',
-                tables: [{ index: 1, value: '' }], // 表名数组，按照系统中已有的模式
-                target: 's3', // local, s3
-                // Local 配置
+                tables: [],          // string[] — directly submitted
+                target: 's3',
                 localPath: '',
-                // S3 配置
                 s3Endpoint: '',
                 s3AccessKeyId: '',
                 s3SecretAccessKey: '',
                 s3Region: '',
                 s3Bucket: '',
-                // 压缩格式
                 compression: 'gzip',
-                backupType: 'partition', // 备份类型：按分区名(partition)/按时间段(daily)
-                daysBefore: 7,          // 按时间段备份的天数
-                partitions: [],         // 按分区名备份的分区名称
-                backupStyle: 'full',    // 备份方式：全量备份(full)/增量备份(incremental)
-                clean: false,           // 是否清理成功分区
+                backupType: 'partition',
+                daysBefore: 7,
+                partitions: [],
+                backupStyle: 'full',
+                clean: false,
                 checksum: true
             },
             rules: {
                 scheduleType: [
-                    { required: true, message: '请选择备份类型', trigger: 'change' }
+                    { required: true, message: this.$t('backup.Please select backup type'), trigger: 'change' }
                 ],
-                tables: [ // 修改验证规则
+                tables: [
                     {
                         required: true,
-                        message: '请输入至少一个表名',
-                        trigger: 'blur',
+                        trigger: 'change',
                         validator: (rule, value, callback) => {
-                            if (!this.form.tables ||
-                                this.form.tables.length === 0 ||
-                                this.form.tables.every(t => !t.value || t.value.trim() === '')) {
-                                callback(new Error('请输入至少一个表名'));
+                            if (!value || value.length === 0) {
+                                callback(new Error(this.$t('backup.Please enter at least one table name')));
+                            } else if (value.length > 100) {
+                                callback(new Error(this.$t('backup.Max 100 Tables')));
                             } else {
                                 callback();
                             }
                         }
                     }
                 ],
-                partitions: [ // 注意：这里保持prop名称不变
+                partitions: [
                     {
-                        required: true,
-                        message: '请输入至少一个分区名称',
-                        trigger: 'blur',
+                        required: false,
+                        trigger: 'change',
                         validator: (rule, value, callback) => {
-                            if (this.form.backupType === 'partition' &&
-                                this.form.partitions.length === 0) {
-                                callback(new Error('请输入至少一个分区名称'));
+                            if (this.form.backupStyle === 'incremental' && this.form.backupType === 'partition') {
+                                if (!value || value.length === 0) {
+                                    callback(new Error(this.$t('backup.Please enter at least one partition name')));
+                                } else if (value.length > 200) {
+                                    callback(new Error(this.$t('backup.Max 200 Partitions')));
+                                } else {
+                                    callback();
+                                }
                             } else {
                                 callback();
                             }
@@ -252,12 +364,11 @@ export default {
                 ],
                 crontab: [
                     {
-                        required: true,
-                        message: '请输入cron表达式',
+                        required: false,
                         trigger: 'blur',
                         validator: (rule, value, callback) => {
-                            if (this.form.scheduleType === 'scheduled' && !value.trim()) {
-                                callback(new Error('请输入cron表达式'));
+                            if (this.form.scheduleType === 'scheduled' && (!value || !value.trim())) {
+                                callback(new Error(this.$t('backup.Please enter cron expression')));
                             } else {
                                 callback();
                             }
@@ -266,12 +377,11 @@ export default {
                 ],
                 instance: [
                     {
-                        required: true,
-                        message: '请选择实例',
+                        required: false,
                         trigger: 'change',
                         validator: (rule, value, callback) => {
                             if (this.form.scheduleType === 'scheduled' && !value) {
-                                callback(new Error('请选择实例'));
+                                callback(new Error(this.$t('backup.Please select instance')));
                             } else {
                                 callback();
                             }
@@ -279,19 +389,18 @@ export default {
                     }
                 ],
                 database: [
-                    { required: true, message: '请输入数据库名', trigger: 'blur' }
+                    { required: true, message: this.$t('backup.Please enter database name'), trigger: 'blur' }
                 ],
                 target: [
-                    { required: true, message: '请选择备份目标', trigger: 'change' }
+                    { required: true, message: this.$t('backup.Please select backup target'), trigger: 'change' }
                 ],
                 localPath: [
                     {
-                        required: true,
-                        message: '请输入备份路径',
+                        required: false,
                         trigger: 'blur',
                         validator: (rule, value, callback) => {
-                            if (this.form.target === 'local' && !value.trim()) {
-                                callback(new Error('请输入备份路径'));
+                            if (this.form.target === 'local' && (!value || !value.trim())) {
+                                callback(new Error(this.$t('backup.Please enter backup path')));
                             } else {
                                 callback();
                             }
@@ -300,12 +409,11 @@ export default {
                 ],
                 s3Endpoint: [
                     {
-                        required: true,
-                        message: '请输入S3端点地址',
+                        required: false,
                         trigger: 'blur',
                         validator: (rule, value, callback) => {
-                            if (this.form.target === 's3' && !value.trim()) {
-                                callback(new Error('请输入S3端点地址'));
+                            if (this.form.target === 's3' && (!value || !value.trim())) {
+                                callback(new Error(this.$t('backup.Please enter S3 endpoint')));
                             } else {
                                 callback();
                             }
@@ -314,12 +422,11 @@ export default {
                 ],
                 s3AccessKeyId: [
                     {
-                        required: true,
-                        message: '请输入AccessKeyID',
+                        required: false,
                         trigger: 'blur',
                         validator: (rule, value, callback) => {
-                            if (this.form.target === 's3' && !value.trim()) {
-                                callback(new Error('请输入AccessKeyID'));
+                            if (this.form.target === 's3' && (!value || !value.trim())) {
+                                callback(new Error(this.$t('backup.Please enter AccessKeyID')));
                             } else {
                                 callback();
                             }
@@ -328,12 +435,11 @@ export default {
                 ],
                 s3SecretAccessKey: [
                     {
-                        required: true,
-                        message: '请输入SecretAccessKey',
+                        required: false,
                         trigger: 'blur',
                         validator: (rule, value, callback) => {
-                            if (this.form.target === 's3' && !value.trim()) {
-                                callback(new Error('请输入SecretAccessKey'));
+                            if (this.form.target === 's3' && (!value || !value.trim())) {
+                                callback(new Error(this.$t('backup.Please enter SecretAccessKey')));
                             } else {
                                 callback();
                             }
@@ -342,12 +448,11 @@ export default {
                 ],
                 s3Bucket: [
                     {
-                        required: true,
-                        message: '请输入Bucket名称',
+                        required: false,
                         trigger: 'blur',
                         validator: (rule, value, callback) => {
-                            if (this.form.target === 's3' && !value.trim()) {
-                                callback(new Error('请输入Bucket名称'));
+                            if (this.form.target === 's3' && (!value || !value.trim())) {
+                                callback(new Error(this.$t('backup.Please enter Bucket name')));
                             } else {
                                 callback();
                             }
@@ -355,114 +460,190 @@ export default {
                     }
                 ],
                 compression: [
-                    { required: true, message: '请选择压缩格式', trigger: 'change' }
+                    { required: true, message: this.$t('backup.Please select compression format'), trigger: 'change' }
                 ]
             }
         };
     },
+    computed: {
+        // Tables that are not compatible with daily mode
+        incompatibleTables() {
+            if (this.tablesFallback || this.tableList.length === 0) return [];
+            return this.form.tables.filter(name => {
+                const tbl = this.tableList.find(t => t.name === name);
+                return tbl && tbl.daily_compatible === false;
+            });
+        },
+        // Whether "daily" radio should be disabled
+        dailyDisabled() {
+            return this.incompatibleTables.length > 0;
+        },
+        // Tooltip content for disabled daily radio
+        dailyDisabledReason() {
+            if (this.incompatibleTables.length === 0) return '';
+            return this.$t('backup.Daily Disabled Reason', { tables: this.incompatibleTables.join(', ') });
+        },
+        // Total bytes of selected tables
+        selectedTotalBytes() {
+            if (this.tablesFallback || this.tableList.length === 0) return 0;
+            return this.form.tables.reduce((sum, name) => {
+                const tbl = this.tableList.find(t => t.name === name);
+                return sum + (tbl ? (tbl.total_bytes || 0) : 0);
+            }, 0);
+        }
+    },
     methods: {
-        // 添加表名输入框
-        addTable() {
-            const newIndex = this.form.tables.length > 0
-                ? Math.max(...this.form.tables.map(item => item.index)) + 1
-                : 1;
-            this.form.tables.push({ index: newIndex, value: '' });
+        // ── Partition tag helpers ──────────────────────────────────
+        partitionTagClass(format) {
+            const map = { day: 'daily', month: 'month', hour: 'daily', custom: 'custom', none: 'none' };
+            return map[format] || 'custom';
+        },
+        partitionTagLabel(format) {
+            const map = {
+                day: this.$t('backup.Partition Day'),
+                month: this.$t('backup.Partition Month'),
+                hour: this.$t('backup.Partition Hour'),
+                custom: this.$t('backup.Partition Custom'),
+                none: this.$t('backup.Partition None')
+            };
+            return map[format] || (format || this.$t('backup.Partition Unknown'));
         },
 
+        // ── Byte formatter ─────────────────────────────────────────
+        formatBytes(bytes) {
+            if (!bytes || bytes === 0) return '—';
+            const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+            let val = bytes;
+            let ui = 0;
+            while (val >= 1024 && ui < units.length - 1) { val /= 1024; ui++; }
+            return val.toFixed(1) + ' ' + units[ui];
+        },
+
+        // ── Cron next-trigger (simple, no new deps) ────────────────
+        handleCronInput(val) {
+            this.nextTriggerText = this.calcNextTrigger(val);
+        },
+        calcNextTrigger(expr) {
+            if (!expr || !expr.trim()) return '';
+            const parts = expr.trim().split(/\s+/);
+            // Validate it looks like a 5-field standard cron (minute hour dom month dow)
+            if (parts.length !== 5) return this.$t('backup.Next Trigger Placeholder');
+            // All parts must be valid cron fields (digits, *, /, -, ,)
+            const valid = parts.every(p => /^[0-9\*\/\-,]+$/.test(p));
+            if (!valid) return this.$t('backup.Next Trigger Placeholder');
+            return this.$t('backup.Next Trigger Placeholder');
+        },
+
+        // ── Instance list ──────────────────────────────────────────
         async fetchInstanceList() {
             try {
                 const response = await ConfigApi.getInstances();
                 if (response.data.retCode === '0000') {
-                    console.log(response.data.entity)
                     this.instanceList = response.data.entity || [];
-                    console.log(this.instanceList)
                 } else {
-                    this.$message.error(response.data.retMsg || '获取实例列表失败');
+                    this.$message.error(response.data.retMsg || this.$t('backup.Fetch Instance Failed'));
                 }
             } catch (error) {
-                console.error('获取实例列表失败:', error);
-                this.$message.error('获取实例列表失败');
+                console.error('fetchInstanceList error:', error);
             }
         },
 
-        // 删除表名输入框
-        delTable(index) {
-            if (this.form.tables.length > 1) {
-                const idx = this.form.tables.findIndex(item => item.index === index);
-                if (idx !== -1) {
-                    this.form.tables.splice(idx, 1);
+        // ── Table summary ─────────────────────────────────────────
+        async fetchTableSummary(cluster, database) {
+            if (!cluster || !database || !database.trim()) {
+                this.tableList = [];
+                this.tablesFallback = false;
+                return;
+            }
+            this.tablesLoading = true;
+            try {
+                const { data } = await DataManageApi.getTableSummary(cluster, database);
+                if (data.retCode === '0000' && Array.isArray(data.entity) && data.entity.length > 0) {
+                    this.tableList = data.entity;
+                    this.tablesFallback = false;
+                } else {
+                    // API succeeded but empty — fall back to allow-create
+                    this.tableList = [];
+                    this.tablesFallback = true;
                 }
-            } else {
-                this.form.tables[0].value = '';
+            } catch (err) {
+                // API not implemented or network error — graceful fallback
+                console.warn('getTableSummary failed, falling back to free input:', err);
+                this.tableList = [];
+                this.tablesFallback = true;
+            } finally {
+                this.tablesLoading = false;
             }
         },
 
-        // 处理备份类型变化
+        // ── Event handlers ─────────────────────────────────────────
+        handleDatabaseChange(val) {
+            // Reset tables selection when database changes
+            this.form.tables = [];
+            this.fetchTableSummary(this.$route.params.id, val);
+        },
+
+        handleTablesChange(val) {
+            // If daily is selected but now becomes disabled, switch to partition
+            if (this.dailyDisabled && this.form.backupType === 'daily') {
+                this.form.backupType = 'partition';
+            }
+        },
+
         handleBackupTypeChange(value) {
             if (value === 'immediate') {
                 this.form.crontab = '';
                 this.form.instance = '';
+                this.nextTriggerText = '';
             } else if (value === 'scheduled') {
-                // 定时备份只支持增量备份
                 this.form.backupStyle = 'incremental';
             }
         },
-        handleBackupStyleChange(value){
+
+        handleBackupStyleChange(value) {
+            if (value === 'full') {
+                this.form.daysBefore = 7;
+                this.form.partitions = [];
+            }
+        },
+
+        handleIncrementalTypeChange(value) {
             if (value === 'partition') {
-                this.form.daysBefore = 0;
+                this.form.daysBefore = 7;
             } else {
                 this.form.partitions = [];
             }
         },
-        handlePartitionInput(event) {
-            const inputValue = event.target.value.trim();
-            if (inputValue) {
-                // 添加新分区到数组
-                this.form.partitions.push(inputValue);
-                // 添加到选项列表
-                if (!this.partitionOptions.includes(inputValue)) {
-                    this.partitionOptions.push(inputValue);
-                }
-                // 清空输入框
-                event.target.value = '';
-            }
-        },
 
-        // 处理目标类型变化
-        handleTargetChange(value) {
-            // 重置所有目标相关字段
+        handleTargetChange() {
             this.form.localPath = '';
             this.form.s3Endpoint = '';
             this.form.s3AccessKeyId = '';
             this.form.s3SecretAccessKey = '';
             this.form.s3Region = '';
             this.form.s3Bucket = '';
-
-            this.form.daysBefore = typeof this.form.daysBefore === 'number'
-                ? this.form.daysBefore : 7;
         },
 
-        // 显示cron帮助
         showCronHelp() {
             this.cronHelpVisible = !this.cronHelpVisible;
         },
 
-        // 构建备份参数
+        // ── Build params ──────────────────────────────────────────
         buildBackupParams() {
-            // 过滤掉空的表名
-            const validTableNames = this.form.tables
-                .filter(table => table.value && table.value.trim() !== '')
-                .map(table => table.value);
+            if (this.form.scheduleType === 'scheduled' && this.form.backupStyle === 'full') {
+                this.$message.error(this.$t('backup.Scheduled full backup not supported'));
+                return null;
+            }
 
             const params = {
                 schedule_type: this.form.scheduleType,
                 database: this.form.database,
-                tables: validTableNames,
+                tables: this.form.tables,    // string[] — directly
                 backup_style: this.form.backupStyle,
                 backup_type: this.form.backupType,
                 days_before: this.form.daysBefore,
                 target: this.form.target,
-                Compression: this.form.compression,
+                compression: this.form.compression,
                 clean: this.form.clean,
                 checksum: this.form.checksum,
             };
@@ -476,15 +657,8 @@ export default {
                 params.partitions = this.form.partitions;
             }
 
-            if (this.form.scheduleType === 'scheduled' && this.form.backupStyle === 'full') {
-                this.$message.error('定时备份不支持全量备份');
-                return null;
-            }
-
             if (this.form.target === 'local') {
-                params.local = {
-                    path: this.form.localPath
-                };
+                params.local = { path: this.form.localPath };
             } else if (this.form.target === 's3') {
                 params.s3 = {
                     endpoint: this.form.s3Endpoint,
@@ -498,139 +672,222 @@ export default {
             return params;
         },
 
-        // 开始备份按钮点击事件
+        // ── Submit ────────────────────────────────────────────────
         onSubmit() {
             this.$refs.backupForm.validate(async (valid) => {
-                if (valid) {
-                    const params = this.buildBackupParams();
-                    if (!params) return;
-
-                    try {
-                        this.submitLoading = true;
-                        console.log('备份参数:', params);
-                        const { data } = await DataManageApi.backupData(this.$route.params.id, params);
-                        console.log('备份结果:', data);
-                        // 根据retCode判断业务是否成功
-                        if (data.retCode === '0000') {
-                            this.$message.success(data.retMsg || '备份成功');
-                            console.log('备份成功:', data);
-                            
-                        } else {
-                            this.$message.error(data.retMsg || '备份失败');
-                            console.error('备份失败:', data);
-                        }
-                    } catch (error) {
-                        let errorMsg = '未知错误';
-                        if (error.response && error.response.data) {
-                            const responseData = error.response.data;
-                            if (responseData.retMsg) {
-                                errorMsg = responseData.retMsg;
-                            } else if (responseData.message) {
-                                errorMsg = responseData.message;
-                            } else {
-                                errorMsg = JSON.stringify(responseData);
-                            }
-                        } else if (error.message) {
-                            errorMsg = error.message;
-                        }
-                        this.$message.error(errorMsg);
-                    } finally {
-                        this.submitLoading = false;
-                    }
-                } else {
-                    this.$message.error('请检查表单填写是否正确');
+                if (!valid) {
+                    this.$message.error(this.$t('backup.Please check form'));
                     return false;
+                }
+                const params = this.buildBackupParams();
+                if (!params) return;
+
+                try {
+                    this.submitLoading = true;
+                    const { data } = await DataManageApi.backupData(this.$route.params.id, params);
+                    if (data.retCode === '0000') {
+                        const runIds = (data.entity && data.entity.run_ids) ? data.entity.run_ids : [];
+                        if (runIds.length > 0) {
+                            this.$message.success(
+                                this.$t('backup.Submitted Tasks', { n: runIds.length })
+                            );
+                        } else {
+                            // Scheduled backup — policy created, no run_ids
+                            this.$message.success(data.retMsg || this.$t('backup.Backup Success'));
+                        }
+                        // Do NOT navigate away — stay on form per spec
+                    } else {
+                        this.$message.error(data.retMsg || this.$t('backup.Backup Failed'));
+                    }
+                } catch (error) {
+                    let errorMsg = this.$t('backup.Unknown Error');
+                    if (error.response && error.response.data) {
+                        const rd = error.response.data;
+                        errorMsg = rd.retMsg || rd.message || JSON.stringify(rd);
+                    } else if (error.message) {
+                        errorMsg = error.message;
+                    }
+                    this.$message.error(errorMsg);
+                } finally {
+                    this.submitLoading = false;
                 }
             });
         },
 
-        // 重置表单
+        // ── Reset ────────────────────────────────────────────────
         resetForm() {
             this.$refs.backupForm.resetFields();
             this.cronHelpVisible = false;
-            // 重置表名列表
-            this.form.tables = [{ index: 1, value: '' }];
-            this.$message.info('表单已重置');
+            this.nextTriggerText = '';
+            this.form.tables = [];
+            this.form.partitions = [];
+            this.$message.info(this.$t('backup.Form Reset'));
         }
     }
 };
 </script>
 
-<style scoped>
-.backup-container {
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+<style scoped lang="scss">
+@import '@/app/variables.scss';
+
+.form-section {
+    border-bottom: 1px solid #ebeef5;
+    padding-bottom: 16px;
+    margin-bottom: 18px;
+
+    &:last-of-type {
+        border-bottom: none;
+    }
 }
 
-.el-form-item {
-    margin-bottom: 22px;
-}
-
-.cron-help {
-    margin-top: 10px;
-    padding: 10px;
-    background-color: #f8f8f8;
-    border-radius: 4px;
-    border: 1px solid #ebeef5;
-}
-
-.cron-help ul {
-    padding-left: 20px;
-    margin: 10px 0;
-}
-
-.cron-help code {
-    background-color: #f5f7fa;
-    padding: 2px 5px;
-    border-radius: 3px;
-    font-family: monospace;
-}
-
-.table-list-box {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.table-list-item {
+.form-section-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #303133;
+    margin: 0 0 14px 0;
     display: flex;
     align-items: center;
-    margin-bottom: 10px;
+    gap: 8px;
 }
 
-.table-list-item .el-input {
-    margin-right: 10px;
-}
-
-.table-list-icon {
-    display: flex;
+.section-num {
+    background: $primary-color;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: inline-flex;
     align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    flex-shrink: 0;
 }
 
-.fc-primary {
-    color: #409EFF;
-}
-
-.fc-red {
-    color: #F56C6C;
-}
-
-.pointer {
-    cursor: pointer;
-    font-size: 18px;
-    margin: 0 5px;
-}
-
-/* 表单输入框样式 */
+/* form-input: 500px wide inputs */
 .form-input {
     width: 500px !important;
 }
 
-.help-text {
+/* cron help block */
+.cron-help {
+    margin-top: 8px;
+    padding: 10px 14px;
+    background-color: #f8f8f8;
+    border-radius: 4px;
+    border: 1px solid #ebeef5;
+    font-size: 13px;
+
+    ul {
+        padding-left: 20px;
+        margin: 6px 0 0;
+    }
+
+    code {
+        background-color: #f5f7fa;
+        padding: 2px 5px;
+        border-radius: 3px;
+        font-family: monospace;
+    }
+}
+
+/* next trigger hint */
+.next-trigger-hint {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #b08c00;
+
+    b {
+        color: #b08c00;
+    }
+}
+
+/* table option row in dropdown */
+.ms-row-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.ms-option-name {
+    flex: 1;
+    color: #303133;
+    font-size: 13px;
+}
+
+.ms-option-size {
+    font-size: 11px;
+    color: #909399;
+    min-width: 60px;
+    text-align: right;
+}
+
+/* partition-tag variants */
+.partition-tag {
+    font-size: 11px;
+    padding: 1px 6px;
+    border-radius: 2px;
+    text-align: center;
+    white-space: nowrap;
+
+    &.daily {
+        background: #f0f9eb;
+        color: #67C23A;
+        border: 1px solid #c2e7b0;
+    }
+
+    &.month {
+        background: #fdf6ec;
+        color: #E6A23C;
+        border: 1px solid #f5dab1;
+    }
+
+    &.none {
+        background: #fef0f0;
+        color: #F56C6C;
+        border: 1px solid #fbc4c4;
+    }
+
+    &.custom {
+        background: #f4f4f5;
+        color: #909399;
+        border: 1px solid #e9e9eb;
+    }
+}
+
+/* selection counter */
+.selection-counter {
+    margin-top: 5px;
     font-size: 12px;
     color: #909399;
-    margin-top: 5px;
+}
+
+/* warn hint (yellow background) */
+.warn-hint {
+    margin-top: 6px;
+    padding: 8px 10px;
+    background: #fdf6ec;
+    border: 1px solid #f5dab1;
+    color: #ad6c00;
+    border-radius: 3px;
+    font-size: 12px;
+    line-height: 1.5;
+
+    code {
+        background: white;
+        padding: 0 3px;
+        border-radius: 2px;
+    }
+}
+
+/* generic hint text */
+.form-hint-text {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #909399;
+}
+
+.warn-text {
+    color: #ad6c00;
 }
 </style>
