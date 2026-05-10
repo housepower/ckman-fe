@@ -18,15 +18,11 @@
                         v-model="form.crontab"
                         :placeholder="$t('backup.Enter cron expression')"
                         class="form-input"
-                        @input="handleCronInput"
                     >
                         <template #append>
                             <el-button @click="showCronHelp">{{ $t('common.Help') }}</el-button>
                         </template>
                     </el-input>
-                    <div v-if="nextTriggerText" class="next-trigger-hint">
-                        {{ $t('backup.Next Trigger') }}: <b>{{ nextTriggerText }}</b>
-                    </div>
                     <div v-if="cronHelpVisible" class="cron-help">
                         <p>{{ $t('backup.Common cron expressions') }}：</p>
                         <ul>
@@ -163,12 +159,6 @@
                     :placeholder="$t('backup.Enter partition names')"
                     class="form-input"
                 >
-                    <el-option
-                        v-for="item in partitionOptions"
-                        :key="item"
-                        :label="item"
-                        :value="item"
-                    />
                 </el-select>
                 <div class="selection-counter">
                     {{ $t('backup.Partition Count', { count: form.partitions.length, max: 200 }) }}
@@ -295,8 +285,6 @@ export default {
     data() {
         return {
             cronHelpVisible: false,
-            nextTriggerText: '',
-            partitionOptions: [],
             instanceList: [],
             submitLoading: false,
             // Table summary state
@@ -519,21 +507,6 @@ export default {
             return val.toFixed(1) + ' ' + units[ui];
         },
 
-        // ── Cron next-trigger (simple, no new deps) ────────────────
-        handleCronInput(val) {
-            this.nextTriggerText = this.calcNextTrigger(val);
-        },
-        calcNextTrigger(expr) {
-            if (!expr || !expr.trim()) return '';
-            const parts = expr.trim().split(/\s+/);
-            // Validate it looks like a 5-field standard cron (minute hour dom month dow)
-            if (parts.length !== 5) return this.$t('backup.Next Trigger Placeholder');
-            // All parts must be valid cron fields (digits, *, /, -, ,)
-            const valid = parts.every(p => /^[0-9\*\/\-,]+$/.test(p));
-            if (!valid) return this.$t('backup.Next Trigger Placeholder');
-            return this.$t('backup.Next Trigger Placeholder');
-        },
-
         // ── Instance list ──────────────────────────────────────────
         async fetchInstanceList() {
             try {
@@ -594,7 +567,6 @@ export default {
             if (value === 'immediate') {
                 this.form.crontab = '';
                 this.form.instance = '';
-                this.nextTriggerText = '';
             } else if (value === 'scheduled') {
                 this.form.backupStyle = 'incremental';
             }
@@ -718,7 +690,6 @@ export default {
         resetForm() {
             this.$refs.backupForm.resetFields();
             this.cronHelpVisible = false;
-            this.nextTriggerText = '';
             this.form.tables = [];
             this.form.partitions = [];
             this.$message.info(this.$t('backup.Form Reset'));
@@ -787,17 +758,6 @@ export default {
         padding: 2px 5px;
         border-radius: 3px;
         font-family: monospace;
-    }
-}
-
-/* next trigger hint */
-.next-trigger-hint {
-    margin-top: 4px;
-    font-size: 12px;
-    color: #b08c00;
-
-    b {
-        color: #b08c00;
     }
 }
 
