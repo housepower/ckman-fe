@@ -2,9 +2,7 @@
   <div class="table-ledger">
     <!-- Toolbar -->
     <div class="toolbar">
-      <el-select v-model="selectedDatabase" size="small" style="width: 140px" :placeholder="$t('backup.Database')" clearable @change="onDatabaseChange">
-        <el-option v-for="db in databaseList" :key="db" :label="db" :value="db" />
-      </el-select>
+      <el-input v-model="selectedDatabase" size="small" style="width: 140px" :placeholder="$t('history.Enter Database')" clearable />
       <el-input
         v-model="selectedTable"
         size="small"
@@ -18,13 +16,13 @@
         <el-option :label="$t('history.Days 30')" :value="30" />
       </el-select>
       <el-button type="primary" size="small" @click="fetchLedger" :loading="loading">
-        查询
+        {{ $t('history.Query') }}
       </el-button>
     </div>
 
     <template v-if="hasQueried">
       <h3 class="ledger-title">
-        {{ selectedDatabase }} · {{ selectedTable }} · 过去 {{ selectedDays }} 天备份情况
+        {{ $t('history.Days Ago Title', { days: selectedDays, table: `${selectedDatabase}.${selectedTable}` }) }}
         <span class="ledger-hint">（{{ $t('history.Calendar Hover Hint') }}）</span>
       </h3>
 
@@ -63,7 +61,7 @@
         <div class="cal-side">
           <h3 class="summary-title">{{ $t('history.Summary') }}</h3>
           <div class="summary-body">
-            <div>共 <b>{{ summary.total }}</b> 个有效日</div>
+            <div>{{ $t('history.Effective Days Count', { count: summary.total }) }}</div>
             <div>
               {{ $t('history.Success') }} <b class="c-success">{{ summary.success }}</b> ·
               {{ $t('history.Failed') }} <b class="c-danger">{{ summary.failed }}</b>
@@ -72,7 +70,7 @@
               {{ $t('history.Skipped') }} <b class="c-warning">{{ summary.skipped }}</b> ·
               {{ $t('history.Running') }} <b class="c-primary">{{ summary.running }}</b>
             </div>
-            <div>无备份记录 <b>{{ summary.noRun }}</b> 天</div>
+            <div>{{ $t('history.No Run Days', { count: summary.noRun }) }}</div>
             <div style="margin-top: 10px">
               {{ $t('history.Last Success') }}：{{ summary.lastSuccess || '—' }}
             </div>
@@ -94,8 +92,6 @@
 <script>
 import { DataManageApi } from '@/apis';
 
-const WEEK_HEADERS = ['日', '一', '二', '三', '四', '五', '六'];
-
 export default {
   name: 'TableLedger',
   data() {
@@ -105,14 +101,24 @@ export default {
       selectedDatabase: '',
       selectedTable: '',
       selectedDays: 30,
-      databaseList: [],
       runs: [],         // BackupRun[]
-      weekHeaders: WEEK_HEADERS,
     };
   },
   computed: {
     cluster() {
       return this.$route.params.id;
+    },
+
+    weekHeaders() {
+      return [
+        this.$t('history.Sun'),
+        this.$t('history.Mon'),
+        this.$t('history.Tue'),
+        this.$t('history.Wed'),
+        this.$t('history.Thu'),
+        this.$t('history.Fri'),
+        this.$t('history.Sat'),
+      ];
     },
 
     // Map date string "YYYY-MM-DD" -> latest run (and all runs list)
@@ -211,25 +217,6 @@ export default {
     },
   },
   methods: {
-    async fetchDatabases() {
-      // We use getTableSummary to get the list of databases with tables
-      // But it requires a database; so we try to list tables per cluster instead.
-      // For now: leave databaseList empty — user types freely (or uses autocomplete).
-      // Optional: if there's a cluster-level DB list endpoint, use it here.
-    },
-
-    async onDatabaseChange() {
-      if (!this.selectedDatabase) return;
-      try {
-        const res = await DataManageApi.getTableSummary(this.cluster, this.selectedDatabase);
-        if (res.data.retCode === '0000') {
-          // getTableSummary returns table list for db — not needed for input, just hints
-        }
-      } catch {
-        // ignore
-      }
-    },
-
     async fetchLedger() {
       if (!this.selectedDatabase || !this.selectedTable) {
         this.$message.warning('请先填写 database 和 table');
@@ -264,15 +251,15 @@ export default {
     cellInfo(cell) {
       const s = cell.status;
       const run = cell.run;
-      if (s === 'no-run') return '无';
+      if (s === 'no-run') return this.$t('history.Cell No Run');
       if (s === 'success') {
         const elapsed = this.calcElapsedSecs(run);
         return elapsed !== null ? `✓ ${this.formatChineseElapsed(elapsed)}` : '✓';
       }
-      if (s === 'failed') return '✗ 失败';
-      if (s === 'skipped') return '↳ 跳过';
-      if (s === 'running') return '⏳ 进行中';
-      if (s === 'queued') return '⏳ 排队';
+      if (s === 'failed') return this.$t('history.Cell Failed');
+      if (s === 'skipped') return this.$t('history.Cell Skipped');
+      if (s === 'running') return this.$t('history.Cell Running');
+      if (s === 'queued') return this.$t('history.Cell Queued');
       if (s === 'interrupted') return '⚡ 中断';
       return '';
     },

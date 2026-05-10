@@ -7,7 +7,7 @@
         <el-option :label="$t('history.Enabled')" value="enabled" />
         <el-option :label="$t('history.Disabled')" value="disabled" />
       </el-select>
-      <el-select v-model="filterDatabase" size="small" style="width: 140px" clearable :placeholder="$t('history.Status Filter')">
+      <el-select v-model="filterDatabase" size="small" style="width: 140px" clearable :placeholder="$t('history.Database Filter')">
         <el-option v-for="db in databaseList" :key="db" :label="db" :value="db" />
       </el-select>
       <el-input
@@ -39,7 +39,7 @@
         <template #default="{ row }">
           <div class="run-expand" @click.stop>
             <div v-if="runLoadingMap[row.policy_id]" class="run-loading">
-              <i class="el-icon-loading" /> 加载中...
+              <i class="el-icon-loading" /> {{ $t('history.Loading') }}
             </div>
             <template v-else>
               <div class="run-header">
@@ -77,7 +77,7 @@
                 </span>
               </div>
               <div v-if="!(runMap[row.policy_id] || []).length" class="run-empty muted">
-                暂无运行记录
+                {{ $t('history.No Runs') }}
               </div>
               <div class="run-more" @click.stop="goViewMore(row)">
                 {{ $t('history.View More 30 Days') }} →
@@ -97,7 +97,7 @@
       <!-- 类型 -->
       <el-table-column :label="$t('history.Schedule Type')" width="80">
         <template #default="{ row }">
-          {{ row.schedule_type === 'scheduled' ? '定时' : '立即' }}
+          {{ row.schedule_type === 'scheduled' ? $t('history.Schedule Scheduled') : $t('history.Schedule Immediate') }}
         </template>
       </el-table-column>
 
@@ -274,7 +274,7 @@ export default {
       try {
         const res = await DataManageApi.triggerPolicy(policy.policy_id);
         if (res.data.retCode === '0000') {
-          this.$message.success('已触发，稍后可展开查看最新 run');
+          this.$message.success(this.$t('history.Trigger Success'));
           // refresh run list if already expanded
           this.$delete(this.runMap, policy.policy_id);
           await this.fetchRunsForPolicy(policy.policy_id);
@@ -309,9 +309,9 @@ export default {
 
     async deletePolicy(policy) {
       try {
-        await this.$confirm(`确认删除策略 ${policy.database}.${policy.table}？`, '确认删除', {
-          confirmButtonText: '删除',
-          cancelButtonText: '取消',
+        await this.$confirm(this.$t('history.Confirm Delete', { table: `${policy.database}.${policy.table}` }), this.$t('common.Confirm'), {
+          confirmButtonText: this.$t('history.Confirm Delete Btn'),
+          cancelButtonText: this.$t('common.Cancel'),
           type: 'warning',
         });
       } catch {
