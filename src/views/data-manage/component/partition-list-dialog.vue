@@ -44,7 +44,7 @@
       @row-click="handleRowClick"
     >
       <el-table-column type="selection" width="50" class-name="col-no-click" />
-      <el-table-column type="expand" class-name="col-no-click">
+      <el-table-column type="expand" class-name="col-no-click hide-expand-col" width="1">
         <template #default="{ row }">
           <div class="ops-timeline">
             <div class="ops-header">
@@ -53,6 +53,7 @@
               <span class="ops-col-status">{{ $t('history.Status') }}</span>
               <span class="ops-col-elapsed">{{ $t('history.Elapsed') }}</span>
               <span class="ops-col-size">{{ $t('history.Disk Size') }}</span>
+              <span class="ops-col-rows">{{ $t('history.Rows') }}</span>
               <span class="ops-col-target">{{ $t('history.Target') }}</span>
               <span class="ops-col-msg">{{ $t('history.Notes') }}</span>
               <span class="ops-col-action"></span>
@@ -75,6 +76,7 @@
               </span>
               <span class="ops-col-elapsed muted">{{ formatElapsed(op.elapsed) }}</span>
               <span class="ops-col-size muted">{{ formatBytes(op.size) }}</span>
+              <span class="ops-col-rows muted">{{ formatNumber(op.rows) }}</span>
               <span class="ops-col-target">
                 <el-tooltip v-if="op.target" :content="op.target.label" placement="top">
                   <el-tag size="mini" :type="op.target.kind === 's3' ? 'warning' : 'success'" class="ellipsis-tag">
@@ -94,8 +96,11 @@
       <el-table-column prop="partition" :label="$t('history.Partition')" min-width="140" sortable show-overflow-tooltip>
         <template #default="{ row }"><span class="mono">{{ row.partition }}</span></template>
       </el-table-column>
-      <el-table-column :label="$t('history.Disk Size')" width="120" sortable :sort-method="(a, b) => (a.size || 0) - (b.size || 0)">
+      <el-table-column :label="$t('history.Disk Size')" width="110" sortable :sort-method="(a, b) => (a.size || 0) - (b.size || 0)">
         <template #default="{ row }">{{ formatBytes(row.size) }}</template>
+      </el-table-column>
+      <el-table-column :label="$t('history.Rows')" width="110" sortable :sort-method="(a, b) => (a.rows || 0) - (b.rows || 0)">
+        <template #default="{ row }">{{ formatNumber(row.rows) }}</template>
       </el-table-column>
       <el-table-column :label="$t('history.Latest Backup')" min-width="180" sortable :sort-method="sortByLatestBackup" show-overflow-tooltip>
         <template #default="{ row }">
@@ -188,13 +193,14 @@ export default {
         const target = this.targetOfPolicy(this.policyById[run.policy_id]);
         for (const p of (run.partitions || [])) {
           if (!map[p.partition]) {
-            map[p.partition] = { partition: p.partition, ops: [], size: p.size || 0, latestBackup: null, latestRestore: null };
+            map[p.partition] = { partition: p.partition, ops: [], size: p.size || 0, rows: p.rows || 0, latestBackup: null, latestRestore: null };
           }
           const op = {
             op: run.operation,
             time: run.started_at || run.create_time,
             status: p.status,
             size: p.size || 0,
+            rows: p.rows || 0,
             elapsed: p.elapsed || 0,
             run_id: run.run_id,
             policy_id: run.policy_id,
@@ -214,6 +220,9 @@ export default {
           }
           if (op.size && (!map[p.partition].size || op.size > map[p.partition].size)) {
             map[p.partition].size = op.size;
+          }
+          if (op.rows && (!map[p.partition].rows || op.rows > map[p.partition].rows)) {
+            map[p.partition].rows = op.rows;
           }
         }
       }
@@ -395,6 +404,10 @@ export default {
       if (b < 1073741824) return (b / 1048576).toFixed(2) + ' MB';
       return (b / 1073741824).toFixed(2) + ' GB';
     },
+    formatNumber(n) {
+      if (!n || n === 0) return '—';
+      return Number(n).toLocaleString();
+    },
   },
 };
 </script>
@@ -404,13 +417,15 @@ export default {
 .part-row-clickable { cursor: pointer; }
 .part-row-clickable .col-no-click { cursor: default; }
 .part-pagination { margin-top: 10px; text-align: right; }
+::v-deep .hide-expand-col { padding: 0; }
+::v-deep .el-table__expand-icon { display: none; }
 .summary { margin-top: 10px; font-size: 12px; color: #909399; }
 .mono { font-family: ui-monospace, Menlo, Consolas, monospace; }
 .ops-timeline { padding: 8px 16px; background: #FDF7DD; border-left: 3px solid #C9A100; }
 .ops-header, .ops-row {
   display: grid;
-  grid-template-columns: 70px 150px 80px 70px 90px 160px 1fr 70px;
-  gap: 8px;
+  grid-template-columns: 60px 150px 70px 60px 80px 90px 150px 1fr 60px;
+  gap: 6px;
   padding: 6px 8px;
   font-size: 12.5px;
   align-items: center;
