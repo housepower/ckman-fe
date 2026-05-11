@@ -170,11 +170,13 @@
 
                 <!-- 按分区名输入 -->
                 <el-form-item
+                    key="partition-input"
                     v-if="form.backupStyle === 'incremental' && form.backupType === 'partition'"
                     :label="$t('backup.Partition Name')"
                     prop="partitions"
                 >
                     <el-select
+                        key="partition-select"
                         v-model="form.partitions"
                         multiple
                         filterable
@@ -191,11 +193,12 @@
 
                 <!-- 按时间段 -->
                 <el-form-item
+                    key="daily-input"
                     v-if="form.backupStyle === 'incremental' && form.backupType === 'daily'"
                     :label="$t('backup.Time Range')"
                     prop="daysBefore"
                 >
-                    <el-select v-model="form.daysBefore" :placeholder="$t('backup.Select days')" style="width: 150px;">
+                    <el-select key="daily-select" v-model="form.daysBefore" :placeholder="$t('backup.Select days')" style="width: 150px;">
                         <el-option v-for="day in [1, 3, 7, 14, 30]" :key="day" :label="$t('backup.Days Ago', { day })" :value="day" />
                     </el-select>
                     <span style="margin-left:10px">{{ $t('backup.Or enter directly') }}:
