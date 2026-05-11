@@ -28,15 +28,6 @@
       <el-button size="small" icon="el-icon-refresh" :loading="loading" @click="fetchPolicies">
         {{ $t('history.Refresh') }}
       </el-button>
-      <span style="display:inline-flex;align-items:center;gap:6px;margin-left:8px;font-size:12px;color:#909399">
-        <el-switch
-          v-model="autoRefresh"
-          active-color="#C9A100"
-          inactive-color="#c0c4cc"
-          @change="onAutoRefreshChange"
-        />
-        {{ $t('history.Auto Refresh 30s') }}
-      </span>
     </div>
 
     <!-- Policy Table -->
@@ -204,9 +195,6 @@ export default {
       runMap: {},         // policy_id -> BackupRun[]
       runLoadingMap: {},  // policy_id -> boolean
       latestRunMap: {},   // policy_id -> BackupRun (latest)
-      autoRefreshTimer: null,
-      autoRefreshInterval: 30000,
-      autoRefresh: false,  // 默认关闭；避免后台一直轮询
     };
   },
   computed: {
@@ -433,36 +421,9 @@ export default {
       return m > 0 ? `${h}时${m}分` : `${h}时`;
     },
 
-    startAutoRefresh() {
-      this.stopAutoRefresh();
-      this.autoRefreshTimer = setInterval(() => {
-        this.fetchPolicies();
-        // Also refresh runs for expanded rows
-        for (const policyId of Object.keys(this.runMap || {})) {
-          this.fetchRunsForPolicy(policyId);
-        }
-      }, this.autoRefreshInterval);
-    },
-
-    stopAutoRefresh() {
-      if (this.autoRefreshTimer) {
-        clearInterval(this.autoRefreshTimer);
-        this.autoRefreshTimer = null;
-      }
-    },
-
-    onAutoRefreshChange(val) {
-      if (val) this.startAutoRefresh();
-      else this.stopAutoRefresh();
-    },
   },
   mounted() {
     this.fetchPolicies();
-    // autoRefresh 默认 false，不启动 timer；用户点开关时再启动
-  },
-
-  destroyed() {
-    this.stopAutoRefresh();
   },
 };
 </script>
