@@ -9,7 +9,7 @@
     <el-table
       :data="pagedRows"
       v-loading="loading"
-      row-key="policy_id"
+      row-key="key"
       border
       style="width:100%"
       :row-class-name="() => 'table-row-clickable'"
@@ -21,15 +21,24 @@
           <span class="table-name">{{ row.database }}.{{ row.table }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('history.Belong Task')" min-width="180">
+      <el-table-column :label="$t('history.Belong Task')" min-width="220">
         <template #default="{ row }">
-          <span class="muted">{{ taskNameOf(row) }}</span>
+          <el-tag
+            v-for="name in row.taskNames"
+            :key="name"
+            size="mini"
+            type="info"
+            class="task-tag"
+          >
+            {{ name }}
+          </el-tag>
+          <span v-if="row.taskNames.length === 0" class="muted">—</span>
         </template>
       </el-table-column>
       <el-table-column :label="$t('history.Latest Backup')" min-width="180">
         <template #default="{ row }">
-          <template v-if="metaMap[row.policy_id] && metaMap[row.policy_id].latestBackup">
-            <span class="muted">{{ formatDate(metaMap[row.policy_id].latestBackup.time) }}</span>
+          <template v-if="metaMap[row.key] && metaMap[row.key].latestBackup">
+            <span class="muted">{{ formatDate(metaMap[row.key].latestBackup.time) }}</span>
             <el-tag size="mini" type="success" style="margin-left:6px">{{ $t('history.Status Success') }}</el-tag>
           </template>
           <span v-else class="muted">—</span>
@@ -37,8 +46,8 @@
       </el-table-column>
       <el-table-column :label="$t('history.Latest Restore')" min-width="180">
         <template #default="{ row }">
-          <template v-if="metaMap[row.policy_id] && metaMap[row.policy_id].latestRestore">
-            <span class="muted">{{ formatDate(metaMap[row.policy_id].latestRestore.time) }}</span>
+          <template v-if="metaMap[row.key] && metaMap[row.key].latestRestore">
+            <span class="muted">{{ formatDate(metaMap[row.key].latestRestore.time) }}</span>
             <el-tag size="mini" type="info" style="margin-left:6px">{{ $t('history.Status Success') }}</el-tag>
           </template>
           <span v-else class="muted">—</span>
@@ -46,12 +55,12 @@
       </el-table-column>
       <el-table-column :label="$t('history.Partitions Count Label')" width="100">
         <template #default="{ row }">
-          <span class="muted">{{ metaMap[row.policy_id] ? metaMap[row.policy_id].partitionCount : '—' }}</span>
+          <span class="muted">{{ metaMap[row.key] ? metaMap[row.key].partitionCount : '—' }}</span>
         </template>
       </el-table-column>
       <el-table-column :label="$t('history.Actions')" width="120" fixed="right" class-name="col-no-click">
         <template #default="{ row }">
-          <el-button type="text" size="mini" @click="$emit('view-table', row)">{{ $t('history.View Partitions') }}</el-button>
+          <el-button type="text" size="mini" @click="$emit('view-table', toViewPolicy(row))">{{ $t('history.View Partitions') }}</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -87,13 +96,37 @@ export default {
     };
   },
   computed: {
-    rows() {
-      return this.policies.filter(p => !p.deleted);
+    // 按 cluster.db.table 聚合 policies，一张表一行
+    aggregatedRows() {
+      const map = new Map();
+      for (const p of this.policies) {
+        if (p.deleted) continue;
+        const key = `${p.cluster_name}.${p.database}.${p.table}`;
+        if (!map.has(key)) {
+          map.set(key, {
+            key,
+            cluster_name: p.cluster_name,
+            database: p.database,
+            table: p.table,
+            policies: [],
+            taskNames: [],
+          });
+        }
+        map.get(key).policies.push(p);
+      }
+      for (const row of map.values()) {
+        const names = new Set();
+        for (const p of row.policies) {
+          names.add(p.task_name || `${p.database}.${p.table}`);
+        }
+        row.taskNames = [...names];
+      }
+      return [...map.values()];
     },
     filteredRows() {
-      if (!this.searchKey) return this.rows;
+      if (!this.searchKey) return this.aggregatedRows;
       const q = this.searchKey.toLowerCase();
-      return this.rows.filter(p => `${p.database}.${p.table}`.toLowerCase().includes(q));
+      return this.aggregatedRows.filter(r => `${r.database}.${r.table}`.toLowerCase().includes(q));
     },
     pagedRows() {
       const s = (this.currentPage - 1) * this.pageSize;
@@ -101,18 +134,18 @@ export default {
     },
   },
   watch: {
-    policies: {
-      handler(newPolicies) {
-        for (const p of newPolicies) this.fetchPolicyMeta(p.policy_id);
+    aggregatedRows: {
+      handler(rows) {
+        for (const r of rows) this.fetchTableMeta(r);
       },
       immediate: true,
     },
     searchKey() { this.currentPage = 1; },
   },
   methods: {
-    async fetchPolicyMeta(policyId) {
+    async fetchTableMeta(row) {
       try {
-        const res = await DataManageApi.listRunsByPolicy(policyId, { limit: 30 });
+        const res = await DataManageApi.listRunsByTable(row.cluster_name, row.database, row.table, 365);
         if (res.data.retCode === '0000') {
           const runs = res.data.entity || [];
           let latestBackup = null, latestRestore = null;
@@ -127,17 +160,22 @@ export default {
             }
             for (const p of (r.partitions || [])) parts.add(p.partition);
           }
-          this.$set(this.metaMap, policyId, { latestBackup, latestRestore, partitionCount: parts.size });
+          this.$set(this.metaMap, row.key, { latestBackup, latestRestore, partitionCount: parts.size });
         }
       } catch { /* silent */ }
     },
-    taskNameOf(p) {
-      return p.task_name || `${p.database}.${p.table}`;
+    toViewPolicy(row) {
+      // partition-list-dialog 只读 cluster_name / database / table，构造一个最小 policy
+      return {
+        cluster_name: row.cluster_name,
+        database: row.database,
+        table: row.table,
+      };
     },
     handleRowClick(row, column) {
       if (!column) return;
       if ((column.className || '').includes('col-no-click')) return;
-      this.$emit('view-table', row);
+      this.$emit('view-table', this.toViewPolicy(row));
     },
     formatDate(s) {
       if (!s || s === '0001-01-01T00:00:00Z') return '—';
@@ -154,5 +192,6 @@ export default {
 .table-row-clickable .col-no-click { cursor: default; }
 .table-name { font-weight: 500; }
 .muted { color: #909399; }
+.task-tag { margin-right: 4px; margin-bottom: 2px; }
 .table-pagination { margin-top: 12px; text-align: right; }
 </style>

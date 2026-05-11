@@ -25,7 +25,7 @@
     <TaskDetailDialog v-model="taskDetailVisible" :task="currentTask" @edit-task="onEditTask" />
     <TaskEditDialog v-model="taskEditVisible" :task="currentTask" @updated="fetchPolicies" />
     <PartitionListDialog v-model="partitionDialogVisible" :policy="currentPolicy" @view-run="onViewRun" @restore-partitions="onRestorePartitions" />
-    <BackupFormDialog v-model="backupDialogVisible" :cluster="cluster" @submitted="fetchPolicies" />
+    <BackupFormDialog v-model="backupDialogVisible" :cluster="cluster" :policies="policies" @submitted="fetchPolicies" />
     <RestoreFormDialog
       v-model="restoreDialogVisible"
       :cluster="cluster"

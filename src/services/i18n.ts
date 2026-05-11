@@ -471,6 +471,7 @@ const messages = {
       'Submit Backup': 'Submit Backup',
       'Task Name': 'Task Name',
       'Task Name Placeholder': 'Task name (optional, auto-generated if empty)',
+      'Already Scheduled': 'Already in task: {task}',
     },
     // History Component Translations
     history: {
@@ -1268,6 +1269,7 @@ const messages = {
       'Submit Backup': '提交备份',
       'Task Name': '任务名',
       'Task Name Placeholder': '任务名（可选，留空自动生成）',
+      'Already Scheduled': '已挂在任务：{task}',
     },
     rebalance: {
       'Database': '数据库',

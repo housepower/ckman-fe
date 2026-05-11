@@ -102,9 +102,13 @@
                                 :key="tbl.name"
                                 :label="tbl.name"
                                 :value="tbl.name"
+                                :disabled="!!conflictingTables[tbl.name]"
                             >
                                 <div class="ms-row-option">
                                     <span class="ms-option-name">{{ tbl.name }}</span>
+                                    <span v-if="conflictingTables[tbl.name]" class="conflict-tag">
+                                        {{ $t('backup.Already Scheduled', { task: conflictingTables[tbl.name] }) }}
+                                    </span>
                                     <span :class="['partition-tag', partitionTagClass(tbl.partition_format)]">
                                         {{ partitionTagLabel(tbl.partition_format) }}
                                     </span>
@@ -352,6 +356,8 @@ export default {
     props: {
         value: { type: Boolean, default: false },
         cluster: { type: String, required: true },
+        // 已存在的 policies（来自父组件 history.vue），用于检测重复定时备份
+        policies: { type: Array, default: () => [] },
     },
     data() {
         return {
@@ -553,6 +559,20 @@ export default {
                 const tbl = this.tableList.find(t => t.name === name);
                 return sum + (tbl ? (tbl.total_bytes || 0) : 0);
             }, 0);
+        },
+        // 已挂在 active scheduled task 下的表（同 cluster + 当前 database）。
+        // 仅在 scheduleType=scheduled 时影响选项可用性。
+        conflictingTables() {
+            const map = {};
+            if (this.form.scheduleType !== 'scheduled' || !this.form.database) return map;
+            for (const p of this.policies) {
+                if (p.deleted || !p.enabled) continue;
+                if (p.schedule_type !== 'scheduled') continue;
+                if (p.cluster_name !== this.cluster) continue;
+                if (p.database !== this.form.database) continue;
+                map[p.table] = p.task_name || `${p.database}.${p.table}`;
+            }
+            return map;
         }
     },
     watch: {
@@ -745,6 +765,8 @@ export default {
                 this.form.backupStyle = 'incremental';
                 this.form.backupType = 'daily';
                 this.form.partitions = [];
+                // 切到定时备份时，把已选的冲突表清掉，避免提交时被后端拒绝
+                this.form.tables = this.form.tables.filter(t => !this.conflictingTables[t]);
             }
         },
 
@@ -955,6 +977,17 @@ export default {
     color: #909399;
     min-width: 60px;
     text-align: right;
+}
+
+/* conflict tag for already-scheduled tables */
+.conflict-tag {
+    font-size: 11px;
+    padding: 1px 6px;
+    border-radius: 2px;
+    background: #fef0f0;
+    color: #F56C6C;
+    border: 1px solid #fbc4c4;
+    white-space: nowrap;
 }
 
 /* partition-tag variants */
