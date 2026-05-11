@@ -48,6 +48,7 @@
       <el-table-column :label="$t('history.Enabled')" width="80" class-name="col-no-click">
         <template #default="{ row: t }">
           <el-switch
+            v-if="t.schedule_type === 'scheduled'"
             :value="t.enabled"
             :loading="!!t.toggling"
             :disabled="!!t.toggling"
@@ -55,6 +56,7 @@
             inactive-color="#c0c4cc"
             @change="toggleTaskEnabled(t)"
           />
+          <span v-else class="muted">—</span>
         </template>
       </el-table-column>
       <el-table-column :label="$t('history.Latest Run')" min-width="180">

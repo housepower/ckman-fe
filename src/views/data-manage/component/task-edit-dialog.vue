@@ -13,9 +13,6 @@
       <el-form-item :label="$t('history.Task Name')" prop="task_name">
         <el-input v-model="form.task_name" :placeholder="$t('history.Task Name Placeholder')" />
       </el-form-item>
-      <el-form-item :label="$t('history.Enabled')">
-        <el-switch v-model="form.enabled" active-color="#C9A100" inactive-color="#c0c4cc" />
-      </el-form-item>
       <el-form-item :label="$t('backup.Backup Type')">
         <el-input
           :value="form.schedule_type === 'scheduled' ? $t('history.Schedule Scheduled') : $t('history.Schedule Immediate')"
@@ -23,6 +20,9 @@
         />
       </el-form-item>
       <template v-if="form.schedule_type === 'scheduled'">
+        <el-form-item :label="$t('history.Enabled')">
+          <el-switch v-model="form.enabled" active-color="#C9A100" inactive-color="#c0c4cc" />
+        </el-form-item>
         <el-form-item label="Crontab" prop="crontab">
           <el-input v-model="form.crontab" :placeholder="$t('backup.Enter cron expression')" />
           <span class="form-hint">{{ $t('history.Crontab Min Interval') }}</span>
