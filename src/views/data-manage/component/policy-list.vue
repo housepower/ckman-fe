@@ -123,8 +123,8 @@
             :value="row.enabled"
             :loading="!!row.toggling"
             :disabled="!!row.toggling"
-            active-color="#67C23A"
-            inactive-color="#909399"
+            active-color="#C9A100"
+            inactive-color="#c0c4cc"
             @change="toggleEnabled(row)"
           />
         </template>
