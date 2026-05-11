@@ -648,6 +648,7 @@ const messages = {
       'Restore Submitted Partial': 'Submitted {success} restore task(s), {failed} failed',
       'New Restore': 'New Restore',
       'Refresh': 'Refresh',
+      'Auto Refresh 30s': 'Auto refresh (30s)',
     },
 
     // Import Component Translations
@@ -1404,6 +1405,7 @@ const messages = {
       'Restore Submitted Partial': '已提交 {success} 个恢复任务，{failed} 个失败',
       'New Restore': '新建恢复',
       'Refresh': '刷新',
+      'Auto Refresh 30s': '自动刷新 (30s)',
     },
 
     // Import Component Translations

@@ -27,6 +27,15 @@
       >
         {{ $t('history.Refresh') }}
       </el-button>
+      <span v-if="hasQueried" style="display:inline-flex;align-items:center;gap:6px;margin-left:8px;font-size:12px;color:#909399">
+        <el-switch
+          v-model="autoRefresh"
+          active-color="#C9A100"
+          inactive-color="#c0c4cc"
+          @change="onAutoRefreshChange"
+        />
+        {{ $t('history.Auto Refresh 30s') }}
+      </span>
     </div>
 
     <template v-if="hasQueried">
@@ -123,6 +132,7 @@ export default {
       selectedDays: 30,
       runs: [],         // BackupRun[]
       autoRefreshTimer: null,
+      autoRefresh: false,  // 默认关闭；用户点开关再启动 30s 轮询
     };
   },
   computed: {
@@ -260,8 +270,10 @@ export default {
           this.runs = res.data.entity || [];
           if (!silent) {
             this.hasQueried = true;
-            // Start auto-polling after first successful query
-            this.startAutoRefresh();
+            // autoRefresh 默认关；用户手动开关时启动
+            if (this.autoRefresh) {
+              this.startAutoRefresh();
+            }
           }
         } else {
           if (!silent) {
@@ -297,6 +309,11 @@ export default {
         clearInterval(this.autoRefreshTimer);
         this.autoRefreshTimer = null;
       }
+    },
+
+    onAutoRefreshChange(val) {
+      if (val && this.hasQueried) this.startAutoRefresh();
+      else this.stopAutoRefresh();
     },
 
     cellClass(cell) {
