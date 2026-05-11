@@ -72,7 +72,8 @@
       </el-table-column>
       <el-table-column :label="$t('history.Actions')" width="200" fixed="right" class-name="col-no-click">
         <template #default="{ row: t }">
-          <el-button type="text" size="mini" @click="triggerTask(t)" v-if="t.schedule_type === 'scheduled'">{{ $t('history.Trigger Now') }}</el-button>
+          <el-button v-if="t.schedule_type === 'scheduled'" type="text" size="mini" @click="triggerTask(t)">{{ $t('history.Trigger Now') }}</el-button>
+          <el-button v-else type="text" size="mini" class="action-placeholder" tabindex="-1" aria-hidden="true">{{ $t('history.Trigger Now') }}</el-button>
           <el-button type="text" size="mini" style="color:#F56C6C" @click="deleteTask(t)">{{ $t('history.Delete') }}</el-button>
         </template>
       </el-table-column>
@@ -277,4 +278,5 @@ export default {
 .task-name { font-weight: 500; }
 .muted { color: #909399; }
 .task-pagination { margin-top: 12px; text-align: right; }
+.action-placeholder { visibility: hidden; pointer-events: none; }
 </style>
