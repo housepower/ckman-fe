@@ -38,7 +38,7 @@
       row-key="partition"
       border
       style="width:100%"
-      max-height="50vh"
+      :max-height="tableMaxHeight"
       :row-class-name="() => 'part-row-clickable'"
       @selection-change="onSelectionChange"
       @row-click="handleRowClick"
@@ -145,7 +145,8 @@ export default {
       filterPartitionName: '',
       selectedPartitions: [],
       currentPage: 1,
-      pageSize: 20,
+      pageSize: 10,
+      viewportHeight: typeof window !== 'undefined' ? window.innerHeight : 800,
     };
   },
   computed: {
@@ -206,6 +207,10 @@ export default {
       const s = (this.currentPage - 1) * this.pageSize;
       return this.filteredRows.slice(s, s + this.pageSize);
     },
+    // dialog 内部高度大概是 viewport - title/padding/footer/filter/pagination ≈ viewport - 320
+    tableMaxHeight() {
+      return Math.max(240, this.viewportHeight - 320);
+    },
     involvedRunCount() {
       const runs = new Set();
       for (const partName of this.selectedPartitions) {
@@ -219,6 +224,13 @@ export default {
     filterDateRange() { this.currentPage = 1; },
     filterPartitionName() { this.currentPage = 1; },
     pagedRows() { this.$nextTick(() => this.syncTableSelection()); },
+  },
+  mounted() {
+    this.onResize = () => { this.viewportHeight = window.innerHeight; };
+    window.addEventListener('resize', this.onResize);
+  },
+  beforeDestroy() {
+    if (this.onResize) window.removeEventListener('resize', this.onResize);
   },
   methods: {
     onOpened() {
