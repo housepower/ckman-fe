@@ -115,26 +115,55 @@
         {{ $t('restore.Preview Hint') }}
       </div>
 
-      <el-tree
-        v-else
-        ref="partitionTree"
-        :data="treeData"
-        show-checkbox
-        default-expand-all
-        node-key="id"
-        :default-checked-keys="defaultCheckedKeys"
-        @check="onTreeCheck"
-        class="partition-tree"
-      >
-        <template #default="{ node, data }">
-          <span :class="['tree-node', data.level]">
-            <i v-if="data.level === 'table'" class="el-icon-files" style="margin-right: 4px; color: #C9A100" />
-            <i v-else-if="data.level === 'run'" class="el-icon-document" style="margin-right: 4px; color: #909399" />
-            <i v-else class="el-icon-paperclip" style="margin-right: 4px; color: #67C23A" />
-            {{ data.label }}
-          </span>
-        </template>
-      </el-tree>
+      <template v-else>
+        <!-- partition filter toolbar -->
+        <div class="partition-filter">
+          <el-date-picker
+            v-model="filterDateRange"
+            type="daterange"
+            :start-placeholder="$t('restore.Filter Start')"
+            :end-placeholder="$t('restore.Filter End')"
+            size="small"
+            value-format="yyyy-MM-dd"
+            style="width: 260px"
+          />
+          <el-input
+            v-model="filterPartitionName"
+            size="small"
+            :placeholder="$t('restore.Filter Partition Name')"
+            suffix-icon="el-icon-search"
+            clearable
+            style="width: 200px; margin-left: 8px"
+          />
+          <el-button size="small" @click="checkAllFiltered" style="margin-left: 8px">
+            {{ $t('restore.Check All Filtered') }} ({{ filteredPartitionCount }})
+          </el-button>
+          <el-button size="small" @click="uncheckAll">
+            {{ $t('restore.Uncheck All') }}
+          </el-button>
+        </div>
+
+        <el-tree
+          ref="partitionTree"
+          :data="treeData"
+          show-checkbox
+          default-expand-all
+          node-key="id"
+          :default-checked-keys="defaultCheckedKeys"
+          :filter-node-method="filterTreeNode"
+          @check="onTreeCheck"
+          class="partition-tree"
+        >
+          <template #default="{ node, data }">
+            <span :class="['tree-node', data.level]">
+              <i v-if="data.level === 'table'" class="el-icon-files" style="margin-right: 4px; color: #C9A100" />
+              <i v-else-if="data.level === 'run'" class="el-icon-document" style="margin-right: 4px; color: #909399" />
+              <i v-else class="el-icon-paperclip" style="margin-right: 4px; color: #67C23A" />
+              {{ data.label }}
+            </span>
+          </template>
+        </el-tree>
+      </template>
     </div>
 
     <!-- Section 5: 执行 -->
@@ -169,6 +198,10 @@ import { DataManageApi } from '@/apis';
 
 export default {
   name: 'RestoreComponent',
+  props: {
+    initDatabase: { type: String, default: '' },
+    initTable: { type: String, default: '' },
+  },
   data() {
     // Default date range: past 30 days
     const today = new Date();
@@ -196,6 +229,10 @@ export default {
       treeData: [],
       defaultCheckedKeys: [],
       checkedPartitions: {}, // runId -> Set<partitionName>
+
+      // Section 4 filter state
+      filterDateRange: null,
+      filterPartitionName: '',
 
       // Section 5 state
       submitting: false,
@@ -244,6 +281,26 @@ export default {
       }
       return tables.size;
     },
+    filteredPartitionCount() {
+      return this.collectFilteredPartitionIds().length;
+    },
+  },
+  watch: {
+    filterDateRange() { this.applyTreeFilter(); },
+    filterPartitionName() { this.applyTreeFilter(); },
+    tableList(newList) {
+      if (this.initTable && newList.some(t => t.name === this.initTable)) {
+        if (!this.selectedTables.includes(this.initTable)) {
+          this.selectedTables.push(this.initTable);
+        }
+      }
+    },
+  },
+  mounted() {
+    if (this.initDatabase) {
+      this.selectedDatabase = this.initDatabase;
+      this.onDatabaseChange();
+    }
   },
   methods: {
     // ── Partition tag helpers ──────────────────────────────────
@@ -497,6 +554,74 @@ export default {
       }
     },
 
+    // ── Partition filter methods ────────────────────────────────
+    applyTreeFilter() {
+      this.$nextTick(() => {
+        if (this.$refs.partitionTree) {
+          this.$refs.partitionTree.filter('__');
+        }
+      });
+    },
+
+    filterTreeNode(_, data) {
+      if (!data.id || !data.id.startsWith('part:')) {
+        return true;
+      }
+      const parts = data.id.split(':');
+      const partitionName = parts[parts.length - 1];
+
+      if (this.filterPartitionName) {
+        if (!partitionName.toLowerCase().includes(this.filterPartitionName.toLowerCase())) {
+          return false;
+        }
+      }
+      if (this.filterDateRange && this.filterDateRange.length === 2) {
+        const [start, end] = this.filterDateRange;
+        const partitionDate = this.parsePartitionDate(partitionName);
+        if (partitionDate) {
+          if (start && partitionDate < start) return false;
+          if (end && partitionDate > end) return false;
+        } else {
+          return false;
+        }
+      }
+      return true;
+    },
+
+    parsePartitionDate(name) {
+      let m = name.match(/^(\d{4})(\d{2})(\d{2})$/);
+      if (m) return `${m[1]}-${m[2]}-${m[3]}`;
+      m = name.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (m) return name;
+      return null;
+    },
+
+    collectFilteredPartitionIds() {
+      const ids = [];
+      const walk = (nodes) => {
+        for (const n of nodes) {
+          if (n.id && n.id.startsWith('part:')) {
+            if (this.filterTreeNode(null, n)) ids.push(n.id);
+          } else if (n.children) {
+            walk(n.children);
+          }
+        }
+      };
+      walk(this.treeData);
+      return ids;
+    },
+
+    checkAllFiltered() {
+      const ids = this.collectFilteredPartitionIds();
+      this.$refs.partitionTree.setCheckedKeys(ids);
+      this.onTreeCheck();
+    },
+
+    uncheckAll() {
+      this.$refs.partitionTree.setCheckedKeys([]);
+      this.onTreeCheck();
+    },
+
     // ── Submit ──────────────────────────────────────────────────
     async onSubmit() {
       if (this.submitPlan.length === 0) {
@@ -629,6 +754,14 @@ export default {
   border-radius: 3px;
   font-size: 12px;
   line-height: 1.5;
+}
+
+.partition-filter {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0;
+  margin-bottom: 10px;
 }
 
 .partition-tree {

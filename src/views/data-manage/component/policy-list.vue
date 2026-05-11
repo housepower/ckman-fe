@@ -79,6 +79,13 @@
                 <el-button
                   type="text"
                   size="mini"
+                  @click="$emit('restore-table', p)"
+                >
+                  {{ $t('history.Restore Table Partitions') }}
+                </el-button>
+                <el-button
+                  type="text"
+                  size="mini"
                   :disabled="!latestRunMap[p.policy_id]"
                   @click="$emit('view-run', latestRunMap[p.policy_id] && latestRunMap[p.policy_id].run_id)"
                 >
@@ -520,7 +527,7 @@ export default {
 .task-policies-header,
 .task-policy-row {
   display: grid;
-  grid-template-columns: 220px 1fr 180px;
+  grid-template-columns: 220px 1fr 280px;
   gap: 10px;
   align-items: center;
   padding: 6px 10px;

@@ -17,7 +17,12 @@
           {{ $t('history.Back to List') }}
         </el-button>
       </div>
-      <RestoreComponent @submitted="onRestoreSubmitted" @cancel="backToList" />
+      <RestoreComponent
+        :init-database="restoreInitDatabase"
+        :init-table="restoreInitTable"
+        @submitted="onRestoreSubmitted"
+        @cancel="backToList"
+      />
     </div>
 
     <!-- list view -->
@@ -29,6 +34,7 @@
         @go-restore="goToRestore"
         @edit-policy="handleEditPolicy"
         @copy-policy="handleCopyPolicy"
+        @restore-table="handleRestoreTable"
       />
     </div>
 
@@ -61,6 +67,8 @@ export default {
       currentRunId: '',
       editModalVisible: false,
       currentEditPolicyId: '',
+      restoreInitDatabase: '',
+      restoreInitTable: '',
     };
   },
   methods: {
@@ -68,6 +76,13 @@ export default {
       this.currentView = 'create';
     },
     goToRestore() {
+      this.restoreInitDatabase = '';
+      this.restoreInitTable = '';
+      this.currentView = 'restore';
+    },
+    handleRestoreTable(policy) {
+      this.restoreInitDatabase = policy.database || '';
+      this.restoreInitTable = policy.table || '';
       this.currentView = 'restore';
     },
     backToList() {

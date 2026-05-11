@@ -631,6 +631,7 @@ const messages = {
       'View Latest Run': 'View Run',
       'Edit Task Coming Soon': 'Batch edit task: coming soon. Please edit each policy individually.',
       'Mixed Enabled Hint': 'Policies in this task have mixed enabled states',
+      'Restore Table Partitions': 'Restore partitions',
     },
 
     // Restore Component Translations
@@ -666,6 +667,11 @@ const messages = {
       'Restore Submitted Partial': 'Submitted {success} restore task(s), {failed} failed',
       'New Restore': 'New Restore',
       'Refresh': 'Refresh',
+      'Filter Start': 'Start',
+      'Filter End': 'End',
+      'Filter Partition Name': 'Partition name search',
+      'Check All Filtered': 'Check all filtered',
+      'Uncheck All': 'Uncheck all',
     },
 
     // Import Component Translations
@@ -1405,6 +1411,7 @@ const messages = {
       'View Latest Run': '查看最新 run',
       'Edit Task Coming Soon': '批量编辑任务功能待开发，请逐条编辑策略。',
       'Mixed Enabled Hint': '该任务下的策略启用状态不一致',
+      'Restore Table Partitions': '恢复此表分区',
     },
 
     // Restore Component Translations
@@ -1440,6 +1447,11 @@ const messages = {
       'Restore Submitted Partial': '已提交 {success} 个恢复任务，{failed} 个失败',
       'New Restore': '新建恢复',
       'Refresh': '刷新',
+      'Filter Start': '起始日期',
+      'Filter End': '结束日期',
+      'Filter Partition Name': '分区名搜索',
+      'Check All Filtered': '全选筛选结果',
+      'Uncheck All': '取消全选',
     },
 
     // Import Component Translations
