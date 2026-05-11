@@ -39,10 +39,12 @@
       border
       style="width:100%"
       max-height="50vh"
+      :row-class-name="() => 'part-row-clickable'"
       @selection-change="onSelectionChange"
+      @row-click="handleRowClick"
     >
-      <el-table-column type="selection" width="50" />
-      <el-table-column type="expand">
+      <el-table-column type="selection" width="50" class-name="col-no-click" />
+      <el-table-column type="expand" class-name="col-no-click">
         <template #default="{ row }">
           <div class="ops-timeline">
             <div class="ops-header">
@@ -217,6 +219,11 @@ export default {
     onSelectionChange(rows) {
       this.selectedPartitions = rows.map(r => r.partition);
     },
+    handleRowClick(row, column) {
+      if (!column) return;
+      if ((column.className || '').includes('col-no-click')) return;
+      this.$refs.partTable.toggleRowExpansion(row);
+    },
     checkAllFiltered() {
       this.$nextTick(() => {
         this.$refs.partTable.clearSelection();
@@ -288,6 +295,8 @@ export default {
 
 <style scoped>
 .filter-toolbar { display:flex; gap:8px; align-items:center; margin-bottom:12px; flex-wrap:wrap; }
+.part-row-clickable { cursor: pointer; }
+.part-row-clickable .col-no-click { cursor: default; }
 .summary { margin-top: 10px; font-size: 12px; color: #909399; }
 .mono { font-family: ui-monospace, Menlo, Consolas, monospace; }
 .ops-timeline { padding: 8px 16px; background: #FDF7DD; border-left: 3px solid #C9A100; }
