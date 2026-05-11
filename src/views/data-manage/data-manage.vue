@@ -4,20 +4,16 @@
     <div class="content-container flex">
       <div class="menu-container">
         <el-menu mode="vertical" class="data-manage-menu" text-color="#000" active-text-color="#C9A100"
-          default-active="backup-data" :collapse="isCollapse" unique-opened>
+          default-active="backup-management" :collapse="isCollapse" unique-opened>
           <el-submenu index="backup-restore">
             <template #title>
               <i class="el-icon-folder"></i>
               <span v-if="!isCollapse" class="bold-text">{{ $t('dataManage.backupRestore') }}</span>
             </template>
 
-            <el-menu-item index="backup-data" @click="showComponent('backup')">
-              <i class="el-icon-folder-add"></i>
-              <span v-if="!isCollapse">{{ $t('dataManage.backupData') }}</span>
-            </el-menu-item>
-            <el-menu-item index="history-list" @click="showComponent('history')">
+            <el-menu-item index="backup-management" @click="showComponent('history')">
               <i class="el-icon-time"></i>
-              <span v-if="!isCollapse">{{ $t('dataManage.backupHistory') }}</span>
+              <span v-if="!isCollapse">{{ $t('dataManage.backupManagement') }}</span>
             </el-menu-item>
           </el-submenu>
 
@@ -63,7 +59,6 @@
 <script>
 import ImportComponent from './component/import.vue';
 import ExportComponent from './component/export.vue';
-import BackupComponent from './component/backup.vue';
 import HistoryComponent from './component/history.vue';
 import RebalanceComponent from './component/rebalance.vue';
 import MigrationComponent from './component/migration.vue';
@@ -71,20 +66,19 @@ export default {
   components: {
     ImportComponent,
     ExportComponent,
-    BackupComponent,
     HistoryComponent,
     RebalanceComponent,
     MigrationComponent,
   },
   data() {
     return {
-      activeMenu: 'backup-data', // 当前激活的菜单项
+      activeMenu: 'backup-management', // 当前激活的菜单项
       currentComponent: null, // 当前显示的组件
       isCollapse: false, // 菜单是否折叠
     };
   },
   created() {
-    this.showComponent('backup');
+    this.showComponent('history');
   },
   methods: {
     showComponent(componentName) {
@@ -98,9 +92,6 @@ export default {
           break;
         case 'export':
           this.currentComponent = 'ExportComponent';
-          break;
-        case 'backup':
-          this.currentComponent = 'BackupComponent';
           break;
         case 'history':
           this.currentComponent = 'HistoryComponent';

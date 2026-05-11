@@ -357,6 +357,7 @@ const messages = {
       'backupRestore': 'Backup & Restore',
       'backupData': 'Backup Data',
       'backupHistory': 'Backup History',
+      'backupManagement': 'Backup Management',
       'dataBalancing': 'Data Balancing',
       'clusterMigration': 'Cluster Migration',
       'selectFunction': 'Please select a function from the left menu',
@@ -597,6 +598,7 @@ const messages = {
       'Cancel': 'Cancel',
       'Copy Policy Hint': 'Copy Policy: feature pending. Manually create a new backup with the same fields for now.',
       'Go Backup Hint': 'Switch to "Backup Data" menu via the left sidebar to create a new backup.',
+      'Back to List': '← Back to List',
     },
 
     // Import Component Translations
@@ -1040,6 +1042,7 @@ const messages = {
       'backupRestore': '备份恢复',
       'backupData': '备份数据',
       'backupHistory': '备份历史',
+      'backupManagement': '备份管理',
       'dataBalancing': '数据均衡',
       'clusterMigration': '集群迁移',
       'selectFunction': '请从左侧菜单选择功能',
@@ -1302,6 +1305,7 @@ const messages = {
       'Cancel': '取消',
       'Copy Policy Hint': '复制为新备份功能待实现，请到「新建备份」表单手工填入相同字段。',
       'Go Backup Hint': '请在左侧菜单切到「新建备份」创建新备份。',
+      'Back to List': '← 返回列表',
     },
 
     // Import Component Translations

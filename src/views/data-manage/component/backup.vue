@@ -261,6 +261,7 @@
 
         <!-- 操作按钮 -->
         <el-form-item>
+            <el-button @click="$emit('cancel')">{{ $t('common.Cancel') }}</el-button>
             <el-button
                 type="primary"
                 @click="onSubmit"
@@ -667,7 +668,7 @@ export default {
                             // Scheduled backup — policy created, no run_ids
                             this.$message.success(data.retMsg || this.$t('backup.Backup Success'));
                         }
-                        // Do NOT navigate away — stay on form per spec
+                        this.$emit('submitted', runIds);
                     } else {
                         this.$message.error(data.retMsg || this.$t('backup.Backup Failed'));
                     }
