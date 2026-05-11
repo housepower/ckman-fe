@@ -49,6 +49,7 @@
             <template v-else>
               <div class="run-header">
                 <span class="run-col col-time">{{ $t('history.Trigger Time') }}</span>
+                <span class="run-col col-op">{{ $t('history.Operation') }}</span>
                 <span class="run-col col-type">{{ $t('history.Trigger Type') }}</span>
                 <span class="run-col col-status">{{ $t('history.Status') }}</span>
                 <span class="run-col col-parts">{{ $t('history.Partition Count') }}</span>
@@ -63,6 +64,11 @@
                 @click="$emit('view-run', run.run_id)"
               >
                 <span class="run-col col-time">{{ formatDate(run.start_time || run.create_time) }}</span>
+                <span class="run-col col-op">
+                  <el-tag size="mini" :type="run.operation === 'backup' ? 'primary' : 'info'">
+                    {{ run.operation === 'backup' ? $t('history.Op Backup') : $t('history.Op Restore') }}
+                  </el-tag>
+                </span>
                 <span class="run-col col-type muted">{{ triggerTypeLabel(run.trigger_type) }}</span>
                 <span class="run-col col-status">
                   <el-tag :type="statusType(run.status)" size="mini" v-if="run.status !== 'interrupted'">
@@ -492,7 +498,7 @@ export default {
 .run-header,
 .run-row {
   display: grid;
-  grid-template-columns: 120px 110px 90px 70px 80px 1fr 70px;
+  grid-template-columns: 120px 60px 110px 90px 70px 80px 1fr 70px;
   gap: 10px;
   align-items: center;
   padding: 6px 10px;

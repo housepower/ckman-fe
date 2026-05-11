@@ -23,7 +23,12 @@
         </div>
         <div class="meta-field">
           <span class="label">{{ $t('history.Operation') }}</span>
-          <span class="value">{{ run.operation || '—' }}</span>
+          <span class="value">
+            <el-tag size="mini" :type="run.operation === 'backup' ? 'primary' : 'info'" v-if="run.operation">
+              {{ run.operation === 'backup' ? $t('history.Op Backup') : $t('history.Op Restore') }}
+            </el-tag>
+            <span v-else>—</span>
+          </span>
         </div>
         <div class="meta-field">
           <span class="label">{{ $t('history.Instance') }}</span>
