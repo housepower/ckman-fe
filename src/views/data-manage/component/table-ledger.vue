@@ -10,10 +10,13 @@
         placeholder="table"
         clearable
       />
-      <el-select v-model="selectedDays" size="small" style="width: 130px">
+      <el-select v-model="selectedDays" size="small" style="width: 140px">
         <el-option :label="$t('history.Days 7')" :value="7" />
         <el-option :label="$t('history.Days 14')" :value="14" />
         <el-option :label="$t('history.Days 30')" :value="30" />
+        <el-option :label="$t('history.Days 60')" :value="60" />
+        <el-option :label="$t('history.Days 90')" :value="90" />
+        <el-option :label="$t('history.Days 180')" :value="180" />
       </el-select>
       <el-button type="primary" size="small" @click="fetchLedger" :loading="loading">
         {{ $t('history.Query') }}
