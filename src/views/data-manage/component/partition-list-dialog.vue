@@ -106,7 +106,7 @@
     <span slot="footer">
       <el-button @click="$emit('input', false)">{{ $t('history.Close') }}</el-button>
       <el-button type="primary" :disabled="selectedPartitions.length === 0" @click="onRestoreSelected">
-        {{ $t('history.Restore Selected Partitions', { count: selectedPartitions.length }) }}
+        {{ $t('history.Restore Selected Partitions Count', { count: selectedPartitions.length }) }}
       </el-button>
     </span>
   </el-dialog>
