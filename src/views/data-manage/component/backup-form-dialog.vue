@@ -148,7 +148,13 @@
 
                 <el-form-item v-if="form.backupStyle === 'incremental'" :label="$t('backup.Incremental Method')" prop="backupType">
                     <el-radio-group v-model="form.backupType" @change="handleIncrementalTypeChange">
-                        <el-radio label="partition">{{ $t('backup.By Partition Name') }}</el-radio>
+                        <el-tooltip
+                            :content="$t('backup.Partition Disabled For Scheduled')"
+                            :disabled="form.scheduleType !== 'scheduled'"
+                            placement="top"
+                        >
+                            <el-radio label="partition" :disabled="form.scheduleType === 'scheduled'">{{ $t('backup.By Partition Name') }}</el-radio>
+                        </el-tooltip>
                         <el-tooltip
                             :content="dailyDisabledReason"
                             :disabled="!dailyDisabled"
@@ -719,6 +725,8 @@ export default {
                 this.form.instance = '';
             } else if (value === 'scheduled') {
                 this.form.backupStyle = 'incremental';
+                this.form.backupType = 'daily';
+                this.form.partitions = [];
             }
         },
 
