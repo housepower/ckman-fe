@@ -335,7 +335,6 @@ export default {
           {
             confirmButtonText: this.$t('history.Confirm Delete Btn'),
             cancelButtonText: this.$t('common.Cancel'),
-            confirmButtonClass: 'el-button--danger',
             type: 'warning',
             dangerouslyUseHTMLString: true,
           }
