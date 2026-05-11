@@ -327,25 +327,32 @@ export default {
     },
 
     async deletePolicy(policy) {
+      const table = `${policy.database}.${policy.table}`;
       try {
-        await this.$confirm(this.$t('history.Confirm Delete', { table: `${policy.database}.${policy.table}` }), this.$t('common.Confirm'), {
-          confirmButtonText: this.$t('history.Confirm Delete Btn'),
-          cancelButtonText: this.$t('common.Cancel'),
-          type: 'warning',
-        });
+        await this.$confirm(
+          this.$t('history.Confirm Delete', { table }),
+          this.$t('common.Confirm'),
+          {
+            confirmButtonText: this.$t('history.Confirm Delete Btn'),
+            cancelButtonText: this.$t('common.Cancel'),
+            confirmButtonClass: 'el-button--danger',
+            type: 'warning',
+            dangerouslyUseHTMLString: true,
+          }
+        );
       } catch {
         return; // user cancelled
       }
       try {
         const res = await DataManageApi.deletePolicy(policy.policy_id);
         if (res.data.retCode === '0000') {
-          this.$message.success('删除成功');
+          this.$message.success(this.$t('history.Delete Success', { table }));
           await this.fetchPolicies();
         } else {
-          this.$message.error(res.data.retMsg || '删除失败');
+          this.$message.error(res.data.retMsg || this.$t('history.Delete Failed'));
         }
       } catch (e) {
-        this.$message.error('删除异常: ' + e.message);
+        this.$message.error(this.$t('history.Delete Failed') + ': ' + e.message);
       }
     },
 
