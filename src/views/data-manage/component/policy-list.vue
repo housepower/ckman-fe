@@ -32,12 +32,15 @@
 
     <!-- Policy Table -->
     <el-table
+      ref="policyTable"
       :data="pagedPolicies"
       v-loading="loading"
       row-key="policy_id"
       border
       style="width: 100%"
+      :row-class-name="rowClassName"
       @expand-change="handleExpandChange"
+      @row-click="handleRowClick"
     >
       <!-- Expand column -->
       <el-table-column type="expand">
@@ -123,7 +126,7 @@
       </el-table-column>
 
       <!-- 启用：直接 switch -->
-      <el-table-column :label="$t('history.Enabled')" width="80">
+      <el-table-column :label="$t('history.Enabled')" width="80" class-name="col-no-click">
         <template #default="{ row }">
           <el-switch
             :value="row.enabled"
@@ -159,7 +162,7 @@
       </el-table-column>
 
       <!-- 操作 -->
-      <el-table-column :label="$t('history.Actions')" width="220" fixed="right">
+      <el-table-column :label="$t('history.Actions')" width="220" fixed="right" class-name="col-no-click">
         <template #default="{ row }">
           <template v-if="row.schedule_type === 'scheduled'">
             <el-button type="text" size="mini" @click="triggerNow(row)">{{ $t('history.Trigger Now') }}</el-button>
@@ -254,6 +257,19 @@ export default {
   methods: {
     onPageSizeChange() {
       this.currentPage = 1;
+    },
+
+    rowClassName() {
+      return 'policy-row-clickable';
+    },
+
+    // 整行点击展开/收起；启用列和操作列跳过（class-name=col-no-click）
+    handleRowClick(row, column) {
+      if (!column) return;
+      if (column.type === 'expand') return; // expand 列 element-ui 自己处理
+      const cn = column.className || '';
+      if (cn.includes('col-no-click')) return;
+      this.$refs.policyTable.toggleRowExpansion(row);
     },
     async fetchPolicies() {
       this.loading = true;
@@ -572,5 +588,13 @@ export default {
 .policy-pagination {
   margin-top: 12px;
   text-align: right;
+}
+
+/* 整行可点击 cursor 提示；启用 / 操作列改回 default */
+.policy-row-clickable {
+  cursor: pointer;
+}
+.policy-row-clickable .col-no-click {
+  cursor: default;
 }
 </style>
