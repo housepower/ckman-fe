@@ -8,34 +8,21 @@
     @opened="onOpened"
   >
     <el-form ref="form" :model="form" :rules="rules" label-width="120px" size="small" v-if="task">
-      <!-- 不可改字段 -->
-      <div class="section-title">{{ $t('history.Readonly Fields') }}</div>
-      <el-form-item :label="$t('backup.Database')">
-        <el-input :value="form.database" disabled />
-      </el-form-item>
-      <el-form-item :label="$t('backup.Table Name')">
-        <div>
-          <el-tag v-for="t in form.tables" :key="t" size="small" style="margin-right:4px;margin-bottom:4px">{{ t }}</el-tag>
-        </div>
-        <span class="form-hint">{{ $t('history.Tables Readonly Hint') }}</span>
-      </el-form-item>
-      <el-form-item :label="$t('backup.Backup Type')">
-        <el-input :value="form.schedule_type === 'scheduled' ? $t('history.Schedule Scheduled') : $t('history.Schedule Immediate')" disabled />
-        <span class="form-hint">{{ $t('history.Readonly Fields Hint') }}</span>
-      </el-form-item>
-
-      <!-- 任务名 -->
-      <div class="section-title">{{ $t('history.Task Basic') }}</div>
+      <!-- ① 调度 -->
+      <div class="section-title">{{ $t('backup.Schedule') }}</div>
       <el-form-item :label="$t('history.Task Name')" prop="task_name">
         <el-input v-model="form.task_name" :placeholder="$t('history.Task Name Placeholder')" />
       </el-form-item>
       <el-form-item :label="$t('history.Enabled')">
         <el-switch v-model="form.enabled" active-color="#C9A100" inactive-color="#c0c4cc" />
       </el-form-item>
-
-      <!-- 调度 (仅 scheduled 显示) -->
+      <el-form-item :label="$t('backup.Backup Type')">
+        <el-input
+          :value="form.schedule_type === 'scheduled' ? $t('history.Schedule Scheduled') : $t('history.Schedule Immediate')"
+          disabled
+        />
+      </el-form-item>
       <template v-if="form.schedule_type === 'scheduled'">
-        <div class="section-title">{{ $t('backup.Schedule') }}</div>
         <el-form-item label="Crontab" prop="crontab">
           <el-input v-model="form.crontab" :placeholder="$t('backup.Enter cron expression')" />
           <span class="form-hint">{{ $t('history.Crontab Min Interval') }}</span>
@@ -53,7 +40,18 @@
         </el-form-item>
       </template>
 
-      <!-- 备份方式（read-only：避免改变运行语义导致数据范围混乱）-->
+      <!-- ② 备份对象 -->
+      <div class="section-title">{{ $t('backup.Backup Object') }}</div>
+      <el-form-item :label="$t('backup.Database')">
+        <el-input :value="form.database" disabled />
+      </el-form-item>
+      <el-form-item :label="$t('backup.Table Name')">
+        <div>
+          <el-tag v-for="t in form.tables" :key="t" size="small" style="margin-right:4px;margin-bottom:4px">{{ t }}</el-tag>
+        </div>
+      </el-form-item>
+
+      <!-- ③ 备份方式 -->
       <div class="section-title">{{ $t('backup.Backup Mode') }}</div>
       <el-form-item :label="$t('backup.Backup Method')">
         <el-input
@@ -69,21 +67,19 @@
       </el-form-item>
       <el-form-item v-if="form.backup_type === 'daily' && form.backup_style === 'incremental'" :label="$t('backup.Time Range')">
         <el-input :value="form.days_before + ' ' + $t('backup.Days Ago Text')" disabled />
-        <span class="form-hint">{{ $t('history.Backup Mode Readonly Hint') }}</span>
-      </el-form-item>
-      <el-form-item v-else>
-        <span class="form-hint">{{ $t('history.Backup Mode Readonly Hint') }}</span>
       </el-form-item>
 
-      <!-- 备份目标 (target_type 不可改，但配置可改) -->
-      <div class="section-title">{{ $t('backup.Backup Target Section') }} ({{ form.target_type === 's3' ? 'S3' : 'Local' }})</div>
+      <!-- ④ 备份目标 -->
+      <div class="section-title">{{ $t('backup.Backup Target Section') }}</div>
+      <el-form-item :label="$t('backup.Backup Target')">
+        <el-input :value="form.target_type === 's3' ? 'AWS S3' : 'Local'" disabled />
+      </el-form-item>
       <template v-if="form.target_type === 's3'">
         <el-form-item :label="$t('backup.Endpoint')">
           <el-input :value="form.s3Endpoint" disabled />
         </el-form-item>
         <el-form-item :label="$t('backup.Bucket')">
           <el-input :value="form.s3Bucket" disabled />
-          <span class="form-hint">{{ $t('history.S3 Target Readonly Hint') }}</span>
         </el-form-item>
         <el-form-item :label="$t('backup.AccessKeyID')" prop="s3AccessKeyId">
           <el-input v-model="form.s3AccessKeyId" />
@@ -99,11 +95,10 @@
       <template v-if="form.target_type === 'local'">
         <el-form-item :label="$t('backup.Backup Path')">
           <el-input :value="form.localPath" disabled />
-          <span class="form-hint">{{ $t('history.Local Path Readonly Hint') }}</span>
         </el-form-item>
       </template>
 
-      <!-- 选项 -->
+      <!-- ⑤ 选项 -->
       <div class="section-title">{{ $t('backup.Options') }}</div>
       <el-form-item :label="$t('backup.Compression Format')">
         <el-select v-model="form.compression" style="width:100%">
