@@ -58,4 +58,9 @@ export const DataManageApi = {
   getTableSummary(clusterName: string, database: string) {
     return axios.get(`${url}/tables/${clusterName}/${database}/summary`);
   },
+
+  // ============ 集群 local disk 列表（Local 备份目标用）============
+  getClusterDisks(clusterName: string) {
+    return axios.get(`${url}/disks/${clusterName}`);
+  },
 };

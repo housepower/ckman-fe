@@ -457,6 +457,12 @@ const messages = {
       'Fetch Instance Failed': 'Failed to fetch instance list',
       'Max 100 Tables': 'Maximum 100 tables per backup',
       'Max 200 Partitions': 'Maximum 200 partitions per backup',
+      // Local disk target
+      'Local Disk': 'Local Disk',
+      'Select Local Disk': 'Select a disk',
+      'Enter Backup Path': 'Enter backup path manually',
+      'Disk Unsafe Hint': 'Disk "{name}" has allow_backup=false in ckman config. Backup will likely fail unless ClickHouse XML has been manually configured otherwise.',
+      'Disk Empty Hint': 'No local disk detected in ckman config. Ensure your ClickHouse cluster has a configured local disk with allow_backup=true, then enter its path. Risk: misconfigured path will fail at runtime.',
     },
     // History Component Translations
     history: {
@@ -1182,6 +1188,12 @@ const messages = {
       'Fetch Instance Failed': '获取实例列表失败',
       'Max 100 Tables': '单次最多选择 100 张表',
       'Max 200 Partitions': '单次最多输入 200 个分区',
+      // Local disk target
+      'Local Disk': '本地磁盘',
+      'Select Local Disk': '选择磁盘',
+      'Enter Backup Path': '请手动输入备份路径',
+      'Disk Unsafe Hint': 'ckman 配置中磁盘 "{name}" 未标记 allow_backup，备份可能失败（除非已在 ClickHouse XML 手工配置 allow_backup=true）。',
+      'Disk Empty Hint': 'ckman 配置中未检测到本地磁盘。请确认 ClickHouse 集群已配置 local disk 且 allow_backup=true，然后填入路径。风险：配置错误会在执行时失败。',
     },
     rebalance: {
       'Database': '数据库',

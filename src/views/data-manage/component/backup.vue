@@ -198,13 +198,52 @@
                     @change="handleTargetChange"
                     class="form-input"
                 >
+                    <el-option label="Local" value="local" />
                     <el-option label="AWS S3" value="s3" />
                 </el-select>
             </el-form-item>
 
             <template v-if="form.target === 'local'">
-                <el-form-item :label="$t('backup.Backup Path')" prop="localPath">
-                    <el-input v-model="form.localPath" :placeholder="$t('backup.Enter backup path')" class="form-input" />
+                <el-form-item :label="$t('backup.Local Disk')" prop="localDisk">
+                    <!-- 有 disk 列表 → dropdown -->
+                    <template v-if="diskList.length > 0">
+                        <el-select
+                            v-model="form.localDisk"
+                            :placeholder="$t('backup.Select Local Disk')"
+                            class="form-input"
+                            :loading="disksLoading"
+                            @change="onLocalDiskChange"
+                        >
+                            <el-option
+                                v-for="d in diskList"
+                                :key="d.name"
+                                :label="`${d.name} (${d.path})`"
+                                :value="d.name"
+                            >
+                                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+                                    <span>{{ d.name }} <span class="muted" style="font-size:12px;color:#909399">{{ d.path }}</span></span>
+                                    <el-tag v-if="d.allowed_backup" size="mini" type="success">allow_backup</el-tag>
+                                    <el-tag v-else size="mini" type="warning">&#9888; 未配置 allow_backup</el-tag>
+                                </div>
+                            </el-option>
+                        </el-select>
+                        <div v-if="selectedDiskUnsafe" class="warn-hint" style="margin-top:6px">
+                            &#9888; {{ $t('backup.Disk Unsafe Hint', { name: form.localDisk }) }}
+                        </div>
+                    </template>
+
+                    <!-- 空列表 fallback → 手动输入 -->
+                    <template v-else>
+                        <el-input
+                            v-model="form.localPath"
+                            :placeholder="$t('backup.Enter Backup Path')"
+                            class="form-input"
+                            :disabled="disksLoading"
+                        />
+                        <div class="warn-hint" style="margin-top:6px">
+                            &#9888; {{ $t('backup.Disk Empty Hint') }}
+                        </div>
+                    </template>
                 </el-form-item>
             </template>
 
@@ -292,6 +331,9 @@ export default {
             tableList: [],          // [{name, partition_format, daily_compatible, total_bytes}]
             tablesLoading: false,
             tablesFallback: false,  // true = API failed, allow-create mode
+            // Local disk state
+            diskList: [],           // [{name, type, path, allowed_backup}]
+            disksLoading: false,
             form: {
                 scheduleType: 'immediate',
                 crontab: '',
@@ -299,6 +341,7 @@ export default {
                 database: '',
                 tables: [],          // string[] — directly submitted
                 target: 's3',
+                localDisk: '',       // selected disk name
                 localPath: '',
                 s3Endpoint: '',
                 s3AccessKeyId: '',
@@ -383,13 +426,28 @@ export default {
                 target: [
                     { required: true, message: this.$t('backup.Please select backup target'), trigger: 'change' }
                 ],
+                localDisk: [
+                    {
+                        required: false,
+                        trigger: 'change',
+                        validator: (rule, value, callback) => {
+                            if (this.form.target !== 'local') { callback(); return; }
+                            if (this.diskList.length > 0 && !value) {
+                                callback(new Error(this.$t('backup.Select Local Disk')));
+                            } else {
+                                callback();
+                            }
+                        }
+                    }
+                ],
                 localPath: [
                     {
                         required: false,
                         trigger: 'blur',
                         validator: (rule, value, callback) => {
-                            if (this.form.target === 'local' && (!value || !value.trim())) {
-                                callback(new Error(this.$t('backup.Please enter backup path')));
+                            if (this.form.target !== 'local') { callback(); return; }
+                            if (this.diskList.length === 0 && (!value || !value.trim())) {
+                                callback(new Error(this.$t('backup.Enter Backup Path')));
                             } else {
                                 callback();
                             }
@@ -472,6 +530,12 @@ export default {
             if (this.incompatibleTables.length === 0) return '';
             return this.$t('backup.Daily Disabled Reason', { tables: this.incompatibleTables.join(', ') });
         },
+        // Whether selected local disk has allow_backup=false
+        selectedDiskUnsafe() {
+            if (!this.form.localDisk) return false;
+            const d = this.diskList.find(x => x.name === this.form.localDisk);
+            return d && !d.allowed_backup;
+        },
         // Total bytes of selected tables
         selectedTotalBytes() {
             if (this.tablesFallback || this.tableList.length === 0) return 0;
@@ -479,6 +543,13 @@ export default {
                 const tbl = this.tableList.find(t => t.name === name);
                 return sum + (tbl ? (tbl.total_bytes || 0) : 0);
             }, 0);
+        }
+    },
+    watch: {
+        'form.target'(val) {
+            if (val === 'local') {
+                this.fetchDisks();
+            }
         }
     },
     methods: {
@@ -506,6 +577,30 @@ export default {
             let ui = 0;
             while (val >= 1024 && ui < units.length - 1) { val /= 1024; ui++; }
             return val.toFixed(1) + ' ' + units[ui];
+        },
+
+        // ── Local disk list ────────────────────────────────────────
+        async fetchDisks() {
+            this.disksLoading = true;
+            try {
+                const res = await DataManageApi.getClusterDisks(this.$route.params.id);
+                if (res.data.retCode === '0000') {
+                    this.diskList = res.data.entity || [];
+                } else {
+                    this.diskList = [];
+                }
+            } catch (e) {
+                this.diskList = [];
+            } finally {
+                this.disksLoading = false;
+            }
+        },
+
+        onLocalDiskChange(diskName) {
+            const d = this.diskList.find(x => x.name === diskName);
+            if (d) {
+                this.form.localPath = d.path;
+            }
         },
 
         // ── Instance list ──────────────────────────────────────────
@@ -589,12 +684,14 @@ export default {
         },
 
         handleTargetChange() {
+            this.form.localDisk = '';
             this.form.localPath = '';
             this.form.s3Endpoint = '';
             this.form.s3AccessKeyId = '';
             this.form.s3SecretAccessKey = '';
             this.form.s3Region = '';
             this.form.s3Bucket = '';
+            this.diskList = [];
         },
 
         showCronHelp() {
