@@ -662,6 +662,11 @@ const messages = {
       'Task Disabled Toast': 'Task "{name}" disabled',
       'Fetch Run Failed': 'Failed to fetch run',
       'Fetch Policies Failed': 'Failed to fetch policies',
+      'Filter Start': 'Start date',
+      'Filter End': 'End date',
+      'Filter Partition Name': 'Partition name search',
+      'Check All Filtered': 'Check all filtered',
+      'Uncheck All': 'Uncheck all',
     },
 
     // Restore Component Translations
@@ -1472,6 +1477,11 @@ const messages = {
       'Task Disabled Toast': '任务 "{name}" 已禁用',
       'Fetch Run Failed': '拉取运行记录失败',
       'Fetch Policies Failed': '拉取任务列表失败',
+      'Filter Start': '起始日期',
+      'Filter End': '结束日期',
+      'Filter Partition Name': '分区名搜索',
+      'Check All Filtered': '全选筛选结果',
+      'Uncheck All': '取消全选',
     },
 
     // Restore Component Translations
