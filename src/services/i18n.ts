@@ -465,6 +465,11 @@ const messages = {
       'Disk Empty Hint': 'No local disk detected in ckman config. Ensure your ClickHouse cluster has a configured local disk with allow_backup=true, then enter its path. Risk: misconfigured path will fail at runtime.',
       'Loading Disks': 'Loading disks...',
       'Disk Tag Unsafe': 'allow_backup not set',
+      // backup-form-dialog keys
+      'New Backup Title': 'New Backup',
+      'Submit Backup': 'Submit Backup',
+      'Task Name': 'Task Name',
+      'Task Name Placeholder': 'Task name (optional, auto-generated if empty)',
     },
     // History Component Translations
     history: {
@@ -1223,6 +1228,11 @@ const messages = {
       'Disk Empty Hint': 'ckman 配置中未检测到本地磁盘。请确认 ClickHouse 集群已配置 local disk 且 allow_backup=true，然后填入路径。风险：配置错误会在执行时失败。',
       'Loading Disks': '正在加载磁盘列表...',
       'Disk Tag Unsafe': '未配置 allow_backup',
+      // backup-form-dialog keys
+      'New Backup Title': '新建备份',
+      'Submit Backup': '提交备份',
+      'Task Name': '任务名',
+      'Task Name Placeholder': '任务名（可选，留空自动生成）',
     },
     rebalance: {
       'Database': '数据库',
