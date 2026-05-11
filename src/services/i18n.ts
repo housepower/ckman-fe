@@ -639,8 +639,8 @@ const messages = {
       'Mixed Enabled Hint': 'Policies in this task have mixed enabled states',
       'Restore Table Partitions': 'Restore partitions',
       // Task 10: new dialog-container keys
-      'Tasks Tab': 'Tasks',
-      'Tables Tab': 'Tables',
+      'Tasks Tab': 'Task List',
+      'Tables Tab': 'Backup History',
       'Task Detail Title': 'Task Detail — {name}',
       'Edit Task Title': 'Edit Task — {name}',
       'Edit Task': 'Edit Task',
@@ -1458,8 +1458,8 @@ const messages = {
       'Mixed Enabled Hint': '该任务下的策略启用状态不一致',
       'Restore Table Partitions': '恢复此表分区',
       // Task 10: new dialog-container keys
-      'Tasks Tab': '任务视角',
-      'Tables Tab': '表视角',
+      'Tasks Tab': '任务列表',
+      'Tables Tab': '备份历史',
       'Task Detail Title': '任务详情 — {name}',
       'Edit Task Title': '编辑任务 — {name}',
       'Edit Task': '编辑任务',

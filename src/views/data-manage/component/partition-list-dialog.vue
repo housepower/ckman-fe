@@ -51,6 +51,7 @@
               <span class="ops-col-op">{{ $t('history.Operation') }}</span>
               <span class="ops-col-time">{{ $t('history.Trigger Time') }}</span>
               <span class="ops-col-status">{{ $t('history.Status') }}</span>
+              <span class="ops-col-elapsed">{{ $t('history.Elapsed') }}</span>
               <span class="ops-col-size">{{ $t('history.Disk Size') }}</span>
               <span class="ops-col-msg">{{ $t('history.Notes') }}</span>
               <span class="ops-col-action"></span>
@@ -71,6 +72,7 @@
                 <el-tag size="mini" :type="statusType(op.status)" v-if="op.status !== 'interrupted'">{{ $t('history.Status ' + capitalize(op.status)) }}</el-tag>
                 <el-tag v-else size="mini" color="#ED8936" style="color:white;border-color:#ED8936">{{ $t('history.Status Interrupted') }}</el-tag>
               </span>
+              <span class="ops-col-elapsed muted">{{ formatElapsed(op.elapsed) }}</span>
               <span class="ops-col-size muted">{{ formatBytes(op.size) }}</span>
               <span class="ops-col-msg muted">{{ op.msg || '—' }}</span>
               <span class="ops-col-action">
@@ -149,6 +151,7 @@ export default {
             time: run.started_at || run.create_time,
             status: p.status,
             size: p.size || 0,
+            elapsed: p.elapsed || 0,
             run_id: run.run_id,
             msg: p.msg,
           };
@@ -282,6 +285,18 @@ export default {
       const d = new Date(s);
       return isNaN(d.getTime()) ? s : d.toLocaleString('zh-CN', { hour12: false });
     },
+    formatElapsed(sec) {
+      if (!sec || sec <= 0) return '—';
+      if (sec < 60) return sec + 's';
+      if (sec < 3600) {
+        const m = Math.floor(sec / 60);
+        const s = sec % 60;
+        return s ? `${m}m ${s}s` : `${m}m`;
+      }
+      const h = Math.floor(sec / 3600);
+      const m = Math.floor((sec % 3600) / 60);
+      return m ? `${h}h ${m}m` : `${h}h`;
+    },
     formatBytes(b) {
       if (!b || b === 0) return '—';
       if (b < 1024) return b + ' B';
@@ -302,7 +317,7 @@ export default {
 .ops-timeline { padding: 8px 16px; background: #FDF7DD; border-left: 3px solid #C9A100; }
 .ops-header, .ops-row {
   display: grid;
-  grid-template-columns: 80px 160px 90px 100px 1fr 80px;
+  grid-template-columns: 80px 160px 90px 80px 100px 1fr 80px;
   gap: 10px;
   padding: 6px 8px;
   font-size: 12.5px;
