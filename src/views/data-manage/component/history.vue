@@ -10,6 +10,16 @@
       <BackupComponent @submitted="onBackupSubmitted" @cancel="backToList" />
     </div>
 
+    <!-- restore view -->
+    <div v-else-if="currentView === 'restore'">
+      <div class="create-header">
+        <el-button icon="el-icon-arrow-left" size="small" @click="backToList">
+          {{ $t('history.Back to List') }}
+        </el-button>
+      </div>
+      <RestoreComponent @submitted="onRestoreSubmitted" @cancel="backToList" />
+    </div>
+
     <!-- list view -->
     <div v-else>
       <el-tabs v-model="activeTab" type="">
@@ -19,6 +29,7 @@
             ref="policyList"
             @view-run="handleViewRun"
             @go-backup="goToCreate"
+            @go-restore="goToRestore"
             @edit-policy="handleEditPolicy"
             @copy-policy="handleCopyPolicy"
             @view-table-ledger="handleViewTableLedger"
@@ -50,6 +61,7 @@
 
 <script>
 import BackupComponent from './backup.vue';
+import RestoreComponent from './restore.vue';
 import PolicyList from './policy-list.vue';
 import TableLedger from './table-ledger.vue';
 import RunDetail from './run-detail.vue';
@@ -57,10 +69,10 @@ import PolicyEditModal from './policy-edit-modal.vue';
 
 export default {
   name: 'History',
-  components: { BackupComponent, PolicyList, TableLedger, RunDetail, PolicyEditModal },
+  components: { BackupComponent, RestoreComponent, PolicyList, TableLedger, RunDetail, PolicyEditModal },
   data() {
     return {
-      currentView: 'list',  // 'list' | 'create'
+      currentView: 'list',  // 'list' | 'create' | 'restore'
       activeTab: 'policies',
       runDetailVisible: false,
       currentRunId: '',
@@ -74,6 +86,9 @@ export default {
     goToCreate() {
       this.currentView = 'create';
     },
+    goToRestore() {
+      this.currentView = 'restore';
+    },
     backToList() {
       this.currentView = 'list';
     },
@@ -81,6 +96,15 @@ export default {
       this.currentView = 'list';
       this.activeTab = 'policies';
       // 刷新 policy 列表（异步等 Vue 重渲染后 ref 才有效）
+      this.$nextTick(() => {
+        if (this.$refs.policyList && this.$refs.policyList.fetchPolicies) {
+          this.$refs.policyList.fetchPolicies();
+        }
+      });
+    },
+    onRestoreSubmitted() {
+      this.currentView = 'list';
+      this.activeTab = 'policies';
       this.$nextTick(() => {
         if (this.$refs.policyList && this.$refs.policyList.fetchPolicies) {
           this.$refs.policyList.fetchPolicies();

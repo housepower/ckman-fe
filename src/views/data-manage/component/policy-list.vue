@@ -22,7 +22,12 @@
       <el-button type="primary" size="small" icon="el-icon-plus" @click="$emit('go-backup')">
         {{ $t('history.New Backup') }}
       </el-button>
-      <el-button size="small" icon="el-icon-refresh" circle @click="fetchPolicies" :title="$t('history.Refresh')" />
+      <el-button size="small" icon="el-icon-refresh-left" @click="$emit('go-restore')">
+        {{ $t('history.New Restore') }}
+      </el-button>
+      <el-button size="small" icon="el-icon-refresh" :loading="loading" @click="fetchPolicies">
+        {{ $t('history.Refresh') }}
+      </el-button>
     </div>
 
     <!-- Policy Table -->
@@ -187,6 +192,8 @@ export default {
       runMap: {},         // policy_id -> BackupRun[]
       runLoadingMap: {},  // policy_id -> boolean
       latestRunMap: {},   // policy_id -> BackupRun (latest)
+      autoRefreshTimer: null,
+      autoRefreshInterval: 30000,
     };
   },
   computed: {
@@ -397,9 +404,32 @@ export default {
       const m = Math.floor((secs % 3600) / 60);
       return m > 0 ? `${h}时${m}分` : `${h}时`;
     },
+
+    startAutoRefresh() {
+      this.stopAutoRefresh();
+      this.autoRefreshTimer = setInterval(() => {
+        this.fetchPolicies();
+        // Also refresh runs for expanded rows
+        for (const policyId of Object.keys(this.runMap || {})) {
+          this.fetchRunsForPolicy(policyId);
+        }
+      }, this.autoRefreshInterval);
+    },
+
+    stopAutoRefresh() {
+      if (this.autoRefreshTimer) {
+        clearInterval(this.autoRefreshTimer);
+        this.autoRefreshTimer = null;
+      }
+    },
   },
   mounted() {
     this.fetchPolicies();
+    this.startAutoRefresh();
+  },
+
+  destroyed() {
+    this.stopAutoRefresh();
   },
 };
 </script>

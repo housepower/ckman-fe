@@ -18,6 +18,15 @@
       <el-button type="primary" size="small" @click="fetchLedger" :loading="loading">
         {{ $t('history.Query') }}
       </el-button>
+      <el-button
+        v-if="hasQueried"
+        size="small"
+        icon="el-icon-refresh"
+        :loading="silentLoading"
+        @click="fetchLedgerSilent"
+      >
+        {{ $t('history.Refresh') }}
+      </el-button>
     </div>
 
     <template v-if="hasQueried">
@@ -107,11 +116,13 @@ export default {
   data() {
     return {
       loading: false,
+      silentLoading: false,
       hasQueried: false,
       selectedDatabase: '',
       selectedTable: '',
       selectedDays: 30,
       runs: [],         // BackupRun[]
+      autoRefreshTimer: null,
     };
   },
   computed: {
@@ -227,12 +238,17 @@ export default {
     },
   },
   methods: {
-    async fetchLedger() {
+    async fetchLedger(silent = false) {
       if (!this.selectedDatabase || !this.selectedTable) {
         this.$message.warning('请先填写 database 和 table');
         return;
       }
-      this.loading = true;
+      if (silent) {
+        this.silentLoading = true;
+      } else {
+        this.loading = true;
+        this.stopAutoRefresh();
+      }
       try {
         const res = await DataManageApi.listRunsByTable(
           this.cluster,
@@ -242,14 +258,44 @@ export default {
         );
         if (res.data.retCode === '0000') {
           this.runs = res.data.entity || [];
-          this.hasQueried = true;
+          if (!silent) {
+            this.hasQueried = true;
+            // Start auto-polling after first successful query
+            this.startAutoRefresh();
+          }
         } else {
-          this.$message.error(res.data.retMsg || '查询失败');
+          if (!silent) {
+            this.$message.error(res.data.retMsg || '查询失败');
+          }
         }
       } catch (e) {
-        this.$message.error('查询异常: ' + e.message);
+        if (!silent) {
+          this.$message.error('查询异常: ' + e.message);
+        }
       } finally {
-        this.loading = false;
+        if (silent) {
+          this.silentLoading = false;
+        } else {
+          this.loading = false;
+        }
+      }
+    },
+
+    fetchLedgerSilent() {
+      this.fetchLedger(true);
+    },
+
+    startAutoRefresh() {
+      this.stopAutoRefresh();
+      this.autoRefreshTimer = setInterval(() => {
+        this.fetchLedger(true);
+      }, 30000);
+    },
+
+    stopAutoRefresh() {
+      if (this.autoRefreshTimer) {
+        clearInterval(this.autoRefreshTimer);
+        this.autoRefreshTimer = null;
       }
     },
 
@@ -383,6 +429,9 @@ export default {
     if (this.initDatabase && this.initTable) {
       this.fetchLedger();
     }
+  },
+  destroyed() {
+    this.stopAutoRefresh();
   },
 };
 </script>
