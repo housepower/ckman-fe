@@ -10,18 +10,9 @@
   >
     <el-form ref="form" :model="form" label-width="120px" size="small">
 
-      <!-- Section 1: 目标 -->
+      <!-- Section 1: 恢复范围 -->
       <div class="form-section">
-        <div class="form-section-title"><span class="section-num">1</span>{{ $t('restore.Target') }}</div>
-        <div class="form-row">
-          <label class="form-label">{{ $t('restore.Cluster') }}</label>
-          <span class="cluster-tag">{{ cluster }}</span>
-        </div>
-      </div>
-
-      <!-- Section 2: 恢复范围 -->
-      <div class="form-section">
-        <div class="form-section-title"><span class="section-num">2</span>{{ $t('restore.Restore Range') }}</div>
+        <div class="form-section-title"><span class="section-num">1</span>{{ $t('restore.Restore Range') }}</div>
 
         <div class="form-row">
           <label class="form-label">{{ $t('restore.Restore Date Range') }}</label>
@@ -83,7 +74,7 @@
       <!-- Section 3: 来源 runs 预览 -->
       <div class="form-section">
         <div class="form-section-title">
-          <span class="section-num">3</span>{{ $t('restore.Source Runs Preview') }}
+          <span class="section-num">2</span>{{ $t('restore.Source Runs Preview') }}
           <el-button
             v-if="selectedTables.length > 0 && selectedDatabase"
             size="mini"
@@ -118,7 +109,7 @@
 
       <!-- Section 4: 分区预览树 -->
       <div class="form-section">
-        <div class="form-section-title"><span class="section-num">4</span>{{ $t('restore.Restore Preview') }}</div>
+        <div class="form-section-title"><span class="section-num">3</span>{{ $t('restore.Restore Preview') }}</div>
 
         <div v-if="treeData.length === 0" class="section-hint muted">
           {{ $t('restore.Preview Hint') }}
@@ -177,7 +168,7 @@
 
       <!-- Section 5: 执行摘要 -->
       <div class="form-section" style="border-bottom: none; margin-bottom: 0">
-        <div class="form-section-title"><span class="section-num">5</span>{{ $t('restore.Execute') }}</div>
+        <div class="form-section-title"><span class="section-num">4</span>{{ $t('restore.Execute') }}</div>
 
         <div v-if="submitPlan.length > 0" class="submit-summary">
           {{ $t('restore.Will Submit', { count: submitPlan.length, tables: uniqueSubmitTables }) }}
