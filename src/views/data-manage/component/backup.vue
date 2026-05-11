@@ -286,10 +286,6 @@
                 <el-select v-model="form.compression" :placeholder="$t('backup.Select compression format')" class="form-input">
                     <el-option label="gzip" value="gzip" />
                     <el-option label="gz" value="gz" />
-                    <el-option label="brotli" value="brotli" />
-                    <el-option label="br" value="br" />
-                    <el-option label="xz" value="xz" />
-                    <el-option label="LZMA" value="LZMA" />
                     <el-option label="zstd" value="zstd" />
                     <el-option label="none" value="none" />
                 </el-select>

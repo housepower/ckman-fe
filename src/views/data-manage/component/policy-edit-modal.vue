@@ -171,7 +171,7 @@ export default {
       originalInstance: '',
       instanceList: [],
       saving: false,
-      compressionOptions: ['none', 'gzip', 'gz', 'brotli', 'br', 'xz', 'LZMA', 'zstd'],
+      compressionOptions: ['gzip', 'gz', 'zstd', 'none'],
       rules: {
         crontab: [
           { required: true, message: 'Crontab is required', trigger: 'blur' },
