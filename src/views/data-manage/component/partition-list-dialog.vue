@@ -33,7 +33,7 @@
     <!-- Partition table -->
     <el-table
       ref="partTable"
-      :data="filteredRows"
+      :data="pagedRows"
       v-loading="loading"
       row-key="partition"
       border
@@ -102,6 +102,17 @@
       </el-table-column>
     </el-table>
 
+    <el-pagination
+      v-if="filteredRows.length > 0"
+      class="part-pagination"
+      :current-page.sync="currentPage"
+      :page-size.sync="pageSize"
+      :page-sizes="[10, 20, 50, 100]"
+      :total="filteredRows.length"
+      layout="total, sizes, prev, pager, next, jumper"
+      @size-change="currentPage = 1"
+    />
+
     <!-- Summary + Footer -->
     <div class="summary">
       {{ $t('history.Partition Summary', { selected: selectedPartitions.length, total: partitionRows.length, runs: involvedRunCount }) }}
@@ -133,6 +144,8 @@ export default {
       filterDateRange: null,
       filterPartitionName: '',
       selectedPartitions: [],
+      currentPage: 1,
+      pageSize: 20,
     };
   },
   computed: {
@@ -189,6 +202,10 @@ export default {
         return true;
       });
     },
+    pagedRows() {
+      const s = (this.currentPage - 1) * this.pageSize;
+      return this.filteredRows.slice(s, s + this.pageSize);
+    },
     involvedRunCount() {
       const runs = new Set();
       for (const partName of this.selectedPartitions) {
@@ -197,6 +214,11 @@ export default {
       }
       return runs.size;
     },
+  },
+  watch: {
+    filterDateRange() { this.currentPage = 1; },
+    filterPartitionName() { this.currentPage = 1; },
+    pagedRows() { this.$nextTick(() => this.syncTableSelection()); },
   },
   methods: {
     onOpened() {
@@ -207,6 +229,7 @@ export default {
       this.selectedPartitions = [];
       this.filterDateRange = null;
       this.filterPartitionName = '';
+      this.currentPage = 1;
     },
     async fetchRuns() {
       this.loading = true;
@@ -220,7 +243,11 @@ export default {
       }
     },
     onSelectionChange(rows) {
-      this.selectedPartitions = rows.map(r => r.partition);
+      // 分页后 el-table 只感知当前页选择，需要合并保留其他页已选项
+      const onPage = new Set(this.pagedRows.map(r => r.partition));
+      const newOnPage = rows.map(r => r.partition);
+      const kept = this.selectedPartitions.filter(p => !onPage.has(p));
+      this.selectedPartitions = [...kept, ...newOnPage];
     },
     handleRowClick(row, column) {
       if (!column) return;
@@ -228,17 +255,25 @@ export default {
       this.$refs.partTable.toggleRowExpansion(row);
     },
     checkAllFiltered() {
-      this.$nextTick(() => {
-        this.$refs.partTable.clearSelection();
-        for (const row of this.filteredRows) {
-          this.$refs.partTable.toggleRowSelection(row, true);
-        }
-      });
+      // 一键选中筛选结果（跨页），不依赖当前页 el-table 状态
+      this.selectedPartitions = this.filteredRows.map(r => r.partition);
+      this.$nextTick(() => this.syncTableSelection());
     },
     uncheckAll() {
+      this.selectedPartitions = [];
       this.$nextTick(() => {
-        this.$refs.partTable.clearSelection();
+        if (this.$refs.partTable) this.$refs.partTable.clearSelection();
       });
+    },
+    syncTableSelection() {
+      if (!this.$refs.partTable) return;
+      const sel = new Set(this.selectedPartitions);
+      this.$refs.partTable.clearSelection();
+      for (const row of this.pagedRows) {
+        if (sel.has(row.partition)) {
+          this.$refs.partTable.toggleRowSelection(row, true);
+        }
+      }
     },
     onRestoreSelected() {
       const groups = new Map();
@@ -312,6 +347,7 @@ export default {
 .filter-toolbar { display:flex; gap:8px; align-items:center; margin-bottom:12px; flex-wrap:wrap; }
 .part-row-clickable { cursor: pointer; }
 .part-row-clickable .col-no-click { cursor: default; }
+.part-pagination { margin-top: 10px; text-align: right; }
 .summary { margin-top: 10px; font-size: 12px; color: #909399; }
 .mono { font-family: ui-monospace, Menlo, Consolas, monospace; }
 .ops-timeline { padding: 8px 16px; background: #FDF7DD; border-left: 3px solid #C9A100; }
