@@ -116,12 +116,17 @@
         </template>
       </el-table-column>
 
-      <!-- 启用 -->
+      <!-- 启用：直接 switch -->
       <el-table-column :label="$t('history.Enabled')" width="80">
         <template #default="{ row }">
-          <el-tag :type="row.enabled ? 'success' : 'info'" size="mini">
-            {{ row.enabled ? $t('history.Enabled') : $t('history.Disabled') }}
-          </el-tag>
+          <el-switch
+            :value="row.enabled"
+            :loading="!!row.toggling"
+            :disabled="!!row.toggling"
+            active-color="#67C23A"
+            inactive-color="#909399"
+            @change="toggleEnabled(row)"
+          />
         </template>
       </el-table-column>
 
@@ -153,9 +158,7 @@
           <template v-if="row.schedule_type === 'scheduled'">
             <el-button type="text" size="mini" @click="triggerNow(row)">{{ $t('history.Trigger Now') }}</el-button>
             <el-button type="text" size="mini" @click="$emit('edit-policy', row)">{{ $t('history.Edit') }}</el-button>
-            <el-button type="text" size="mini" @click="toggleEnabled(row)">
-              {{ row.enabled ? $t('history.Disable') : $t('history.Enable') }}
-            </el-button>
+            <el-button type="text" size="mini" style="color: #F56C6C" @click="deletePolicy(row)">{{ $t('history.Delete') }}</el-button>
           </template>
           <template v-else>
             <el-button type="text" size="mini" @click="$emit('copy-policy', row)">{{ $t('history.Copy as New') }}</el-button>
@@ -295,22 +298,31 @@ export default {
     },
 
     async toggleEnabled(policy) {
+      const table = `${policy.database}.${policy.table}`;
+      const willEnable = !policy.enabled;
+      this.$set(policy, 'toggling', true);
       try {
         const pRes = await DataManageApi.getPolicy(policy.policy_id);
         if (pRes.data.retCode !== '0000') {
-          this.$message.error(pRes.data.retMsg || '获取策略详情失败');
+          this.$message.error(pRes.data.retMsg || this.$t('history.Toggle Fetch Failed'));
           return;
         }
-        const full = { ...pRes.data.entity, enabled: !policy.enabled };
+        const full = { ...pRes.data.entity, enabled: willEnable };
         const upRes = await DataManageApi.updatePolicy(policy.policy_id, full);
         if (upRes.data.retCode === '0000') {
-          this.$message.success(policy.enabled ? '已禁用' : '已启用');
+          this.$message.success(
+            willEnable
+              ? this.$t('history.Enabled Toast', { table })
+              : this.$t('history.Disabled Toast', { table })
+          );
           await this.fetchPolicies();
         } else {
-          this.$message.error(upRes.data.retMsg || '操作失败');
+          this.$message.error(upRes.data.retMsg || this.$t('history.Toggle Failed'));
         }
       } catch (e) {
-        this.$message.error('操作异常: ' + e.message);
+        this.$message.error(this.$t('history.Toggle Failed') + ': ' + e.message);
+      } finally {
+        this.$set(policy, 'toggling', false);
       }
     },
 
