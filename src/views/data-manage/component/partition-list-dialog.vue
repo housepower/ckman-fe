@@ -68,7 +68,7 @@
                   {{ op.op === 'backup' ? $t('history.Op Backup') : $t('history.Op Restore') }}
                 </el-tag>
               </span>
-              <span class="ops-col-time muted">{{ formatDate(op.time) }}</span>
+              <span class="ops-col-time muted ellipsis" :title="formatDate(op.time)">{{ formatDate(op.time) }}</span>
               <span class="ops-col-status">
                 <el-tag size="mini" :type="statusType(op.status)" v-if="op.status !== 'interrupted'">{{ $t('history.Status ' + capitalize(op.status)) }}</el-tag>
                 <el-tag v-else size="mini" color="#ED8936" style="color:white;border-color:#ED8936">{{ $t('history.Status Interrupted') }}</el-tag>
@@ -76,12 +76,14 @@
               <span class="ops-col-elapsed muted">{{ formatElapsed(op.elapsed) }}</span>
               <span class="ops-col-size muted">{{ formatBytes(op.size) }}</span>
               <span class="ops-col-target">
-                <el-tag v-if="op.target" size="mini" :type="op.target.kind === 's3' ? 'warning' : 'success'">
-                  {{ op.target.label }}
-                </el-tag>
+                <el-tooltip v-if="op.target" :content="op.target.label" placement="top">
+                  <el-tag size="mini" :type="op.target.kind === 's3' ? 'warning' : 'success'" class="ellipsis-tag">
+                    {{ op.target.label }}
+                  </el-tag>
+                </el-tooltip>
                 <span v-else class="muted">—</span>
               </span>
-              <span class="ops-col-msg muted">{{ op.msg || '—' }}</span>
+              <span class="ops-col-msg muted ellipsis" :title="op.msg || ''">{{ op.msg || '—' }}</span>
               <span class="ops-col-action">
                 <el-button type="text" size="mini" @click.stop="$emit('view-run', op.run_id)">{{ $t('history.View') }}</el-button>
               </span>
@@ -89,13 +91,13 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="partition" :label="$t('history.Partition')" min-width="140" sortable>
+      <el-table-column prop="partition" :label="$t('history.Partition')" min-width="140" sortable show-overflow-tooltip>
         <template #default="{ row }"><span class="mono">{{ row.partition }}</span></template>
       </el-table-column>
       <el-table-column :label="$t('history.Disk Size')" width="120" sortable :sort-method="(a, b) => (a.size || 0) - (b.size || 0)">
         <template #default="{ row }">{{ formatBytes(row.size) }}</template>
       </el-table-column>
-      <el-table-column :label="$t('history.Latest Backup')" min-width="180" sortable :sort-method="sortByLatestBackup">
+      <el-table-column :label="$t('history.Latest Backup')" min-width="180" sortable :sort-method="sortByLatestBackup" show-overflow-tooltip>
         <template #default="{ row }">
           <span class="muted" v-if="row.latestBackup">{{ formatDate(row.latestBackup.time) }}</span>
           <span class="muted" v-else>—</span>
@@ -103,17 +105,19 @@
       </el-table-column>
       <el-table-column :label="$t('history.Target')" min-width="160">
         <template #default="{ row }">
-          <el-tag
+          <el-tooltip
             v-if="row.latestBackup && row.latestBackup.target"
-            size="mini"
-            :type="row.latestBackup.target.kind === 's3' ? 'warning' : 'success'"
+            :content="row.latestBackup.target.label"
+            placement="top"
           >
-            {{ row.latestBackup.target.label }}
-          </el-tag>
+            <el-tag size="mini" :type="row.latestBackup.target.kind === 's3' ? 'warning' : 'success'" class="ellipsis-tag">
+              {{ row.latestBackup.target.label }}
+            </el-tag>
+          </el-tooltip>
           <span v-else class="muted">—</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('history.Latest Restore')" min-width="180" sortable :sort-method="sortByLatestRestore">
+      <el-table-column :label="$t('history.Latest Restore')" min-width="180" sortable :sort-method="sortByLatestRestore" show-overflow-tooltip>
         <template #default="{ row }">
           <span class="muted" v-if="row.latestRestore">{{ formatDate(row.latestRestore.time) }}</span>
           <span class="muted" v-else>—</span>
@@ -415,4 +419,15 @@ export default {
 .ops-row { cursor: pointer; border-radius: 3px; }
 .ops-row:hover { background: rgba(255,255,255,0.7); }
 .muted { color: #909399; }
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ellipsis-tag {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 </style>

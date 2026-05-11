@@ -15,7 +15,7 @@
       :row-class-name="() => 'table-row-clickable'"
       @row-click="handleRowClick"
     >
-      <el-table-column :label="$t('history.Database Table')" min-width="240">
+      <el-table-column :label="$t('history.Database Table')" min-width="240" show-overflow-tooltip>
         <template #default="{ row }">
           <i class="el-icon-tickets" style="color:#C9A100;margin-right:6px" />
           <span class="table-name">{{ row.database }}.{{ row.table }}</span>
@@ -23,19 +23,27 @@
       </el-table-column>
       <el-table-column :label="$t('history.Belong Task')" min-width="220">
         <template #default="{ row }">
-          <el-tag
-            v-for="name in row.taskNames"
-            :key="name"
-            size="mini"
-            type="info"
-            class="task-tag"
+          <el-tooltip
+            v-if="row.taskNames.length > 0"
+            :content="row.taskNames.join(', ')"
+            placement="top"
           >
-            {{ name }}
-          </el-tag>
-          <span v-if="row.taskNames.length === 0" class="muted">—</span>
+            <span class="task-tags-line">
+              <el-tag
+                v-for="name in row.taskNames"
+                :key="name"
+                size="mini"
+                type="info"
+                class="task-tag"
+              >
+                {{ name }}
+              </el-tag>
+            </span>
+          </el-tooltip>
+          <span v-else class="muted">—</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('history.Latest Backup')" min-width="180">
+      <el-table-column :label="$t('history.Latest Backup')" min-width="180" show-overflow-tooltip>
         <template #default="{ row }">
           <template v-if="metaMap[row.key] && metaMap[row.key].latestBackup">
             <span class="muted">{{ formatDate(metaMap[row.key].latestBackup.time) }}</span>
@@ -44,7 +52,7 @@
           <span v-else class="muted">—</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('history.Latest Restore')" min-width="180">
+      <el-table-column :label="$t('history.Latest Restore')" min-width="180" show-overflow-tooltip>
         <template #default="{ row }">
           <template v-if="metaMap[row.key] && metaMap[row.key].latestRestore">
             <span class="muted">{{ formatDate(metaMap[row.key].latestRestore.time) }}</span>
@@ -192,6 +200,14 @@ export default {
 .table-row-clickable .col-no-click { cursor: default; }
 .table-name { font-weight: 500; }
 .muted { color: #909399; }
-.task-tag { margin-right: 4px; margin-bottom: 2px; }
+.task-tag { margin-right: 4px; }
+.task-tags-line {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
+}
 .table-pagination { margin-top: 12px; text-align: right; }
 </style>

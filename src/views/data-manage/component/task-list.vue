@@ -22,7 +22,7 @@
       :row-class-name="() => 'task-row-clickable'"
       @row-click="handleRowClick"
     >
-      <el-table-column :label="$t('history.Task Name')" min-width="240">
+      <el-table-column :label="$t('history.Task Name')" min-width="240" show-overflow-tooltip>
         <template #default="{ row: t }">
           <i class="el-icon-folder" style="color:#C9A100;margin-right:6px" />
           <span class="task-name">{{ displayName(t) }}</span>
@@ -34,7 +34,7 @@
           {{ t.schedule_type === 'scheduled' ? $t('history.Schedule Scheduled') : $t('history.Schedule Immediate') }}
         </template>
       </el-table-column>
-      <el-table-column :label="$t('history.Cron Instance')" min-width="180">
+      <el-table-column :label="$t('history.Cron Instance')" min-width="180" show-overflow-tooltip>
         <template #default="{ row: t }">
           <span class="muted" v-if="t.schedule_type === 'scheduled'">{{ t.crontab }} · {{ t.instance || '—' }}</span>
           <span class="muted" v-else>— · {{ t.instance || '—' }}</span>
@@ -59,7 +59,7 @@
           <span v-else class="muted">—</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('history.Latest Run')" min-width="180">
+      <el-table-column :label="$t('history.Latest Run')" min-width="180" show-overflow-tooltip>
         <template #default="{ row: t }">
           <template v-if="taskLatestRun(t)">
             <span class="muted" style="margin-right:6px">{{ formatDate(taskLatestRun(t).start_time || taskLatestRun(t).create_time) }}</span>
