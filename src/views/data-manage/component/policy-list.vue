@@ -93,9 +93,6 @@
               <div v-if="!(runMap[row.policy_id] || []).length" class="run-empty muted">
                 {{ $t('history.No Runs') }}
               </div>
-              <div class="run-more" @click.stop="goViewMore(row)">
-                {{ $t('history.View More 30 Days') }} →
-              </div>
             </template>
           </div>
         </template>
@@ -403,11 +400,6 @@ export default {
       }
     },
 
-    goViewMore(policy) {
-      // navigate to table-ledger tab with context
-      this.$emit('view-table-ledger', { database: policy.database, table: policy.table });
-    },
-
     statusType(status) {
       switch (status) {
         case 'success': return 'success';
@@ -546,20 +538,6 @@ export default {
 .run-empty {
   padding: 12px 10px;
   font-size: 12.5px;
-}
-
-.run-more {
-  padding: 8px 10px;
-  text-align: center;
-  color: #909399;
-  font-size: 12px;
-  cursor: pointer;
-  border-top: 1px dashed #dcdfe6;
-  margin-top: 4px;
-}
-
-.run-more:hover {
-  color: #C9A100;
 }
 
 /* Legend */

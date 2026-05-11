@@ -22,29 +22,14 @@
 
     <!-- list view -->
     <div v-else>
-      <el-tabs v-model="activeTab" type="">
-        <el-tab-pane :label="$t('history.Policy List')" name="policies">
-          <PolicyList
-            v-if="activeTab === 'policies'"
-            ref="policyList"
-            @view-run="handleViewRun"
-            @go-backup="goToCreate"
-            @go-restore="goToRestore"
-            @edit-policy="handleEditPolicy"
-            @copy-policy="handleCopyPolicy"
-            @view-table-ledger="handleViewTableLedger"
-          />
-        </el-tab-pane>
-        <el-tab-pane :label="$t('history.Table Ledger')" name="ledger">
-          <TableLedger
-            v-if="activeTab === 'ledger'"
-            ref="tableLedger"
-            :init-database="ledgerDb"
-            :init-table="ledgerTable"
-            @view-run="handleViewRun"
-          />
-        </el-tab-pane>
-      </el-tabs>
+      <PolicyList
+        ref="policyList"
+        @view-run="handleViewRun"
+        @go-backup="goToCreate"
+        @go-restore="goToRestore"
+        @edit-policy="handleEditPolicy"
+        @copy-policy="handleCopyPolicy"
+      />
     </div>
 
     <!-- Run Detail Dialog -->
@@ -63,23 +48,19 @@
 import BackupComponent from './backup.vue';
 import RestoreComponent from './restore.vue';
 import PolicyList from './policy-list.vue';
-import TableLedger from './table-ledger.vue';
 import RunDetail from './run-detail.vue';
 import PolicyEditModal from './policy-edit-modal.vue';
 
 export default {
   name: 'History',
-  components: { BackupComponent, RestoreComponent, PolicyList, TableLedger, RunDetail, PolicyEditModal },
+  components: { BackupComponent, RestoreComponent, PolicyList, RunDetail, PolicyEditModal },
   data() {
     return {
       currentView: 'list',  // 'list' | 'create' | 'restore'
-      activeTab: 'policies',
       runDetailVisible: false,
       currentRunId: '',
       editModalVisible: false,
       currentEditPolicyId: '',
-      ledgerDb: '',
-      ledgerTable: '',
     };
   },
   methods: {
@@ -92,10 +73,8 @@ export default {
     backToList() {
       this.currentView = 'list';
     },
-    onBackupSubmitted(runIds) {
+    onBackupSubmitted() {
       this.currentView = 'list';
-      this.activeTab = 'policies';
-      // 刷新 policy 列表（异步等 Vue 重渲染后 ref 才有效）
       this.$nextTick(() => {
         if (this.$refs.policyList && this.$refs.policyList.fetchPolicies) {
           this.$refs.policyList.fetchPolicies();
@@ -104,7 +83,6 @@ export default {
     },
     onRestoreSubmitted() {
       this.currentView = 'list';
-      this.activeTab = 'policies';
       this.$nextTick(() => {
         if (this.$refs.policyList && this.$refs.policyList.fetchPolicies) {
           this.$refs.policyList.fetchPolicies();
@@ -122,11 +100,6 @@ export default {
     handleCopyPolicy(policy) {
       this.$message.info(this.$t('history.Copy Policy Hint'));
       console.log('TODO: copy policy', policy);
-    },
-    handleViewTableLedger({ database, table }) {
-      this.ledgerDb = database;
-      this.ledgerTable = table;
-      this.activeTab = 'ledger';
     },
     onPolicyUpdated() {
       if (this.$refs.policyList && this.$refs.policyList.fetchPolicies) {
