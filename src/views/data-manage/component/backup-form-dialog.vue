@@ -557,7 +557,22 @@ export default {
             if (val === 'local') {
                 this.fetchDisks();
             }
-        }
+        },
+        // 增量类型切换时清掉对方字段，避免视觉残留 + 提交脏数据
+        'form.backupType'(newVal) {
+            if (newVal === 'partition') {
+                this.form.daysBefore = 7;
+            } else if (newVal === 'daily') {
+                this.form.partitions = [];
+            }
+        },
+        // 全量备份不需要 partitions / daysBefore
+        'form.backupStyle'(newVal) {
+            if (newVal === 'full') {
+                this.form.partitions = [];
+                this.form.daysBefore = 7;
+            }
+        },
     },
     methods: {
         // ── Dialog lifecycle ───────────────────────────────────────
