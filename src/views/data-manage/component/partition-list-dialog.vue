@@ -53,6 +53,7 @@
               <span class="ops-col-status">{{ $t('history.Status') }}</span>
               <span class="ops-col-elapsed">{{ $t('history.Elapsed') }}</span>
               <span class="ops-col-size">{{ $t('history.Disk Size') }}</span>
+              <span class="ops-col-target">{{ $t('history.Target') }}</span>
               <span class="ops-col-msg">{{ $t('history.Notes') }}</span>
               <span class="ops-col-action"></span>
             </div>
@@ -74,6 +75,12 @@
               </span>
               <span class="ops-col-elapsed muted">{{ formatElapsed(op.elapsed) }}</span>
               <span class="ops-col-size muted">{{ formatBytes(op.size) }}</span>
+              <span class="ops-col-target">
+                <el-tag v-if="op.target" size="mini" :type="op.target.kind === 's3' ? 'warning' : 'success'">
+                  {{ op.target.label }}
+                </el-tag>
+                <span v-else class="muted">—</span>
+              </span>
               <span class="ops-col-msg muted">{{ op.msg || '—' }}</span>
               <span class="ops-col-action">
                 <el-button type="text" size="mini" @click.stop="$emit('view-run', op.run_id)">{{ $t('history.View') }}</el-button>
@@ -92,6 +99,18 @@
         <template #default="{ row }">
           <span class="muted" v-if="row.latestBackup">{{ formatDate(row.latestBackup.time) }}</span>
           <span class="muted" v-else>—</span>
+        </template>
+      </el-table-column>
+      <el-table-column :label="$t('history.Target')" min-width="160">
+        <template #default="{ row }">
+          <el-tag
+            v-if="row.latestBackup && row.latestBackup.target"
+            size="mini"
+            :type="row.latestBackup.target.kind === 's3' ? 'warning' : 'success'"
+          >
+            {{ row.latestBackup.target.label }}
+          </el-tag>
+          <span v-else class="muted">—</span>
         </template>
       </el-table-column>
       <el-table-column :label="$t('history.Latest Restore')" min-width="180" sortable :sort-method="sortByLatestRestore">
@@ -136,6 +155,7 @@ export default {
   props: {
     value: { type: Boolean, default: false },
     policy: { type: Object, default: null },
+    policies: { type: Array, default: () => [] },
   },
   data() {
     return {
@@ -153,9 +173,15 @@ export default {
     tableLabel() {
       return this.policy ? `${this.policy.database}.${this.policy.table}` : '';
     },
+    policyById() {
+      const map = {};
+      for (const p of this.policies) map[p.policy_id] = p;
+      return map;
+    },
     partitionRows() {
       const map = {};
       for (const run of this.runs) {
+        const target = this.targetOfPolicy(this.policyById[run.policy_id]);
         for (const p of (run.partitions || [])) {
           if (!map[p.partition]) {
             map[p.partition] = { partition: p.partition, ops: [], size: p.size || 0, latestBackup: null, latestRestore: null };
@@ -167,6 +193,8 @@ export default {
             size: p.size || 0,
             elapsed: p.elapsed || 0,
             run_id: run.run_id,
+            policy_id: run.policy_id,
+            target,
             msg: p.msg,
           };
           map[p.partition].ops.push(op);
@@ -344,6 +372,18 @@ export default {
       const m = Math.floor((sec % 3600) / 60);
       return m ? `${h}h ${m}m` : `${h}h`;
     },
+    targetOfPolicy(p) {
+      if (!p) return null;
+      if (p.target_type === 's3') {
+        const bucket = p.s3 && p.s3.bucket;
+        return { kind: 's3', label: bucket ? `S3 / ${bucket}` : 'S3' };
+      }
+      if (p.target_type === 'local') {
+        const path = p.local && p.local.path;
+        return { kind: 'local', label: path ? `Local / ${path}` : 'Local' };
+      }
+      return null;
+    },
     formatBytes(b) {
       if (!b || b === 0) return '—';
       if (b < 1024) return b + ' B';
@@ -365,8 +405,8 @@ export default {
 .ops-timeline { padding: 8px 16px; background: #FDF7DD; border-left: 3px solid #C9A100; }
 .ops-header, .ops-row {
   display: grid;
-  grid-template-columns: 80px 160px 90px 80px 100px 1fr 80px;
-  gap: 10px;
+  grid-template-columns: 70px 150px 80px 70px 90px 160px 1fr 70px;
+  gap: 8px;
   padding: 6px 8px;
   font-size: 12.5px;
   align-items: center;
