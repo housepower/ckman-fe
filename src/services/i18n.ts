@@ -667,6 +667,9 @@ const messages = {
       'Filter Partition Name': 'Partition name search',
       'Check All Filtered': 'Check all filtered',
       'Uncheck All': 'Uncheck all',
+      'Backup Mode Readonly Hint': 'Backup mode cannot be edited. To change backup style or partition strategy, create a new task.',
+      'S3 Target Readonly Hint': 'Endpoint / Bucket cannot be edited — historical backups remain at the original S3 location. To change target, create a new task.',
+      'Local Path Readonly Hint': 'Backup path cannot be edited — historical backups remain at the original local path. To change target, create a new task.',
     },
 
     // Restore Component Translations
@@ -1482,6 +1485,9 @@ const messages = {
       'Filter Partition Name': '分区名搜索',
       'Check All Filtered': '全选筛选结果',
       'Uncheck All': '取消全选',
+      'Backup Mode Readonly Hint': '备份方式不可修改。如需更改备份类型或增量策略，请新建任务。',
+      'S3 Target Readonly Hint': 'Endpoint / Bucket 不可修改 — 历史备份文件存放在原 S3 位置。如需更改目标，请新建任务。',
+      'Local Path Readonly Hint': '备份路径不可修改 — 历史备份文件存放在原本地路径。如需更改目标，请新建任务。',
     },
 
     // Restore Component Translations

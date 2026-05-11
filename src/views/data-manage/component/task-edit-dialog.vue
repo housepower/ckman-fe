@@ -53,33 +53,37 @@
         </el-form-item>
       </template>
 
-      <!-- 备份方式 -->
+      <!-- 备份方式（read-only：避免改变运行语义导致数据范围混乱）-->
       <div class="section-title">{{ $t('backup.Backup Mode') }}</div>
       <el-form-item :label="$t('backup.Backup Method')">
-        <el-radio-group v-model="form.backup_style">
-          <el-radio label="incremental">{{ $t('backup.Incremental Backup') }}</el-radio>
-          <el-radio label="full" :disabled="form.schedule_type === 'scheduled'">{{ $t('backup.Full Backup') }}</el-radio>
-        </el-radio-group>
+        <el-input
+          :value="form.backup_style === 'full' ? $t('backup.Full Backup') : $t('backup.Incremental Backup')"
+          disabled
+        />
       </el-form-item>
       <el-form-item v-if="form.backup_style === 'incremental'" :label="$t('backup.Incremental Method')">
-        <el-radio-group v-model="form.backup_type">
-          <el-radio label="partition">{{ $t('backup.By Partition Name') }}</el-radio>
-          <el-radio label="daily">{{ $t('backup.By Time Period') }}</el-radio>
-        </el-radio-group>
+        <el-input
+          :value="form.backup_type === 'partition' ? $t('backup.By Partition Name') : $t('backup.By Time Period')"
+          disabled
+        />
       </el-form-item>
       <el-form-item v-if="form.backup_type === 'daily' && form.backup_style === 'incremental'" :label="$t('backup.Time Range')">
-        <el-input-number v-model="form.days_before" :min="1" :max="365" controls-position="right" style="width:120px" />
-        {{ $t('backup.Days Ago Text') }}
+        <el-input :value="form.days_before + ' ' + $t('backup.Days Ago Text')" disabled />
+        <span class="form-hint">{{ $t('history.Backup Mode Readonly Hint') }}</span>
+      </el-form-item>
+      <el-form-item v-else>
+        <span class="form-hint">{{ $t('history.Backup Mode Readonly Hint') }}</span>
       </el-form-item>
 
       <!-- 备份目标 (target_type 不可改，但配置可改) -->
       <div class="section-title">{{ $t('backup.Backup Target Section') }} ({{ form.target_type === 's3' ? 'S3' : 'Local' }})</div>
       <template v-if="form.target_type === 's3'">
-        <el-form-item :label="$t('backup.Endpoint')" prop="s3Endpoint">
-          <el-input v-model="form.s3Endpoint" />
+        <el-form-item :label="$t('backup.Endpoint')">
+          <el-input :value="form.s3Endpoint" disabled />
         </el-form-item>
-        <el-form-item :label="$t('backup.Bucket')" prop="s3Bucket">
-          <el-input v-model="form.s3Bucket" />
+        <el-form-item :label="$t('backup.Bucket')">
+          <el-input :value="form.s3Bucket" disabled />
+          <span class="form-hint">{{ $t('history.S3 Target Readonly Hint') }}</span>
         </el-form-item>
         <el-form-item :label="$t('backup.AccessKeyID')" prop="s3AccessKeyId">
           <el-input v-model="form.s3AccessKeyId" />
@@ -93,8 +97,9 @@
         </el-form-item>
       </template>
       <template v-if="form.target_type === 'local'">
-        <el-form-item :label="$t('backup.Backup Path')" prop="localPath">
-          <el-input v-model="form.localPath" />
+        <el-form-item :label="$t('backup.Backup Path')">
+          <el-input :value="form.localPath" disabled />
+          <span class="form-hint">{{ $t('history.Local Path Readonly Hint') }}</span>
         </el-form-item>
       </template>
 
