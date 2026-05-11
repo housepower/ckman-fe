@@ -463,6 +463,8 @@ const messages = {
       'Enter Backup Path': 'Enter backup path manually',
       'Disk Unsafe Hint': 'Disk "{name}" has allow_backup=false in ckman config. Backup will likely fail unless ClickHouse XML has been manually configured otherwise.',
       'Disk Empty Hint': 'No local disk detected in ckman config. Ensure your ClickHouse cluster has a configured local disk with allow_backup=true, then enter its path. Risk: misconfigured path will fail at runtime.',
+      'Loading Disks': 'Loading disks...',
+      'Disk Tag Unsafe': 'allow_backup not set',
     },
     // History Component Translations
     history: {
@@ -1194,6 +1196,8 @@ const messages = {
       'Enter Backup Path': '请手动输入备份路径',
       'Disk Unsafe Hint': 'ckman 配置中磁盘 "{name}" 未标记 allow_backup，备份可能失败（除非已在 ClickHouse XML 手工配置 allow_backup=true）。',
       'Disk Empty Hint': 'ckman 配置中未检测到本地磁盘。请确认 ClickHouse 集群已配置 local disk 且 allow_backup=true，然后填入路径。风险：配置错误会在执行时失败。',
+      'Loading Disks': '正在加载磁盘列表...',
+      'Disk Tag Unsafe': '未配置 allow_backup',
     },
     rebalance: {
       'Database': '数据库',

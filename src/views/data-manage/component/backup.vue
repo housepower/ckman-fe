@@ -205,13 +205,17 @@
 
             <template v-if="form.target === 'local'">
                 <el-form-item :label="$t('backup.Local Disk')" prop="localDisk">
+                    <!-- 加载中占位 -->
+                    <div v-if="disksLoading" class="disk-loading">
+                        <i class="el-icon-loading" /> {{ $t('backup.Loading Disks') }}
+                    </div>
+
                     <!-- 有 disk 列表 → dropdown -->
-                    <template v-if="diskList.length > 0">
+                    <template v-else-if="diskList.length > 0">
                         <el-select
                             v-model="form.localDisk"
                             :placeholder="$t('backup.Select Local Disk')"
                             class="form-input"
-                            :loading="disksLoading"
                             @change="onLocalDiskChange"
                         >
                             <el-option
@@ -220,10 +224,13 @@
                                 :label="`${d.name} (${d.path})`"
                                 :value="d.name"
                             >
-                                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
-                                    <span>{{ d.name }} <span class="muted" style="font-size:12px;color:#909399">{{ d.path }}</span></span>
-                                    <el-tag v-if="d.allowed_backup" size="mini" type="success">allow_backup</el-tag>
-                                    <el-tag v-else size="mini" type="warning">&#9888; 未配置 allow_backup</el-tag>
+                                <div class="disk-option-row">
+                                    <span class="disk-name">{{ d.name }}</span>
+                                    <span class="disk-path">{{ d.path }}</span>
+                                    <span class="disk-tag">
+                                        <el-tag v-if="d.allowed_backup" size="mini" type="success">allow_backup</el-tag>
+                                        <el-tag v-else size="mini" type="warning">&#9888; {{ $t('backup.Disk Tag Unsafe') }}</el-tag>
+                                    </span>
                                 </div>
                             </el-option>
                         </el-select>
@@ -238,7 +245,6 @@
                             v-model="form.localPath"
                             :placeholder="$t('backup.Enter Backup Path')"
                             class="form-input"
-                            :disabled="disksLoading"
                         />
                         <div class="warn-hint" style="margin-top:6px">
                             &#9888; {{ $t('backup.Disk Empty Hint') }}
@@ -947,5 +953,41 @@ export default {
 
 .warn-text {
     color: #ad6c00;
+}
+
+.disk-loading {
+    color: #909399;
+    font-size: 13px;
+    padding: 6px 0;
+
+    .el-icon-loading {
+        margin-right: 4px;
+        color: #C9A100;
+    }
+}
+
+.disk-option-row {
+    display: grid;
+    grid-template-columns: 120px 1fr auto;
+    gap: 12px;
+    align-items: center;
+
+    .disk-name {
+        font-weight: 500;
+        color: #303133;
+    }
+
+    .disk-path {
+        font-size: 12px;
+        color: #909399;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .disk-tag {
+        text-align: right;
+    }
 }
 </style>
