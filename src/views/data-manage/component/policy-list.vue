@@ -30,125 +30,144 @@
       </el-button>
     </div>
 
-    <!-- Policy Table -->
+    <!-- Task Table (outer: one row = one task) -->
     <el-table
-      ref="policyTable"
-      :data="pagedPolicies"
+      ref="taskTable"
+      :data="pagedTasks"
       v-loading="loading"
-      row-key="policy_id"
+      row-key="task_id"
       border
       style="width: 100%"
       :row-class-name="rowClassName"
-      @expand-change="handleExpandChange"
       @row-click="handleRowClick"
     >
       <!-- Expand column -->
       <el-table-column type="expand">
-        <template #default="{ row }">
-          <div class="run-expand" @click.stop>
-            <div v-if="runLoadingMap[row.policy_id]" class="run-loading">
-              <i class="el-icon-loading" /> {{ $t('history.Loading') }}
+        <template #default="{ row: task }">
+          <div class="task-expand" @click.stop>
+            <div class="task-policies-header">
+              <span class="col-table">{{ $t('history.Database Table') }}</span>
+              <span class="col-status">{{ $t('history.Latest Run') }}</span>
+              <span class="col-action"></span>
             </div>
-            <template v-else>
-              <div class="run-header">
-                <span class="run-col col-time">{{ $t('history.Trigger Time') }}</span>
-                <span class="run-col col-op">{{ $t('history.Operation') }}</span>
-                <span class="run-col col-type">{{ $t('history.Trigger Type') }}</span>
-                <span class="run-col col-status">{{ $t('history.Status') }}</span>
-                <span class="run-col col-parts">{{ $t('history.Partition Count') }}</span>
-                <span class="run-col col-elapsed">{{ $t('history.Elapsed') }}</span>
-                <span class="run-col col-notes">{{ $t('history.Notes') }}</span>
-                <span class="run-col col-action"></span>
-              </div>
-              <div
-                v-for="run in (runMap[row.policy_id] || [])"
-                :key="run.run_id"
-                class="run-row"
-                @click="$emit('view-run', run.run_id)"
-              >
-                <span class="run-col col-time">{{ formatDate(run.start_time || run.create_time) }}</span>
-                <span class="run-col col-op">
-                  <el-tag size="mini" :type="run.operation === 'backup' ? 'primary' : 'info'">
-                    {{ run.operation === 'backup' ? $t('history.Op Backup') : $t('history.Op Restore') }}
+            <div
+              v-for="p in task.policies"
+              :key="p.policy_id"
+              class="task-policy-row"
+            >
+              <span class="col-table">
+                <span class="table-name">{{ p.database }}.{{ p.table }}</span>
+              </span>
+              <span class="col-status">
+                <template v-if="latestRunMap[p.policy_id]">
+                  <span class="muted">{{ formatDate(latestRunMap[p.policy_id].start_time || latestRunMap[p.policy_id].create_time) }}</span>
+                  <el-tag
+                    v-if="latestRunMap[p.policy_id].status !== 'interrupted'"
+                    size="mini"
+                    :type="statusType(latestRunMap[p.policy_id].status)"
+                    style="margin-left:8px"
+                  >
+                    {{ statusLabel(latestRunMap[p.policy_id].status) }}
                   </el-tag>
-                </span>
-                <span class="run-col col-type muted">{{ triggerTypeLabel(run.trigger_type) }}</span>
-                <span class="run-col col-status">
-                  <el-tag :type="statusType(run.status)" size="mini" v-if="run.status !== 'interrupted'">
-                    {{ statusLabel(run.status) }}
-                  </el-tag>
-                  <el-tag v-else size="mini" color="#ED8936" style="color: white; border-color: #ED8936;">
+                  <el-tag v-else size="mini" color="#ED8936" style="color: white; border-color: #ED8936; margin-left:8px">
                     {{ $t('history.Status Interrupted') }}
                   </el-tag>
-                </span>
-                <span class="run-col col-parts">{{ run.partitions ? run.partitions.length : '—' }}</span>
-                <span class="run-col col-elapsed muted">{{ formatElapsed(run) }}</span>
-                <span class="run-col col-notes muted">{{ run.message || run.status_reason || '—' }}</span>
-                <span class="run-col col-action">
-                  <el-button type="text" size="mini" @click.stop="$emit('view-run', run.run_id)">
-                    {{ $t('history.View') }}
-                  </el-button>
-                </span>
-              </div>
-              <div v-if="!(runMap[row.policy_id] || []).length" class="run-empty muted">
-                {{ $t('history.No Runs') }}
-              </div>
-            </template>
+                </template>
+                <span v-else class="muted">—</span>
+              </span>
+              <span class="col-action">
+                <el-button
+                  type="text"
+                  size="mini"
+                  :disabled="!latestRunMap[p.policy_id]"
+                  @click="$emit('view-run', latestRunMap[p.policy_id] && latestRunMap[p.policy_id].run_id)"
+                >
+                  {{ $t('history.View Latest Run') }}
+                </el-button>
+                <el-button type="text" size="mini" @click="$emit('edit-policy', p)">{{ $t('history.Edit') }}</el-button>
+              </span>
+            </div>
+            <div v-if="!task.policies.length" class="task-empty muted">
+              {{ $t('history.No Runs') }}
+            </div>
           </div>
         </template>
       </el-table-column>
 
-      <!-- database.table -->
-      <el-table-column :label="$t('history.Database Table')" min-width="180">
-        <template #default="{ row }">
-          <span class="table-name">{{ row.database }}.{{ row.table }}</span>
+      <!-- 任务名 -->
+      <el-table-column :label="$t('history.Task Name')" min-width="200">
+        <template #default="{ row: task }">
+          <span class="table-name">{{ displayTaskName(task) }}</span>
+          <el-tag v-if="task.mixedEnabled" size="mini" type="warning" style="margin-left:6px">mixed</el-tag>
         </template>
       </el-table-column>
 
       <!-- 类型 -->
       <el-table-column :label="$t('history.Schedule Type')" width="80">
-        <template #default="{ row }">
-          {{ row.schedule_type === 'scheduled' ? $t('history.Schedule Scheduled') : $t('history.Schedule Immediate') }}
+        <template #default="{ row: task }">
+          {{ task.schedule_type === 'scheduled' ? $t('history.Schedule Scheduled') : $t('history.Schedule Immediate') }}
         </template>
       </el-table-column>
 
       <!-- cron / instance -->
       <el-table-column :label="$t('history.Cron Instance')" min-width="180">
-        <template #default="{ row }">
-          <span class="muted" v-if="row.schedule_type === 'scheduled'">
-            {{ row.crontab }} · {{ row.instance || '—' }}
+        <template #default="{ row: task }">
+          <span class="muted" v-if="task.schedule_type === 'scheduled'">
+            {{ task.crontab }} · {{ task.instance || '—' }}
           </span>
-          <span class="muted" v-else>— · {{ row.instance || '—' }}</span>
+          <span class="muted" v-else>— · {{ task.instance || '—' }}</span>
         </template>
       </el-table-column>
 
-      <!-- 启用：直接 switch -->
+      <!-- 表数量 -->
+      <el-table-column :label="$t('history.Tables Count Label')" width="80">
+        <template #default="{ row: task }">
+          <span class="muted">{{ $t('history.Tables Count', { count: task.policies.length }) }}</span>
+        </template>
+      </el-table-column>
+
+      <!-- 启用：task 级 switch -->
       <el-table-column :label="$t('history.Enabled')" width="80" class-name="col-no-click">
-        <template #default="{ row }">
+        <template #default="{ row: task }">
+          <el-tooltip
+            v-if="task.mixedEnabled"
+            :content="$t('history.Mixed Enabled Hint')"
+            placement="top"
+          >
+            <el-switch
+              :value="task.enabled"
+              :loading="!!task.toggling"
+              :disabled="!!task.toggling"
+              active-color="#C9A100"
+              inactive-color="#c0c4cc"
+              @change="toggleTaskEnabled(task)"
+            />
+          </el-tooltip>
           <el-switch
-            :value="row.enabled"
-            :loading="!!row.toggling"
-            :disabled="!!row.toggling"
+            v-else
+            :value="task.enabled"
+            :loading="!!task.toggling"
+            :disabled="!!task.toggling"
             active-color="#C9A100"
             inactive-color="#c0c4cc"
-            @change="toggleEnabled(row)"
+            @change="toggleTaskEnabled(task)"
           />
         </template>
       </el-table-column>
 
-      <!-- 最近一次 -->
+      <!-- 最近一次（取 task 下所有 policy 中最新的 run） -->
       <el-table-column :label="$t('history.Latest Run')" min-width="180">
-        <template #default="{ row }">
-          <template v-if="latestRunMap[row.policy_id]">
+        <template #default="{ row: task }">
+          <template v-if="taskLatestRun(task)">
             <span class="muted" style="margin-right: 6px">
-              {{ formatDate(latestRunMap[row.policy_id].start_time || latestRunMap[row.policy_id].create_time) }}
+              {{ formatDate(taskLatestRun(task).start_time || taskLatestRun(task).create_time) }}
             </span>
             <el-tag
-              v-if="latestRunMap[row.policy_id].status !== 'interrupted'"
-              :type="statusType(latestRunMap[row.policy_id].status)"
+              v-if="taskLatestRun(task).status !== 'interrupted'"
+              :type="statusType(taskLatestRun(task).status)"
               size="mini"
             >
-              {{ statusLabel(latestRunMap[row.policy_id].status) }}
+              {{ statusLabel(taskLatestRun(task).status) }}
             </el-tag>
             <el-tag v-else size="mini" color="#ED8936" style="color: white; border-color: #ED8936;">
               {{ $t('history.Status Interrupted') }}
@@ -160,16 +179,15 @@
 
       <!-- 操作 -->
       <el-table-column :label="$t('history.Actions')" width="220" fixed="right" class-name="col-no-click">
-        <template #default="{ row }">
-          <template v-if="row.schedule_type === 'scheduled'">
-            <el-button type="text" size="mini" @click="triggerNow(row)">{{ $t('history.Trigger Now') }}</el-button>
-            <el-button type="text" size="mini" @click="$emit('edit-policy', row)">{{ $t('history.Edit') }}</el-button>
-            <el-button type="text" size="mini" style="color: #F56C6C" @click="deletePolicy(row)">{{ $t('history.Delete') }}</el-button>
+        <template #default="{ row: task }">
+          <template v-if="task.schedule_type === 'scheduled'">
+            <el-button type="text" size="mini" @click="triggerTask(task)">{{ $t('history.Trigger Now') }}</el-button>
+            <el-button type="text" size="mini" @click="editTask(task)">{{ $t('history.Edit') }}</el-button>
+            <el-button type="text" size="mini" style="color: #F56C6C" @click="deleteTask(task)">{{ $t('history.Delete') }}</el-button>
           </template>
           <template v-else>
-            <el-button type="text" size="mini" @click="$emit('copy-policy', row)">{{ $t('history.Copy as New') }}</el-button>
-            <el-button type="text" size="mini" @click="$emit('edit-policy', row)">{{ $t('history.Edit') }}</el-button>
-            <el-button type="text" size="mini" style="color: #F56C6C" @click="deletePolicy(row)">{{ $t('history.Delete') }}</el-button>
+            <el-button type="text" size="mini" @click="editTask(task)">{{ $t('history.Edit') }}</el-button>
+            <el-button type="text" size="mini" style="color: #F56C6C" @click="deleteTask(task)">{{ $t('history.Delete') }}</el-button>
           </template>
         </template>
       </el-table-column>
@@ -177,12 +195,12 @@
 
     <!-- Pagination -->
     <el-pagination
-      v-if="filteredPolicies.length > 0"
+      v-if="tasks.length > 0"
       class="policy-pagination"
       :current-page.sync="currentPage"
       :page-size.sync="pageSize"
       :page-sizes="pageSizes"
-      :total="filteredPolicies.length"
+      :total="tasks.length"
       layout="total, sizes, prev, pager, next, jumper"
       @size-change="onPageSizeChange"
     />
@@ -210,8 +228,6 @@ export default {
       filterEnabled: 'all',
       filterDatabase: '',
       searchKey: '',
-      runMap: {},         // policy_id -> BackupRun[]
-      runLoadingMap: {},  // policy_id -> boolean
       latestRunMap: {},   // policy_id -> BackupRun (latest)
       currentPage: 1,
       pageSize: 20,
@@ -240,9 +256,37 @@ export default {
         return true;
       });
     },
-    pagedPolicies() {
+    // group filteredPolicies by effective task_id
+    tasks() {
+      const groups = new Map();
+      for (const p of this.filteredPolicies) {
+        const tid = p.task_id || p.policy_id;
+        if (!groups.has(tid)) {
+          groups.set(tid, {
+            task_id: tid,
+            task_name: p.task_name || '',
+            schedule_type: p.schedule_type,
+            crontab: p.crontab,
+            instance: p.instance,
+            enabled: p.enabled,
+            toggling: false,
+            policies: [],
+          });
+        }
+        groups.get(tid).policies.push(p);
+      }
+      // compute enabled state per group
+      for (const g of groups.values()) {
+        const enabledStates = new Set(g.policies.map(p => p.enabled));
+        g.mixedEnabled = enabledStates.size > 1;
+        // any enabled = group shown as enabled (conservative)
+        g.enabled = enabledStates.has(true);
+      }
+      return [...groups.values()];
+    },
+    pagedTasks() {
       const start = (this.currentPage - 1) * this.pageSize;
-      return this.filteredPolicies.slice(start, start + this.pageSize);
+      return this.tasks.slice(start, start + this.pageSize);
     },
   },
   watch: {
@@ -263,11 +307,33 @@ export default {
     // 整行点击展开/收起；启用列和操作列跳过（class-name=col-no-click）
     handleRowClick(row, column) {
       if (!column) return;
-      if (column.type === 'expand') return; // expand 列 element-ui 自己处理
+      if (column.type === 'expand') return;
       const cn = column.className || '';
       if (cn.includes('col-no-click')) return;
-      this.$refs.policyTable.toggleRowExpansion(row);
+      this.$refs.taskTable.toggleRowExpansion(row);
     },
+
+    displayTaskName(task) {
+      if (task.task_name) return task.task_name;
+      if (task.policies.length === 1) return `${task.policies[0].database}.${task.policies[0].table}`;
+      const first = task.policies[0];
+      return `${first.database}.${first.table} (+${task.policies.length - 1})`;
+    },
+
+    // get the most recent run across all policies in a task
+    taskLatestRun(task) {
+      let best = null;
+      for (const p of task.policies) {
+        const run = this.latestRunMap[p.policy_id];
+        if (!run) continue;
+        if (!best) { best = run; continue; }
+        const runTime = new Date(run.start_time || run.create_time || 0).getTime();
+        const bestTime = new Date(best.start_time || best.create_time || 0).getTime();
+        if (runTime > bestTime) best = run;
+      }
+      return best;
+    },
+
     async fetchPolicies() {
       this.loading = true;
       try {
@@ -300,82 +366,51 @@ export default {
       }
     },
 
-    async handleExpandChange(row, expandedRows) {
-      const isExpanded = expandedRows.some(r => r.policy_id === row.policy_id);
-      if (!isExpanded) return;
-      if (this.runMap[row.policy_id]) return; // already loaded
-      await this.fetchRunsForPolicy(row.policy_id);
+    async triggerTask(task) {
+      let success = 0, failed = 0;
+      await Promise.all(task.policies.map(async p => {
+        try {
+          const res = await DataManageApi.triggerPolicy(p.policy_id);
+          if (res.data.retCode === '0000') success++;
+          else failed++;
+        } catch { failed++; }
+      }));
+      this.$message.success(this.$t('history.Task Triggered', { success, failed }));
+      this.fetchPolicies();
     },
 
-    async fetchRunsForPolicy(policyId) {
-      this.$set(this.runLoadingMap, policyId, true);
+    async toggleTaskEnabled(task) {
+      const willEnable = !task.enabled;
+      this.$set(task, 'toggling', true);
+      let success = 0, failed = 0;
+      const count = task.policies.length;
+      const name = this.displayTaskName(task);
       try {
-        const res = await DataManageApi.listRunsByPolicy(policyId, { limit: 10 });
-        if (res.data.retCode === '0000') {
-          this.$set(this.runMap, policyId, res.data.entity || []);
-        } else {
-          this.$message.error(res.data.retMsg || '获取运行记录失败');
-          this.$set(this.runMap, policyId, []);
-        }
-      } catch (e) {
-        this.$message.error('获取运行记录异常: ' + e.message);
-        this.$set(this.runMap, policyId, []);
+        await Promise.all(task.policies.map(async p => {
+          try {
+            const pRes = await DataManageApi.getPolicy(p.policy_id);
+            if (pRes.data.retCode !== '0000') { failed++; return; }
+            const body = { ...pRes.data.entity, enabled: willEnable };
+            const upRes = await DataManageApi.updatePolicy(p.policy_id, body);
+            if (upRes.data.retCode === '0000') success++;
+            else failed++;
+          } catch { failed++; }
+        }));
+        this.$message.success(
+          this.$t(willEnable ? 'history.Task Enabled' : 'history.Task Disabled', { name, success, count })
+        );
+        await this.fetchPolicies();
       } finally {
-        this.$set(this.runLoadingMap, policyId, false);
+        this.$set(task, 'toggling', false);
       }
     },
 
-    async triggerNow(policy) {
-      try {
-        const res = await DataManageApi.triggerPolicy(policy.policy_id);
-        if (res.data.retCode === '0000') {
-          this.$message.success(this.$t('history.Trigger Success'));
-          // refresh run list if already expanded
-          this.$delete(this.runMap, policy.policy_id);
-          await this.fetchRunsForPolicy(policy.policy_id);
-          await this.fetchLatestRun(policy.policy_id);
-        } else {
-          this.$message.error(res.data.retMsg || '触发失败');
-        }
-      } catch (e) {
-        this.$message.error('触发异常: ' + e.message);
-      }
-    },
-
-    async toggleEnabled(policy) {
-      const table = `${policy.database}.${policy.table}`;
-      const willEnable = !policy.enabled;
-      this.$set(policy, 'toggling', true);
-      try {
-        const pRes = await DataManageApi.getPolicy(policy.policy_id);
-        if (pRes.data.retCode !== '0000') {
-          this.$message.error(pRes.data.retMsg || this.$t('history.Toggle Fetch Failed'));
-          return;
-        }
-        const full = { ...pRes.data.entity, enabled: willEnable };
-        const upRes = await DataManageApi.updatePolicy(policy.policy_id, full);
-        if (upRes.data.retCode === '0000') {
-          this.$message.success(
-            willEnable
-              ? this.$t('history.Enabled Toast', { table })
-              : this.$t('history.Disabled Toast', { table })
-          );
-          await this.fetchPolicies();
-        } else {
-          this.$message.error(upRes.data.retMsg || this.$t('history.Toggle Failed'));
-        }
-      } catch (e) {
-        this.$message.error(this.$t('history.Toggle Failed') + ': ' + e.message);
-      } finally {
-        this.$set(policy, 'toggling', false);
-      }
-    },
-
-    async deletePolicy(policy) {
-      const table = `${policy.database}.${policy.table}`;
+    async deleteTask(task) {
+      const name = this.displayTaskName(task);
+      const count = task.policies.length;
       try {
         await this.$confirm(
-          this.$t('history.Confirm Delete', { table }),
+          this.$t('history.Confirm Delete Task', { name, count }),
           this.$t('common.Confirm'),
           {
             confirmButtonText: this.$t('history.Confirm Delete Btn'),
@@ -384,19 +419,29 @@ export default {
             dangerouslyUseHTMLString: true,
           }
         );
-      } catch {
-        return; // user cancelled
+      } catch { return; }
+      let success = 0, failed = 0;
+      await Promise.all(task.policies.map(async p => {
+        try {
+          const res = await DataManageApi.deletePolicy(p.policy_id);
+          if (res.data.retCode === '0000') success++;
+          else failed++;
+        } catch { failed++; }
+      }));
+      if (failed === 0) {
+        this.$message.success(this.$t('history.Task Delete Result OK', { success }));
+      } else {
+        this.$message.warning(this.$t('history.Task Delete Result Partial', { success, failed }));
       }
-      try {
-        const res = await DataManageApi.deletePolicy(policy.policy_id);
-        if (res.data.retCode === '0000') {
-          this.$message.success(this.$t('history.Delete Success', { table }));
-          await this.fetchPolicies();
-        } else {
-          this.$message.error(res.data.retMsg || this.$t('history.Delete Failed'));
-        }
-      } catch (e) {
-        this.$message.error(this.$t('history.Delete Failed') + ': ' + e.message);
+      this.fetchPolicies();
+    },
+
+    editTask(task) {
+      if (task.policies.length === 1) {
+        this.$emit('edit-policy', task.policies[0]);
+      } else {
+        // TODO: 后续做批量编辑 modal
+        this.$message.info(this.$t('history.Edit Task Coming Soon'));
       }
     },
 
@@ -423,16 +468,6 @@ export default {
       return map[status] || status;
     },
 
-    triggerTypeLabel(type) {
-      const map = {
-        cron: this.$t('history.Trigger cron'),
-        manual_immediate: this.$t('history.Trigger manual_immediate'),
-        manual_restore: this.$t('history.Trigger manual_restore'),
-        manual_retry: this.$t('history.Trigger manual_retry'),
-      };
-      return map[type] || type;
-    },
-
     formatDate(dateStr) {
       if (!dateStr || dateStr === '0001-01-01T00:00:00Z') return '—';
       try {
@@ -447,22 +482,6 @@ export default {
         return dateStr;
       }
     },
-
-    formatElapsed(run) {
-      if (!run.start_time || run.start_time === '0001-01-01T00:00:00Z') return '—';
-      const end = run.finished_at && run.finished_at !== '0001-01-01T00:00:00Z'
-        ? new Date(run.finished_at)
-        : new Date();
-      const start = new Date(run.start_time);
-      const secs = Math.floor((end - start) / 1000);
-      if (isNaN(secs) || secs < 0) return '—';
-      if (secs < 60) return `${secs}s`;
-      if (secs < 3600) return `${Math.floor(secs / 60)}分`;
-      const h = Math.floor(secs / 3600);
-      const m = Math.floor((secs % 3600) / 60);
-      return m > 0 ? `${h}时${m}分` : `${h}时`;
-    },
-
   },
   mounted() {
     this.fetchPolicies();
@@ -491,29 +510,24 @@ export default {
   color: #909399;
 }
 
-/* Run expand area */
-.run-expand {
+/* Task expand area */
+.task-expand {
   padding: 8px 12px 14px 36px;
   background: #FDF7DD;
   border-left: 3px solid #C9A100;
 }
 
-.run-loading {
-  padding: 12px;
-  color: #909399;
-}
-
-.run-header,
-.run-row {
+.task-policies-header,
+.task-policy-row {
   display: grid;
-  grid-template-columns: 120px 60px 110px 90px 70px 80px 1fr 70px;
+  grid-template-columns: 220px 1fr 180px;
   gap: 10px;
   align-items: center;
   padding: 6px 10px;
   font-size: 12.5px;
 }
 
-.run-header {
+.task-policies-header {
   font-weight: 500;
   color: #909399;
   font-size: 12px;
@@ -521,21 +535,20 @@ export default {
   margin-bottom: 4px;
 }
 
-.run-row {
+.task-policy-row {
   border-bottom: 1px dashed #dcdfe6;
-  cursor: pointer;
   border-radius: 3px;
 }
 
-.run-row:last-of-type {
+.task-policy-row:last-of-type {
   border-bottom: none;
 }
 
-.run-row:hover {
+.task-policy-row:hover {
   background: rgba(255, 255, 255, 0.7);
 }
 
-.run-empty {
+.task-empty {
   padding: 12px 10px;
   font-size: 12.5px;
 }

@@ -618,6 +618,19 @@ const messages = {
       'Copy Policy Hint': 'Copy Policy: feature pending. Manually create a new backup with the same fields for now.',
       'Go Backup Hint': 'Switch to "Backup Data" menu via the left sidebar to create a new backup.',
       'Back to List': '← Back to List',
+      // Task-dimension policy-list keys
+      'Task Name': 'Task',
+      'Tables Count Label': 'Tables',
+      'Tables Count': '{count} table(s)',
+      'Task Triggered': 'Triggered: {success} success, {failed} failed',
+      'Task Enabled': 'Task "{name}" enabled ({success}/{count} policies)',
+      'Task Disabled': 'Task "{name}" disabled ({success}/{count} policies)',
+      'Confirm Delete Task': 'Delete task <b>{name}</b> containing <b>{count}</b> policy/policies?<br><br><span style="color:#F56C6C">&#9888; Once deleted, run history is permanently removed and <b>data cannot be restored via ckman</b>. (Data already pushed to S3 / local disk is not affected.)</span>',
+      'Task Delete Result OK': 'Deleted {success} policy/policies',
+      'Task Delete Result Partial': 'Deleted {success} policy/policies, {failed} failed',
+      'View Latest Run': 'View Run',
+      'Edit Task Coming Soon': 'Batch edit task: coming soon. Please edit each policy individually.',
+      'Mixed Enabled Hint': 'Policies in this task have mixed enabled states',
     },
 
     // Restore Component Translations
@@ -1379,6 +1392,19 @@ const messages = {
       'Copy Policy Hint': '复制为新备份功能待实现，请到「新建备份」表单手工填入相同字段。',
       'Go Backup Hint': '请在左侧菜单切到「新建备份」创建新备份。',
       'Back to List': '← 返回列表',
+      // Task-dimension policy-list keys
+      'Task Name': '任务',
+      'Tables Count Label': '表数量',
+      'Tables Count': '{count} 张表',
+      'Task Triggered': '已触发：{success} 成功，{failed} 失败',
+      'Task Enabled': '任务 "{name}" 已启用（{success}/{count} 策略）',
+      'Task Disabled': '任务 "{name}" 已禁用（{success}/{count} 策略）',
+      'Confirm Delete Task': '删除任务 <b>{name}</b>（含 <b>{count}</b> 条策略）？<br><br><span style="color:#F56C6C">&#9888; 一旦删除，run 历史记录永久消失，<b>无法通过 ckman 进行数据恢复</b>（已推送到 S3 / 本地磁盘的备份文件不受影响）。</span>',
+      'Task Delete Result OK': '已删除 {success} 条策略',
+      'Task Delete Result Partial': '已删除 {success} 条策略，{failed} 个失败',
+      'View Latest Run': '查看最新 run',
+      'Edit Task Coming Soon': '批量编辑任务功能待开发，请逐条编辑策略。',
+      'Mixed Enabled Hint': '该任务下的策略启用状态不一致',
     },
 
     // Restore Component Translations
