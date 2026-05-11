@@ -32,7 +32,7 @@
 
     <!-- Policy Table -->
     <el-table
-      :data="filteredPolicies"
+      :data="pagedPolicies"
       v-loading="loading"
       row-key="policy_id"
       border
@@ -169,6 +169,18 @@
       </el-table-column>
     </el-table>
 
+    <!-- Pagination -->
+    <el-pagination
+      v-if="filteredPolicies.length > 0"
+      class="policy-pagination"
+      :current-page.sync="currentPage"
+      :page-size.sync="pageSize"
+      :page-sizes="pageSizes"
+      :total="filteredPolicies.length"
+      layout="total, sizes, prev, pager, next, jumper"
+      @size-change="onPageSizeChange"
+    />
+
     <!-- Legend -->
     <div class="legend">
       <span class="legend-item"><span class="legend-dot" style="background:#67C23A"></span>{{ $t('history.Status Success') }}</span>
@@ -195,6 +207,9 @@ export default {
       runMap: {},         // policy_id -> BackupRun[]
       runLoadingMap: {},  // policy_id -> boolean
       latestRunMap: {},   // policy_id -> BackupRun (latest)
+      currentPage: 1,
+      pageSize: 20,
+      pageSizes: [10, 20, 50, 100],
     };
   },
   computed: {
@@ -219,8 +234,21 @@ export default {
         return true;
       });
     },
+    pagedPolicies() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      return this.filteredPolicies.slice(start, start + this.pageSize);
+    },
+  },
+  watch: {
+    // filter 变化时回到第 1 页
+    filterEnabled() { this.currentPage = 1; },
+    filterDatabase() { this.currentPage = 1; },
+    searchKey() { this.currentPage = 1; },
   },
   methods: {
+    onPageSizeChange() {
+      this.currentPage = 1;
+    },
     async fetchPolicies() {
       this.loading = true;
       try {
@@ -533,5 +561,10 @@ export default {
   height: 10px;
   border-radius: 2px;
   display: inline-block;
+}
+
+.policy-pagination {
+  margin-top: 12px;
+  text-align: right;
 }
 </style>
