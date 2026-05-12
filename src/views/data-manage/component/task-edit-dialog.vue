@@ -288,7 +288,7 @@ export default {
       };
       if (f.target_type === 's3') {
         body.s3 = {
-          endpoint: f.s3Endpoint,
+          endpoint: (f.s3Endpoint || '').trim().replace(/\/+$/, ''),
           accessKeyId: f.s3AccessKeyId,
           region: f.s3Region,
           bucket: f.s3Bucket,

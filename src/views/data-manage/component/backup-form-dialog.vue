@@ -838,7 +838,7 @@ export default {
                 params.local = { path: this.form.localPath };
             } else if (this.form.target === 's3') {
                 params.s3 = {
-                    endpoint: this.form.s3Endpoint,
+                    endpoint: (this.form.s3Endpoint || '').trim().replace(/\/+$/, ''),
                     accessKeyId: this.form.s3AccessKeyId,
                     secretAccessKey: this.form.s3SecretAccessKey,
                     region: this.form.s3Region,
