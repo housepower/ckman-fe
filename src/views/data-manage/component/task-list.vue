@@ -11,6 +11,17 @@
       <el-button type="primary" size="small" icon="el-icon-plus" @click="$emit('go-backup')">{{ $t('history.New Backup') }}</el-button>
       <el-button size="small" icon="el-icon-refresh-left" @click="$emit('go-restore')">{{ $t('history.New Restore') }}</el-button>
       <el-button size="small" icon="el-icon-refresh" :loading="loading" @click="$emit('refresh')">{{ $t('history.Refresh') }}</el-button>
+      <el-tooltip :content="$t('history.Auto Refresh Tip')" placement="top">
+        <span class="auto-refresh">
+          <el-switch
+            :value="autoRefresh"
+            active-color="#C9A100"
+            inactive-color="#c0c4cc"
+            @change="$emit('update:auto-refresh', $event)"
+          />
+          <span class="ar-label">{{ $t('history.Auto Refresh') }}</span>
+        </span>
+      </el-tooltip>
     </div>
 
     <el-table
@@ -99,6 +110,7 @@ export default {
   props: {
     policies: { type: Array, default: () => [] },
     loading: { type: Boolean, default: false },
+    autoRefresh: { type: Boolean, default: false },
   },
   data() {
     return {
@@ -272,6 +284,8 @@ export default {
 
 <style scoped>
 .toolbar { display:flex; gap:10px; align-items:center; margin-bottom:14px; flex-wrap:wrap; }
+.auto-refresh { display:inline-flex; align-items:center; gap:6px; }
+.ar-label { font-size: 12px; color: #606266; }
 .task-row-clickable { cursor: pointer; }
 .task-row-clickable .col-no-click { cursor: default; }
 .task-name { font-weight: 500; }

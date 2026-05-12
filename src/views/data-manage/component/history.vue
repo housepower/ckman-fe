@@ -5,7 +5,9 @@
         <TaskList
           :policies="policies"
           :loading="loading"
+          :auto-refresh="autoRefresh"
           @refresh="fetchPolicies"
+          @update:auto-refresh="autoRefresh = $event"
           @view-task="onViewTask"
           @go-backup="backupDialogVisible = true"
           @go-restore="onGoRestore"
@@ -15,7 +17,9 @@
         <TableList
           :policies="policies"
           :loading="loading"
+          :auto-refresh="autoRefresh"
           @refresh="fetchPolicies"
+          @update:auto-refresh="autoRefresh = $event"
           @view-table="onViewTable"
         />
       </el-tab-pane>
@@ -66,6 +70,8 @@ export default {
       activeTab: 'tasks',
       policies: [],
       loading: false,
+      autoRefresh: false,
+      refreshTimer: null,
       taskDetailVisible: false,
       taskEditVisible: false,
       partitionDialogVisible: false,
@@ -81,8 +87,25 @@ export default {
   computed: {
     cluster() { return this.$route.params.id; },
   },
+  watch: {
+    autoRefresh(on) {
+      this.stopAutoRefresh();
+      if (on) {
+        this.refreshTimer = setInterval(() => {
+          if (!this.loading) this.fetchPolicies();
+        }, 5000);
+      }
+    },
+  },
   mounted() { this.fetchPolicies(); },
+  beforeDestroy() { this.stopAutoRefresh(); },
   methods: {
+    stopAutoRefresh() {
+      if (this.refreshTimer) {
+        clearInterval(this.refreshTimer);
+        this.refreshTimer = null;
+      }
+    },
     async fetchPolicies() {
       this.loading = true;
       try {
