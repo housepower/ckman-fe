@@ -47,7 +47,13 @@
         <template #default="{ row }">
           <template v-if="metaMap[row.key] && metaMap[row.key].latestBackup">
             <span class="muted">{{ formatDate(metaMap[row.key].latestBackup.time) }}</span>
-            <el-tag size="mini" type="success" style="margin-left:6px">{{ $t('history.Status Success') }}</el-tag>
+            <el-tag
+              size="mini"
+              :type="statusType(metaMap[row.key].latestBackup.status)"
+              style="margin-left:6px"
+            >
+              {{ $t('history.Status ' + capitalize(metaMap[row.key].latestBackup.status)) }}
+            </el-tag>
           </template>
           <span v-else class="muted">—</span>
         </template>
@@ -56,7 +62,13 @@
         <template #default="{ row }">
           <template v-if="metaMap[row.key] && metaMap[row.key].latestRestore">
             <span class="muted">{{ formatDate(metaMap[row.key].latestRestore.time) }}</span>
-            <el-tag size="mini" type="info" style="margin-left:6px">{{ $t('history.Status Success') }}</el-tag>
+            <el-tag
+              size="mini"
+              :type="statusType(metaMap[row.key].latestRestore.status)"
+              style="margin-left:6px"
+            >
+              {{ $t('history.Status ' + capitalize(metaMap[row.key].latestRestore.status)) }}
+            </el-tag>
           </template>
           <span v-else class="muted">—</span>
         </template>
@@ -156,17 +168,21 @@ export default {
         const res = await DataManageApi.listRunsByTable(row.cluster_name, row.database, row.table, 365);
         if (res.data.retCode === '0000') {
           const runs = res.data.entity || [];
+          // 真实最近一次（任意状态），各自维度独立比较
           let latestBackup = null, latestRestore = null;
           const parts = new Set();
           for (const r of runs) {
-            const time = r.start_time || r.create_time;
-            if (r.operation === 'backup' && r.status === 'success') {
-              if (!latestBackup || time > latestBackup.time) latestBackup = { time, run_id: r.run_id };
+            const time = r.started_at || r.start_time || r.create_time;
+            if (r.operation === 'backup') {
+              if (!latestBackup || time > latestBackup.time) latestBackup = { time, run_id: r.run_id, status: r.status };
             }
-            if (r.operation === 'restore' && r.status === 'success') {
-              if (!latestRestore || time > latestRestore.time) latestRestore = { time, run_id: r.run_id };
+            if (r.operation === 'restore') {
+              if (!latestRestore || time > latestRestore.time) latestRestore = { time, run_id: r.run_id, status: r.status };
             }
-            for (const p of (r.partitions || [])) parts.add(p.partition);
+            // 仅成功 run 的 partition 计入「分区数」（用户视角是「可恢复的分区」）
+            if (r.status === 'success') {
+              for (const p of (r.partitions || [])) parts.add(p.partition);
+            }
           }
           this.$set(this.metaMap, row.key, { latestBackup, latestRestore, partitionCount: parts.size });
         }
@@ -189,6 +205,18 @@ export default {
       if (!s || s === '0001-01-01T00:00:00Z') return '—';
       const d = new Date(s);
       return isNaN(d.getTime()) ? s : d.toLocaleString('zh-CN', { hour12: false });
+    },
+    capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; },
+    statusType(s) {
+      switch (s) {
+        case 'success': return 'success';
+        case 'failed': return 'danger';
+        case 'running': return 'primary';
+        case 'queued': return 'info';
+        case 'skipped': return 'warning';
+        case 'interrupted': return 'warning';
+        default: return 'info';
+      }
     },
   },
 };
