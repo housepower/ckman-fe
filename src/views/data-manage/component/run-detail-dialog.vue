@@ -157,11 +157,10 @@ export default {
     },
     maybeStartPoll() {
       this.stopPoll();
-      if (!this.run) return;
-      const inProgress = this.run.status === 'queued' || this.run.status === 'running';
-      if (inProgress) {
-        this.pollTimer = setTimeout(() => this.fetchRun(), 5000);
-      }
+      if (!this.run || !this.value) return;
+      // dialog 打开期间一直 5s 轮询（看 elapsed / partition 状态推进）；
+      // 关闭时由 watch(value) 调 stopPoll 停掉。
+      this.pollTimer = setTimeout(() => this.fetchRun(), 5000);
     },
     stopPoll() {
       if (this.pollTimer) {
