@@ -74,7 +74,7 @@
                 <el-tag size="mini" :type="statusType(op.status)" v-if="op.status !== 'interrupted'">{{ $t('history.Status ' + capitalize(op.status)) }}</el-tag>
                 <el-tag v-else size="mini" color="#ED8936" style="color:white;border-color:#ED8936">{{ $t('history.Status Interrupted') }}</el-tag>
               </span>
-              <span class="ops-col-elapsed muted">{{ formatElapsed(op.elapsed) }}</span>
+              <span class="ops-col-elapsed muted">{{ formatOpElapsed(op) }}</span>
               <span class="ops-col-size muted">{{ formatBytes(op.size) }}</span>
               <span class="ops-col-rows muted">{{ formatNumber(op.rows) }}</span>
               <span class="ops-col-target">
@@ -377,6 +377,15 @@ export default {
       if (!s || s === '0001-01-01T00:00:00Z') return '—';
       const d = new Date(s);
       return isNaN(d.getTime()) ? s : d.toLocaleString('zh-CN', { hour12: false });
+    },
+    // op 维度耗时：partition.Elapsed 是 int 秒，子秒级耗时会被截断为 0。
+    // 对 success op 显示 "<1s" 避免误以为没跑；其它状态保持「—」语义。
+    // 注意：分区耗时 ≠ run 耗时，run 详情里看到的 21s 包含了 prepare /
+    // init / s3 client 初始化等不归属任何一个 partition 的开销。
+    formatOpElapsed(op) {
+      if (op.elapsed && op.elapsed > 0) return this.formatElapsed(op.elapsed);
+      if (op.status === 'success') return '<1s';
+      return '—';
     },
     formatElapsed(sec) {
       if (!sec || sec <= 0) return '—';
