@@ -56,6 +56,7 @@
               <span class="ops-col-rows">{{ $t('history.Rows') }}</span>
               <span class="ops-col-target">{{ $t('history.Target') }}</span>
               <span class="ops-col-msg">{{ $t('history.Notes') }}</span>
+              <span class="ops-col-action"></span>
             </div>
             <div
               v-for="op in row.ops"
@@ -85,6 +86,14 @@
                 <span v-else class="muted">—</span>
               </span>
               <span class="ops-col-msg muted ellipsis" :title="op.msg || ''">{{ op.msg || '—' }}</span>
+              <span class="ops-col-action">
+                <el-button
+                  type="text"
+                  size="mini"
+                  style="color:#F56C6C"
+                  @click.stop="onDeleteRun(op)"
+                >{{ $t('history.Delete') }}</el-button>
+              </span>
             </div>
           </div>
         </template>
@@ -381,6 +390,31 @@ export default {
       const m = Math.floor((sec % 3600) / 60);
       return m ? `${h}h ${m}m` : `${h}h`;
     },
+    async onDeleteRun(op) {
+      try {
+        await this.$confirm(
+          this.$t('history.Confirm Delete Run', { op: op.op === 'backup' ? this.$t('history.Op Backup') : this.$t('history.Op Restore'), time: this.formatDate(op.time) }),
+          this.$t('common.Confirm'),
+          {
+            confirmButtonText: this.$t('history.Confirm Delete Btn'),
+            cancelButtonText: this.$t('common.Cancel'),
+            type: 'warning',
+            dangerouslyUseHTMLString: true,
+          }
+        );
+      } catch { return; }
+      try {
+        const res = await DataManageApi.deleteRun(op.run_id);
+        if (res.data.retCode === '0000') {
+          this.$message.success(this.$t('history.Run Deleted'));
+          this.fetchRuns();
+        } else {
+          this.$message.error(res.data.retMsg || this.$t('history.Delete Failed'));
+        }
+      } catch (e) {
+        this.$message.error(this.$t('history.Delete Failed') + ': ' + (e.message || ''));
+      }
+    },
     targetOfPolicy(p) {
       if (!p) return null;
       if (p.target_type === 's3') {
@@ -420,7 +454,7 @@ export default {
 .ops-timeline { padding: 8px 16px; background: #FDF7DD; border-left: 3px solid #C9A100; }
 .ops-header, .ops-row {
   display: grid;
-  grid-template-columns: 60px 150px 70px 60px 80px 90px 150px 1fr;
+  grid-template-columns: 60px 150px 70px 60px 80px 90px 150px 1fr 60px;
   gap: 6px;
   padding: 6px 8px;
   font-size: 12.5px;

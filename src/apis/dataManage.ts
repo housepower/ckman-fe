@@ -47,6 +47,10 @@ export const DataManageApi = {
   listRunsByPolicy(policyId: string, params?: { limit?: number; before?: string }) {
     return axios.get(`${url}/backup/policy/${policyId}/runs`, { params });
   },
+  // 删除一次 run 台账记录（不动 S3/Local 上的备份数据）
+  deleteRun(runId: string) {
+    return axios.delete(`${url}/backup/run/${runId}`);
+  },
   // 表维度：cluster.database.table 过去 days 天的 run
   listRunsByTable(clusterName: string, database: string, table: string, days?: number) {
     return axios.get(`${url}/backup/table/${clusterName}/${database}/${table}/runs`, {
