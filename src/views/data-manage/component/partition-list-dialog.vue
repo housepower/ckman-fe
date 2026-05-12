@@ -485,6 +485,8 @@ export default {
   font-size: 12.5px;
   align-items: center;
 }
+.ops-col-msg { padding-right: 16px; }
+.ops-col-action { text-align: right; }
 .ops-header { color: #909399; font-size: 12px; font-weight: 500; }
 .ops-row { cursor: pointer; border-radius: 3px; }
 .ops-row:hover { background: rgba(255,255,255,0.7); }
