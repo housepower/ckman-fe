@@ -56,7 +56,6 @@
               <span class="ops-col-rows">{{ $t('history.Rows') }}</span>
               <span class="ops-col-target">{{ $t('history.Target') }}</span>
               <span class="ops-col-msg">{{ $t('history.Notes') }}</span>
-              <span class="ops-col-action"></span>
             </div>
             <div
               v-for="op in row.ops"
@@ -86,9 +85,6 @@
                 <span v-else class="muted">—</span>
               </span>
               <span class="ops-col-msg muted ellipsis" :title="op.msg || ''">{{ op.msg || '—' }}</span>
-              <span class="ops-col-action">
-                <el-button type="text" size="mini" @click.stop="$emit('view-run', op.run_id)">{{ $t('history.View') }}</el-button>
-              </span>
             </div>
           </div>
         </template>
@@ -424,7 +420,7 @@ export default {
 .ops-timeline { padding: 8px 16px; background: #FDF7DD; border-left: 3px solid #C9A100; }
 .ops-header, .ops-row {
   display: grid;
-  grid-template-columns: 60px 150px 70px 60px 80px 90px 150px 1fr 60px;
+  grid-template-columns: 60px 150px 70px 60px 80px 90px 150px 1fr;
   gap: 6px;
   padding: 6px 8px;
   font-size: 12.5px;
