@@ -431,6 +431,7 @@ const messages = {
       'Please check form': 'Please check form',
       'Form Reset': 'Form has been reset',
       'Checksum': 'Checksum',
+      'Checksum Disabled By Compression': 'Disabled because compression is enabled. md5 byte comparison is invalid against gzip/zstd archives; ClickHouse BACKUP has its own metadata integrity check.',
       'Instance': 'Instance',
       // New keys for Task 11 redesign
       'Schedule': 'Schedule',
@@ -1230,6 +1231,7 @@ const messages = {
       'Please check form': '请检查表单填写是否正确',
       'Form Reset': '表单已重置',
       'Checksum': '是否校验MD5',
+      'Checksum Disabled By Compression': '开启压缩后不再做 md5 比对——本地 raw 文件 md5 与 S3 上 gzip/zstd 字节流必然不等。ClickHouse BACKUP 自身有 metadata 完整性校验。',
       'Instance': '指定执行实例',
       // New keys for Task 11 redesign
       'Schedule': '调度',

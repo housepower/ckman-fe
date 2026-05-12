@@ -106,7 +106,21 @@
         </el-select>
       </el-form-item>
       <el-form-item :label="$t('backup.Checksum')">
-        <el-switch v-model="form.checksum" active-color="#C9A100" inactive-color="#c0c4cc" />
+        <el-tooltip
+          :content="$t('backup.Checksum Disabled By Compression')"
+          :disabled="!checksumDisabled"
+          placement="top"
+        >
+          <el-switch
+            v-model="form.checksum"
+            :disabled="checksumDisabled"
+            active-color="#C9A100"
+            inactive-color="#c0c4cc"
+          />
+        </el-tooltip>
+        <div v-if="checksumDisabled" class="form-hint-text">
+          {{ $t('backup.Checksum Disabled By Compression') }}
+        </div>
       </el-form-item>
       <el-form-item :label="$t('backup.Clean Successful Partitions')">
         <el-switch v-model="form.clean" active-color="#C9A100" inactive-color="#c0c4cc" />
@@ -195,10 +209,20 @@ export default {
     instanceChanged() {
       return this.form.instance !== this.originalInstance;
     },
+    checksumDisabled() {
+      const c = (this.form.compression || '').toLowerCase();
+      return c !== '' && c !== 'none';
+    },
   },
   watch: {
     value(visible) {
       if (visible && this.task) this.loadFromTask();
+    },
+    'form.compression'(val) {
+      const c = (val || '').toLowerCase();
+      if (c !== '' && c !== 'none') {
+        this.form.checksum = false;
+      }
     },
   },
   methods: {

@@ -327,7 +327,16 @@
                 </el-form-item>
 
                 <el-form-item :label="$t('backup.Checksum')" prop="checksum">
-                    <el-switch v-model="form.checksum" />
+                    <el-tooltip
+                        :content="$t('backup.Checksum Disabled By Compression')"
+                        :disabled="!checksumDisabled"
+                        placement="top"
+                    >
+                        <el-switch v-model="form.checksum" :disabled="checksumDisabled" />
+                    </el-tooltip>
+                    <span v-if="checksumDisabled" class="form-hint-text">
+                        {{ $t('backup.Checksum Disabled By Compression') }}
+                    </span>
                 </el-form-item>
             </div>
 
@@ -560,6 +569,12 @@ export default {
                 return sum + (tbl ? (tbl.total_bytes || 0) : 0);
             }, 0);
         },
+        // 压缩开启时，checksum 的逐文件 md5 比对没意义（CK 上传的是 gzip 字节流，
+        // 与本地 raw md5 必然不等），后端会跳过 md5 比对——前端直接禁用 + 提示。
+        checksumDisabled() {
+            const c = (this.form.compression || '').toLowerCase();
+            return c !== '' && c !== 'none';
+        },
         // 已挂在 active scheduled task 下的表（同 cluster + 当前 database）。
         // 仅在 scheduleType=scheduled 时影响选项可用性。
         conflictingTables() {
@@ -579,6 +594,13 @@ export default {
         'form.target'(val) {
             if (val === 'local') {
                 this.fetchDisks();
+            }
+        },
+        // 切到压缩格式时自动关 checksum
+        'form.compression'(val) {
+            const c = (val || '').toLowerCase();
+            if (c !== '' && c !== 'none') {
+                this.form.checksum = false;
             }
         },
         // 增量类型切换时清掉对方字段，避免视觉残留 + 提交脏数据
