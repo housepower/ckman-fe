@@ -31,9 +31,9 @@
       </div>
       <p
         class="dfi-description"
-        v-if="description.length && description[0]"
+        v-if="schema['description_' + lang]"
       >
-        {{ description.join(' ') }}
+        {{ schema['description_' + lang] }}
       </p>
       <p class="dfi-error" v-if="errorMessage">{{ errorMessage }}</p>
     </div>
@@ -312,19 +312,6 @@ export default {
       errorMessage: '',
     }
   },
-  mounted() {
-  // 如果是 bool 类型且没有初始值，则根据 schema.default 设置默认值
-  console.log('this.formModel[this.originName]', this.formModel[this.originName]);
-    if (this.schema.type === 'bool' && this.formModel[this.originName] !== undefined) {
-      // 将字符串 "true" 或 true 转换为布尔值 true，其他情况转换为 false
-      const defaultValue = this.schema.default === "true" || this.schema.default === true;
-      console.log('this.schema.default', this.schema.default);
-      console.log('defaultValue', defaultValue);
-      //this.$set(this.formModel, this.originName, defaultValue);
-      console.log('this.formModel[this.originName]', this.formModel[this.originName]);
-    }
-  },
-
   methods: {
     getFilterOption(candidates) {
       const { filter } = this.schema;
