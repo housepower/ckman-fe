@@ -43,7 +43,7 @@
     <!-- {{ schema.type }} -->
     <!-- {{formModel}} -->
     <template v-if="schema.candidates && schema.candidates.length > 0">
-      <el-select v-model="formModel[originName]" :disabled="schema.editable === 'false'" size="medium" class="width-350" :placeholder="$t('common.Please choose')">
+      <el-select v-model="formModel[originName]" :disabled="schema.editable === 'false'" size="medium" class="dfi-input" :placeholder="$t('common.Please choose')">
         <el-option v-for="(item, index) in getFilterOption(schema.candidates)" :key="index" :label="item['label_' + lang]" :value="['int', 'float'].includes(schema.type) ? Number(item.value) : item.value"></el-option>
       </el-select>
     </template>
@@ -51,11 +51,11 @@
     <template v-else>
       <template v-if="schema.type === 'string'">
         <!-- 单行文本 -->
-        <el-input class="width-350" size="medium" :disabled="schema.editable === 'false'" v-model="formModel[originName]" :placeholder="$t('common.Please fill out')" v-if="schema.input_type === 'text'"></el-input>
+        <el-input class="dfi-input" size="medium" :disabled="schema.editable === 'false'" v-model="formModel[originName]" :placeholder="$t('common.Please fill out')" v-if="schema.input_type === 'text'"></el-input>
         <!-- 多行文本 -->
-        <el-input class="width-350" size="medium" :disabled="schema.editable === 'false'" type="textarea" v-model="formModel[originName]" :placeholder="$t('common.Please fill out')" v-if="schema.input_type === 'textarea'"></el-input>
+        <el-input class="dfi-input" size="medium" :disabled="schema.editable === 'false'" type="textarea" v-model="formModel[originName]" :placeholder="$t('common.Please fill out')" v-if="schema.input_type === 'textarea'"></el-input>
         <!-- 密码 -->
-        <el-input class="width-350" size="medium" :disabled="schema.editable === 'false'" autocomplete="new-password" v-model="formModel[originName]" :placeholder="$t('common.Please fill out')" v-if="schema.input_type === 'password'" show-password></el-input>
+        <el-input class="dfi-input" size="medium" :disabled="schema.editable === 'false'" autocomplete="new-password" v-model="formModel[originName]" :placeholder="$t('common.Please fill out')" v-if="schema.input_type === 'password'" show-password></el-input>
       </template>
       
       <!-- switch -->
@@ -69,7 +69,7 @@
       <!-- 数字输入-整数 -->
       <el-input-number
         :disabled="schema.editable === 'false'"
-        class="width-350"
+        class="dfi-input"
         size="medium"
         v-model="formModel[originName]"
         :controls="false"
@@ -82,7 +82,7 @@
       <!-- 数字输入-小数 -->
       <el-input-number
         :disabled="schema.editable === 'false'"
-        class="width-350"
+        class="dfi-input"
         size="medium"
         v-model="formModel[originName]"
         :controls="false"
@@ -490,5 +490,23 @@ export default {
   color: var(--c-danger-fg);
   margin: var(--s-1) 0 0 var(--s-3);
   line-height: var(--lh-normal);
+}
+
+::v-deep .dfi-input {
+  max-width: 480px;
+  width: 100% !important;
+
+  &.el-input--medium .el-input__inner,
+  &.el-input-number--medium .el-input__inner {
+    border-radius: var(--r-sm);
+  }
+}
+
+::v-deep .dfi-input.is-disabled .el-input__inner,
+::v-deep .dfi-input .el-input.is-disabled .el-input__inner {
+  background: var(--c-surface-1);
+  color: var(--c-text-secondary);
+  border-color: var(--c-surface-3);
+  cursor: default;
 }
 </style>
