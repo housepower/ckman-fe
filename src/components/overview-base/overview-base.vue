@@ -1,36 +1,44 @@
 <template>
   <section class="overview-base">
-    <div v-for="(group, gIndex) of chartMetrics" :key="group.title" class="chart-group">
-      <h2 class="chart-group__title">{{ $t('ClickHouseEcharts.' + group.title) }}</h2>
-      <div class="chart-grid">
-        <div
-          v-for="(item, mIndex) of group.metrics"
-          :key="`${gIndex}-${mIndex}`"
-          class="chart-card"
-        >
-          <p class="chart-card__title">{{ $t('ClickHouseEcharts.' + item.expect) }}</p>
-          <div class="chart-card__body">
-            <vue-echarts
-              v-if="item.option && !item.isEmpty"
-              ref="Charts"
-              :option="item.option"
-              theme="ckman"
-              @mousemove.native="mousemove('series', $event)"
-            />
-            <EmptyState
-              v-else-if="item.isEmpty"
-              :title="$t('home.No data')"
-              :description="$t('home.No data hint')"
-              icon-class="el-icon-data-line"
-              compact
-            />
-            <div v-else class="chart-card__loading">
-              <i class="el-icon-loading"></i>
+    <template v-if="!allEmpty">
+      <div v-for="(group, gIndex) of chartMetrics" :key="group.title" class="chart-group">
+        <h2 class="chart-group__title">{{ $t('ClickHouseEcharts.' + group.title) }}</h2>
+        <div class="chart-grid">
+          <div
+            v-for="(item, mIndex) of group.metrics"
+            :key="`${gIndex}-${mIndex}`"
+            class="chart-card"
+          >
+            <p class="chart-card__title">{{ $t('ClickHouseEcharts.' + item.expect) }}</p>
+            <div class="chart-card__body">
+              <vue-echarts
+                v-if="item.option && !item.isEmpty"
+                ref="Charts"
+                :option="item.option"
+                theme="ckman"
+                @mousemove.native="mousemove('series', $event)"
+              />
+              <EmptyState
+                v-else-if="item.isEmpty"
+                :title="$t('home.No data')"
+                :description="$t('home.No data hint')"
+                icon-class="el-icon-data-line"
+                compact
+              />
+              <div v-else class="chart-card__loading">
+                <i class="el-icon-loading"></i>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </template>
+    <EmptyState
+      v-else
+      :title="$t('home.Metrics unavailable')"
+      :description="$t('home.Metrics unavailable hint')"
+      icon-class="el-icon-data-analysis"
+    />
   </section>
 </template>
 <script>
@@ -53,6 +61,18 @@ export default {
     refreshDuration: {
       type: Number,
       default: null,
+    },
+  },
+  computed: {
+    allEmpty() {
+      if (!this.chartMetrics.length) return false;
+      const allLoaded = this.chartMetrics.every(g =>
+        g.metrics.every(m => m.option !== null || m.isEmpty === true)
+      );
+      if (!allLoaded) return false;
+      return this.chartMetrics.every(g =>
+        g.metrics.every(m => m.isEmpty === true)
+      );
     },
   },
   data() {
