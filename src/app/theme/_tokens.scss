@@ -1,0 +1,59 @@
+// ckman-fe Design Tokens
+// 单一来源：所有 token 同时输出为 SCSS 变量（编译时）与 CSS 自定义属性（运行时）
+// 命名约定：用途名 > 物理名。组件层禁止直接使用基色 token（如 --c-gold-500），应使用语义 token（如 --c-primary-solid）
+
+// ─────────────────────────────────────────────────
+// Color · 基色（10 阶金色 + 10 阶中性灰）
+// ─────────────────────────────────────────────────
+
+// 金色（锚 500 = #C9A100，HSL 色相 48°，按饱和度/明度均匀派生）
+$tokens-gold-50:  #FDF9E6;
+$tokens-gold-100: #FAF1B8;
+$tokens-gold-200: #F4E388;
+$tokens-gold-300: #ECCF57;
+$tokens-gold-400: #E0BA32;
+$tokens-gold-500: #C9A100;  // ★ 品牌锚定，绝对不动
+$tokens-gold-600: #A88500;
+$tokens-gold-700: #856900;
+$tokens-gold-800: #634D00;
+$tokens-gold-900: #423300;
+
+// 中性灰（锚 700 = #1a1d23 顶栏色，冷调灰）
+$tokens-gray-50:  #F8F9FA;
+$tokens-gray-100: #F1F3F5;
+$tokens-gray-200: #E5E7EB;
+$tokens-gray-300: #D1D5DB;
+$tokens-gray-400: #9CA3AF;
+$tokens-gray-500: #6B7280;
+$tokens-gray-600: #4B5563;
+$tokens-gray-700: #1A1D23;  // ★ 顶栏深色锚定
+$tokens-gray-800: #0F1115;
+$tokens-gray-900: #07080A;
+
+// ─────────────────────────────────────────────────
+// :root CSS 自定义属性导出
+// ─────────────────────────────────────────────────
+:root {
+  // Color · 基色
+  --c-gold-50:  #{$tokens-gold-50};
+  --c-gold-100: #{$tokens-gold-100};
+  --c-gold-200: #{$tokens-gold-200};
+  --c-gold-300: #{$tokens-gold-300};
+  --c-gold-400: #{$tokens-gold-400};
+  --c-gold-500: #{$tokens-gold-500};
+  --c-gold-600: #{$tokens-gold-600};
+  --c-gold-700: #{$tokens-gold-700};
+  --c-gold-800: #{$tokens-gold-800};
+  --c-gold-900: #{$tokens-gold-900};
+
+  --c-gray-50:  #{$tokens-gray-50};
+  --c-gray-100: #{$tokens-gray-100};
+  --c-gray-200: #{$tokens-gray-200};
+  --c-gray-300: #{$tokens-gray-300};
+  --c-gray-400: #{$tokens-gray-400};
+  --c-gray-500: #{$tokens-gray-500};
+  --c-gray-600: #{$tokens-gray-600};
+  --c-gray-700: #{$tokens-gray-700};
+  --c-gray-800: #{$tokens-gray-800};
+  --c-gray-900: #{$tokens-gray-900};
+}
