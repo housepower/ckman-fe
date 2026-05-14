@@ -424,11 +424,27 @@ export default {
   }
 }
 
+// 紧凑化：label-position=top 下整体压缩高度
+::v-deep .el-form-item {
+  margin-bottom: var(--s-3);
+}
+
+::v-deep .el-form-item__label {
+  padding: 0 0 var(--s-1);
+  line-height: var(--lh-tight);
+  width: 100% !important;
+}
+
+::v-deep .el-form-item__content {
+  line-height: var(--lh-normal);
+  margin-left: 0 !important;
+}
+
 .dfi-label {
   display: block;
   text-align: left;
   cursor: pointer;
-  margin-bottom: var(--s-1);
+  line-height: var(--lh-tight);
 
   &__main {
     display: flex;
@@ -440,7 +456,7 @@ export default {
   }
 
   &__name {
-    line-height: var(--lh-normal);
+    line-height: var(--lh-tight);
   }
 }
 
@@ -468,15 +484,15 @@ export default {
 .dfi-description {
   font-size: var(--fs-xs);
   color: var(--c-text-tertiary);
-  margin: var(--s-1) 0 var(--s-1) var(--s-3);
-  line-height: var(--lh-normal);
+  margin: 2px 0 0;
+  line-height: var(--lh-tight);
 }
 
 .dfi-error {
   font-size: var(--fs-xs);
   color: var(--c-danger-fg);
-  margin: var(--s-1) 0 0 var(--s-3);
-  line-height: var(--lh-normal);
+  margin: 2px 0 0;
+  line-height: var(--lh-tight);
 }
 
 ::v-deep .dfi-input {

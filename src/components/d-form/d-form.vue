@@ -1,5 +1,5 @@
 <template>
-  <el-form :model="formData" ref="form" class="d-form">
+  <el-form :model="formData" ref="form" class="d-form" label-position="top">
     <DFormItem
       v-for="(item, key) in schema"
       :key="key"
