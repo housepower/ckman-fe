@@ -35,10 +35,18 @@
           <el-option
             v-for="n in nodes"
             :key="n.ip"
-            :label="`${n.ip} (${n.status})`"
+            :label="n.ip"
             :value="n.ip"
             :disabled="n.status === 'red'"
-          />
+          >
+            <div class="node-opt">
+              <span class="node-opt__dot" :class="`node-opt__dot--${n.status}`"></span>
+              <span class="node-opt__ip">{{ n.ip }}</span>
+              <span class="node-opt__status" :class="`node-opt__status--${n.status}`">
+                {{ statusLabel(n.status) }}
+              </span>
+            </div>
+          </el-option>
         </el-select>
       </el-form-item>
     </el-form>
@@ -96,6 +104,11 @@ export default {
     },
   },
   methods: {
+    statusLabel(status) {
+      const map = { green: 'statusGreen', red: 'statusRed', yellow: 'statusYellow' };
+      const key = map[status];
+      return key ? this.$t('manage.' + key) : status;
+    },
     close() {
       this.$emit('close');
     },
@@ -165,5 +178,39 @@ export default {
 ::v-deep .el-switch.is-checked .el-switch__core {
   background-color: var(--c-primary-solid);
   border-color: var(--c-primary-solid);
+}
+</style>
+
+<!-- 非 scoped 全局规则：el-select 下拉被 teleport 到 body，scoped 选择器不可达 -->
+<style lang="scss">
+.node-opt {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+
+    &--green  { background: var(--c-success-solid); }
+    &--red    { background: var(--c-danger-solid); }
+    &--yellow { background: var(--c-warning-solid); }
+  }
+
+  &__ip {
+    font-variant-numeric: tabular-nums;
+    color: var(--c-text-primary);
+  }
+
+  &__status {
+    margin-left: auto;
+    font-size: var(--fs-xs);
+
+    &--green  { color: var(--c-success-fg); }
+    &--red    { color: var(--c-danger-fg); }
+    &--yellow { color: var(--c-warning-fg); }
+  }
 }
 </style>
