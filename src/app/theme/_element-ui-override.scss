@@ -26,3 +26,65 @@ $--border-radius-base:    $tokens-r-md;
 $--font-path: '~element-ui-eoi/lib/theme-chalk/fonts';
 
 @import '~element-ui-eoi/packages/theme-chalk/src/index';
+
+// ─────────────────────────────────────────────────
+// Element UI 全局微调（chalk 之后追加，覆盖默认）
+// ─────────────────────────────────────────────────
+
+.el-message {
+  border-radius: var(--r-md);
+  border: 1px solid var(--c-surface-3);
+  box-shadow: var(--sh-md);
+  min-width: 320px;
+  padding: var(--s-3) var(--s-4);
+
+  &--success { border-left: 3px solid var(--c-success-solid); }
+  &--warning { border-left: 3px solid var(--c-warning-solid); }
+  &--error   { border-left: 3px solid var(--c-danger-solid); }
+  &--info    { border-left: 3px solid var(--c-info-solid); }
+}
+
+.el-notification {
+  border-radius: var(--r-md);
+  box-shadow: var(--sh-lg);
+  border: 1px solid var(--c-surface-3);
+}
+
+.el-message-box {
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-lg);
+
+  &__header { padding: var(--s-4) var(--s-5); border-bottom: 1px solid var(--c-surface-3); }
+  &__title  { font-size: var(--fs-md); font-weight: var(--fw-semibold); }
+  &__content { padding: var(--s-4) var(--s-5); }
+  &__btns   { padding: var(--s-3) var(--s-5); }
+}
+
+.el-tooltip__popper {
+  font-size: var(--fs-xs);
+  border-radius: var(--r-sm);
+
+  &.is-dark {
+    background: var(--c-gray-700);
+    color: var(--c-surface-0);
+  }
+}
+
+.el-button {
+  font-size: var(--fs-sm);
+  border-radius: var(--r-sm);
+
+  &--medium { padding: var(--s-2) var(--s-3); }
+  &--small  { padding: 7px var(--s-3); }
+  &--mini   { padding: 6px var(--s-2); font-size: var(--fs-xs); }
+}
+
+.el-input__inner {
+  border-radius: var(--r-sm);
+  font-size: var(--fs-sm);
+}
+
+.el-tag {
+  border-radius: var(--r-sm);
+  font-size: var(--fs-xs);
+}
