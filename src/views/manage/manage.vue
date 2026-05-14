@@ -17,15 +17,26 @@
         </el-button>
       </template>
     </PageHeader>
-    <div class="upgrade-card">
-      <div class="upgrade-card__header">
-        <h3 class="upgrade-card__title">{{ $t('manage.Upgrade Cluster') }}</h3>
-        <div class="upgrade-card__current">
-          <span class="upgrade-card__current-label">{{ $t('home.ClickHouse Version') }}</span>
-          <span class="upgrade-card__current-pill">{{ list.version || '—' }}</span>
+    <div class="upgrade-card" :class="{ 'upgrade-card--collapsed': !upgradeExpanded }">
+      <div
+        class="upgrade-card__header"
+        :class="{ 'upgrade-card__header--toggle': mode === 'deploy' }"
+        @click="mode === 'deploy' && (upgradeExpanded = !upgradeExpanded)"
+      >
+        <div class="upgrade-card__title-group">
+          <h3 class="upgrade-card__title">{{ $t('manage.Upgrade Cluster') }}</h3>
+          <div class="upgrade-card__current">
+            <span class="upgrade-card__current-label">{{ $t('home.ClickHouse Version') }}</span>
+            <span class="upgrade-card__current-pill">{{ list.version || '—' }}</span>
+          </div>
         </div>
+        <i
+          v-if="mode === 'deploy'"
+          class="upgrade-card__chevron fa"
+          :class="upgradeExpanded ? 'fa-chevron-up' : 'fa-chevron-down'"
+        ></i>
       </div>
-      <div v-if="mode === 'deploy'" class="upgrade-card__form">
+      <div v-if="mode === 'deploy' && upgradeExpanded" class="upgrade-card__form">
         <div class="upgrade-card__field">
           <label class="upgrade-card__field-label">{{ $t('manage.Upgrade to') }}</label>
           <el-select
@@ -190,6 +201,7 @@ export default {
   },
   data() {
     return {
+      upgradeExpanded: false,
       addNodeDialogVisible: false,
       reBalanceDialogVisible: false,
       deleteNodeDialogVisible: false,
@@ -545,6 +557,14 @@ export default {
 }
 
 .upgrade-card {
+  &--collapsed {
+    .upgrade-card__header {
+      padding-bottom: 0;
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+  }
+
   &__header {
     display: flex;
     align-items: center;
@@ -553,6 +573,21 @@ export default {
     padding-bottom: var(--s-3);
     border-bottom: 1px solid var(--c-surface-2);
     margin-bottom: var(--s-4);
+
+    &--toggle {
+      cursor: pointer;
+      user-select: none;
+
+      &:hover .upgrade-card__chevron {
+        color: var(--c-primary-solid);
+      }
+    }
+  }
+
+  &__title-group {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--s-4);
   }
 
   &__title {
@@ -561,6 +596,12 @@ export default {
     color: var(--c-text-primary);
     margin: 0;
     line-height: var(--lh-tight);
+  }
+
+  &__chevron {
+    color: var(--c-text-tertiary);
+    font-size: var(--fs-sm);
+    transition: color var(--du-fast) var(--ease-out);
   }
 
   &__current {
