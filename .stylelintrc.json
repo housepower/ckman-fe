@@ -2,6 +2,17 @@
   "extends": ["stylelint-config-recommended-scss"],
   "plugins": ["stylelint-scss"],
   "customSyntax": "postcss-scss",
+  "overrides": [
+    {
+      "files": ["**/*.vue"],
+      "customSyntax": "postcss-html",
+      "rules": {
+        "no-empty-source": null,
+        "block-no-empty": null,
+        "selector-pseudo-class-no-unknown": null
+      }
+    }
+  ],
   "rules": {
     "color-no-hex": [true, {
       "severity": "warning",

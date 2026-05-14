@@ -7,7 +7,7 @@
     "serve": "node_modules/.bin/vue-cli-service serve src/main.tsx",
     "build": "vue-cli-service build src/main.tsx",
     "lint": "node_modules/.bin/vue-cli-service lint",
-    "lint:style": "stylelint --allow-empty-input --max-warnings=99999 \"src/**/*.scss\""
+    "lint:style": "stylelint --allow-empty-input --max-warnings=99999 \"src/**/*.{scss,vue}\""
   },
   "dependencies": {
     "@fontsource/inter": "5",
@@ -58,6 +58,7 @@
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-jsdoc": "^32.3.1",
     "postcss": "8",
+    "postcss-html": "1",
     "postcss-scss": "4",
     "sass": "^1.32.11",
     "sass-loader": "^10.1.0",
