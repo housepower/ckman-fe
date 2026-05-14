@@ -1,22 +1,41 @@
 <template>
   <el-form-item :prop="propName" v-if="isVisible" :class="className" :rules="rules" class="mb-0">
-    <div slot="label" class="width-full text-left relative" @click="isSlideUp = !isSlideUp">
-      <div class="pointer text-ellipsis" style="display: inline-block; width: 250px;">
-        <i v-if="isShowCaret" class="fa" :class="{ 'fa-caret-right': !isSlideUp, 'fa-caret-down': isSlideUp }"></i>
-        {{schema['label_' + lang] || schema['label_' + lang] || originName}}
-        <el-tooltip class="item" effect="dark" placement="top">
+    <div slot="label" class="dfi-label" @click="isSlideUp = !isSlideUp">
+      <div class="dfi-label__main">
+        <i
+          v-if="isShowCaret"
+          class="fa dfi-caret"
+          :class="{ 'fa-caret-right': !isSlideUp, 'fa-caret-down': isSlideUp }"
+        ></i>
+        <span class="dfi-label__name">{{ schema['label_' + lang] || originName }}</span>
+        <span class="dfi-required" v-if="isRequired">*</span>
+        <el-tooltip
+          v-if="description.length"
+          class="item"
+          effect="dark"
+          placement="top"
+        >
           <div slot="content" style="line-height: 1.5">
-            <p v-for="(item, index) in description" :key="index" class="mb-2">{{item}}</p>
+            <p v-for="(item, index) in description" :key="index" class="mb-2">{{ item }}</p>
           </div>
-          <i class="fa fa-info-circle pointer"></i>
+          <i class="fa fa-info-circle dfi-info"></i>
         </el-tooltip>
-        <span class="fc-red bold ml-5" v-if="isRequired">*</span>
-        <span>：</span>
-        <el-button v-if="isShowAddIcon && schema.editable === 'true'" @click.stop="addItem" size="mini" class="absolute" :style="{ 'left': isCascade ? '300px' : '260px' }">
-          <i class="fa fa-plus pointer el-link--primary"></i>
+        <el-button
+          v-if="isShowAddIcon && schema.editable === 'true'"
+          @click.stop="addItem"
+          size="mini"
+          class="dfi-add"
+        >
+          <i class="fa fa-plus"></i>
         </el-button>
-        <span class="fc-red absolute error-message">{{errorMessage}}</span>
       </div>
+      <p
+        class="dfi-description"
+        v-if="description.length && description[0]"
+      >
+        {{ description.join(' ') }}
+      </p>
+      <p class="dfi-error" v-if="errorMessage">{{ errorMessage }}</p>
     </div>
     <!-- {{propName}} -->
     <!-- {{ originName }} -->
@@ -416,5 +435,60 @@ export default {
       left: 300px !important;
     }
   }
+}
+
+.dfi-label {
+  display: block;
+  text-align: left;
+  cursor: pointer;
+  margin-bottom: var(--s-1);
+
+  &__main {
+    display: flex;
+    align-items: center;
+    gap: var(--s-1);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-medium);
+    color: var(--c-text-primary);
+  }
+
+  &__name {
+    line-height: var(--lh-normal);
+  }
+}
+
+.dfi-caret {
+  color: var(--c-text-tertiary);
+  font-size: var(--fs-xs);
+}
+
+.dfi-required {
+  color: var(--c-primary-solid);
+  font-weight: var(--fw-bold);
+  margin-left: 2px;
+}
+
+.dfi-info {
+  color: var(--c-text-tertiary);
+  cursor: help;
+  font-size: var(--fs-sm);
+}
+
+.dfi-add {
+  margin-left: var(--s-2);
+}
+
+.dfi-description {
+  font-size: var(--fs-xs);
+  color: var(--c-text-tertiary);
+  margin: var(--s-1) 0 var(--s-1) var(--s-3);
+  line-height: var(--lh-normal);
+}
+
+.dfi-error {
+  font-size: var(--fs-xs);
+  color: var(--c-danger-fg);
+  margin: var(--s-1) 0 0 var(--s-3);
+  line-height: var(--lh-normal);
 }
 </style>
