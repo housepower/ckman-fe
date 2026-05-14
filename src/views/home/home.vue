@@ -44,7 +44,7 @@
   <el-input
     v-model="key"
     :placeholder="$t('common.keyword search')"
-    autocomplete="false"
+    autocomplete="off"
     clearable
     size="medium"
     class="toolbar__search"
@@ -464,13 +464,6 @@ export default {
     }
   }
 
-  &__delete-item {
-    color: var(--c-danger-fg) !important;
-
-    i {
-      margin-right: var(--s-1);
-    }
-  }
 }
 
 ::v-deep .el-table__row:hover .row-actions {
@@ -495,6 +488,17 @@ export default {
 
   td {
     color: var(--c-text-primary);
+  }
+}
+</style>
+
+<!-- 非 scoped 全局规则：el-dropdown-menu 被 Element UI teleport 到 body，scoped 选择器不可达 -->
+<style lang="scss">
+.row-actions__delete-item {
+  color: var(--c-danger-fg) !important;
+
+  i {
+    margin-right: var(--s-1);
   }
 }
 </style>
