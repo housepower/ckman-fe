@@ -134,6 +134,7 @@ const messages = {
       'Replica only': 'Replica only',
       Cluster: 'Cluster',
       nodes: 'nodes',
+      Open: 'Open',
     },
     manage: {
       'Upgrade Cluster': 'Upgrade Cluster',
@@ -968,6 +969,7 @@ const messages = {
       'Replica only': '仅副本',
       Cluster: '集群',
       nodes: '节点',
+      Open: '打开',
     },
     manage: {
       'Upgrade Cluster': '升级集群',

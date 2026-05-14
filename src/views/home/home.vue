@@ -120,15 +120,27 @@
             <span v-else class="replica-no">—</span>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('home.Actions')"
-                         #default="{ row }">
-          <el-link type="primary"
-                   underline
-                   @click.prevent="toCluster(row)"
-                   :to="'/clusters/' + row.cluster">{{$t('home.Go to cluster')}}</el-link>
-          <i class="fa fa-trash pointer fs-18 ml-35"
-             v-tooltip="$t('common.Delete')"
-             @click="remove(row)" />
+        <el-table-column :label="$t('home.Actions')" width="140" align="right">
+          <template #default="{ row }">
+            <div class="row-actions">
+              <router-link
+                :to="'/clusters/' + row.cluster"
+                @click.native="toCluster(row)"
+                class="row-actions__open"
+              >
+                {{ $t('home.Open') }} ›
+              </router-link>
+              <el-dropdown trigger="click" @command="onRowCommand($event, row)">
+                <i class="fa fa-ellipsis-v row-actions__more"></i>
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item command="delete" class="row-actions__delete-item">
+                    <i class="el-icon-delete"></i>
+                    {{ $t('common.Delete') }}
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+            </div>
+          </template>
         </el-table-column>
       </el-table>
     </div>
@@ -215,6 +227,11 @@ export default {
     toCluster(item) {
       this.$root.clusterBench = item;
       delete this.$root.clusterBench.count;
+    },
+    onRowCommand(command, row) {
+      if (command === 'delete') {
+        this.remove(row);
+      }
     },
     async remove(item) {
       await this.$confirm(this.$t("common.Confirm Delete"), this.$t("common.tips"), {
@@ -425,5 +442,53 @@ export default {
 
 .replica-no {
   color: var(--c-text-tertiary);
+}
+
+.row-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-3);
+  opacity: 0;
+  transition: opacity var(--du-fast) var(--ease-out);
+
+  &__open {
+    color: var(--c-primary-fg);
+    text-decoration: none;
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-medium);
+
+    &:hover {
+      color: var(--c-primary-solid);
+    }
+  }
+
+  &__more {
+    color: var(--c-text-tertiary);
+    cursor: pointer;
+    font-size: var(--fs-md);
+    padding: var(--s-1);
+
+    &:hover {
+      color: var(--c-text-primary);
+    }
+  }
+
+  &__delete-item {
+    color: var(--c-danger-fg) !important;
+
+    i {
+      margin-right: var(--s-1);
+    }
+  }
+}
+
+// hover 行时显示 actions
+::v-deep .el-table__row:hover .row-actions {
+  opacity: 1;
+}
+
+// 避免 hover-only 在键盘焦点时不可达：focus-within 也显示
+::v-deep .el-table__row:focus-within .row-actions {
+  opacity: 1;
 }
 </style>
