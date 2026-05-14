@@ -1,6 +1,7 @@
-@import "variables";
+// Element UI 业务侧样式微调（chalk 主题已在 ./theme/_element-ui-override.scss 中导入）
+// 这里只放 .el-* 选择器的二次微调
 
-// form 必填项*位置修改
+// form 必填项 * 位置修改（保留现状行为，颜色用 token）
 .el-form-item {
   &.is-required:not(.is-no-asterisk)  {
     & > .el-form-item__label {
@@ -10,12 +11,12 @@
 
       &:after {
         content: '*';
-        color: #F56C6C;
+        color: var(--c-danger-solid);
       }
     }
   }
 
   .el-form-item__label, .el-form-item__content, .el-radio__label, .el-checkbox__label {
-    font-size: 13px;
+    font-size: var(--fs-base);
   }
 }

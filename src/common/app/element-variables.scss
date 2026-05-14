@@ -1,20 +1,9 @@
-@import '~@/app/variables';
-
-/* 改变主题色变量 */
-$--color-primary: $primary-color;
-
-/* 改变 icon 字体路径变量，必需 */
-$--font-path: '~element-ui/lib/theme-chalk/fonts';
-
-@import "~element-ui/packages/theme-chalk/src/index";
-
-.primary-color {
-  color: $--color-primary;
-}
+// Element UI 业务侧样式微调（chalk 主题已在 theme/_element-ui-override.scss 中导入）
+// 这里只放 .el-* 选择器的二次微调
 
 .el-button--default:not(.default) {
-  border-color: $--color-primary;
-  color: $--color-primary;
+  border-color: var(--c-primary);
+  color: var(--c-primary);
 }
 
 .el-button--primary:not(.default) {
