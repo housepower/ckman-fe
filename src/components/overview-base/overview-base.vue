@@ -119,3 +119,83 @@ export default {
   },
 };
 </script>
+<style lang="scss" scoped>
+.overview-base {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-6);
+}
+
+.chart-group {
+  &__title {
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-semibold);
+    color: var(--c-text-primary);
+    margin: 0 0 var(--s-3);
+    line-height: var(--lh-tight);
+  }
+}
+
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--s-3);
+}
+
+.chart-card {
+  background: var(--c-surface-0);
+  border: 1px solid var(--c-surface-3);
+  border-radius: var(--r-lg);
+  padding: var(--s-3) var(--s-4) var(--s-4);
+  display: flex;
+  flex-direction: column;
+  min-height: 320px;
+
+  &__title {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-medium);
+    color: var(--c-text-secondary);
+    margin: 0 0 var(--s-2);
+    line-height: var(--lh-tight);
+    min-height: 2.5em;
+  }
+
+  &__body {
+    flex: 1;
+    min-height: 240px;
+    position: relative;
+
+    .vue-echarts {
+      width: 100% !important;
+      height: 100% !important;
+    }
+  }
+
+  &__loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--c-text-tertiary);
+    font-size: var(--fs-xl);
+  }
+}
+
+@media (min-width: 1600px) {
+  .chart-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1200px) {
+  .chart-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .chart-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
