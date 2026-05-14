@@ -30,6 +30,13 @@ const required = [
   '--c-surface-0:', '--c-surface-1:', '--c-surface-2:', '--c-surface-3:',
   // 文字
   '--c-text-primary:', '--c-text-secondary:', '--c-text-tertiary:', '--c-text-disabled:',
+  // Spacing (13 个)
+  '--s-0:', '--s-1:', '--s-2:', '--s-3:', '--s-4:', '--s-5:', '--s-6:',
+  '--s-8:', '--s-10:', '--s-12:', '--s-16:', '--s-20:', '--s-24:',
+  // Radius (4 个)
+  '--r-sm:', '--r-md:', '--r-lg:', '--r-pill:',
+  // Shadow (5 个)
+  '--sh-xs:', '--sh-sm:', '--sh-md:', '--sh-lg:', '--sh-inset:',
 ];
 
 const missing = required.filter(name => !css.includes(name));
@@ -41,4 +48,4 @@ if (!css.includes('--c-gold-500: #C9A100')) {
   console.error('FAIL: gold-500 anchor mismatch');
   process.exit(1);
 }
-console.log('PASS: 48 color tokens verified');
+console.log('PASS: 70 tokens verified');
