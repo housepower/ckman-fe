@@ -147,14 +147,17 @@
               </el-tooltip>
             </div>
             <div v-else-if="col.prop === 'disk'" class="disk-cell">
-              <el-progress
-                :percentage="diskPercent(row.disk)"
-                :color="diskColor"
-                :stroke-width="6"
-                :show-text="false"
-                class="disk-cell__bar"
-              />
-              <span class="disk-cell__text">{{ row.disk }}</span>
+              <template v-if="hasDiskData(row.disk)">
+                <el-progress
+                  :percentage="diskPercent(row.disk)"
+                  :color="diskColor"
+                  :stroke-width="6"
+                  :show-text="false"
+                  class="disk-cell__bar"
+                />
+                <span class="disk-cell__text">{{ row.disk }}</span>
+              </template>
+              <span v-else class="disk-cell__empty">—</span>
             </div>
             <span v-else>{{ row[column.property] }}</span>
           </template>
@@ -352,6 +355,10 @@ export default {
       const key = 'manage.status' + upperFirst(status);
       const label = this.$t(key);
       return label === key ? status : label;
+    },
+    hasDiskData(disk) {
+      if (!disk || typeof disk !== 'string') return false;
+      return /([\d.]+)\s*\w*\s*\/\s*([\d.]+)/.test(disk);
     },
     diskPercent(disk) {
       if (!disk || typeof disk !== 'string') return 0;
@@ -681,13 +688,13 @@ export default {
 
   &__current-pill {
     display: inline-block;
-    font-size: var(--fs-xl);
-    font-weight: var(--fw-bold);
+    font-size: var(--fs-md);
+    font-weight: var(--fw-semibold);
     color: var(--c-primary-solid);
     background: var(--c-primary-bg);
     border: 1px solid var(--c-primary-border);
     border-radius: var(--r-md);
-    padding: var(--s-1) var(--s-3);
+    padding: 2px var(--s-2);
     font-variant-numeric: tabular-nums;
     letter-spacing: 0.3px;
     line-height: var(--lh-tight);
@@ -810,6 +817,10 @@ export default {
     font-size: var(--fs-xs);
     color: var(--c-text-tertiary);
     font-variant-numeric: tabular-nums;
+  }
+
+  &__empty {
+    color: var(--c-text-tertiary);
   }
 }
 
