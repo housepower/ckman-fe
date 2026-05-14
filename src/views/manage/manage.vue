@@ -132,7 +132,7 @@
           <template slot-scope="{ row, column }">
             <div v-if="col.prop === 'status'" class="status-cell">
               <span class="status-dot" :class="`status-dot--${row.status}`"></span>
-              <span class="status-cell__text">{{ row.status }}</span>
+              <span class="status-cell__text">{{ statusLabel(row.status) }}</span>
               <span class="status-cell__uptime">{{ row.uptime }}</span>
             </div>
             <div v-else-if="col.prop === 'ip'" class="ip-cell">
@@ -145,6 +145,16 @@
                   @click="openHttpWeb(row.ip, httpPort)"
                 />
               </el-tooltip>
+            </div>
+            <div v-else-if="col.prop === 'disk'" class="disk-cell">
+              <el-progress
+                :percentage="diskPercent(row.disk)"
+                :color="diskColor"
+                :stroke-width="6"
+                :show-text="false"
+                class="disk-cell__bar"
+              />
+              <span class="disk-cell__text">{{ row.disk }}</span>
             </div>
             <span v-else>{{ row[column.property] }}</span>
           </template>
@@ -338,6 +348,25 @@ export default {
     // this.fetchVersionData();
   },
   methods: {
+    statusLabel(status) {
+      const key = 'manage.status' + upperFirst(status);
+      const label = this.$t(key);
+      return label === key ? status : label;
+    },
+    diskPercent(disk) {
+      if (!disk || typeof disk !== 'string') return 0;
+      const match = disk.match(/([\d.]+)\s*\w*\s*\/\s*([\d.]+)/);
+      if (!match) return 0;
+      const used = parseFloat(match[1]);
+      const total = parseFloat(match[2]);
+      if (!total || isNaN(used)) return 0;
+      return Math.min(100, Math.round((used / total) * 100));
+    },
+    diskColor(percentage) {
+      if (percentage >= 90) return '#EF4444';
+      if (percentage >= 70) return '#F59E0B';
+      return '#10B981';
+    },
     async fetchData() {
       const {
         data: { entity },
@@ -765,6 +794,23 @@ export default {
   &--green  { background: var(--c-success-solid); }
   &--red    { background: var(--c-danger-solid); }
   &--yellow { background: var(--c-warning-solid); }
+}
+
+.disk-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 140px;
+
+  &__bar {
+    width: 100%;
+  }
+
+  &__text {
+    font-size: var(--fs-xs);
+    color: var(--c-text-tertiary);
+    font-variant-numeric: tabular-nums;
+  }
 }
 
 .ip-cell {

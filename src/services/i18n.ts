@@ -142,6 +142,9 @@ const messages = {
       'Metrics unavailable hint': 'Could not load metrics. Verify Prometheus integration is configured for this cluster.',
     },
     manage: {
+      'statusGreen': 'Healthy',
+      'statusRed': 'Offline',
+      'statusYellow': 'Warning',
       'Upgrade Cluster': 'Upgrade Cluster',
       'Upgrade to': 'Upgrade to',
       'Policy': 'Policy',
@@ -982,6 +985,9 @@ const messages = {
       'Metrics unavailable hint': '无法加载监控指标。请确认本集群的 Prometheus 接入配置已生效。',
     },
     manage: {
+      'statusGreen': '健康',
+      'statusRed': '离线',
+      'statusYellow': '警告',
       'Upgrade Cluster': '升级集群',
       'Upgrade to': '升级至',
       'Policy': '升级策略',
