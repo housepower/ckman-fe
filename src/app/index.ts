@@ -1,3 +1,6 @@
+// New design tokens & theme (P1)
+import './theme';
+
 import './element-variables.scss';
 
 import '@/common/app/element-variables.scss';

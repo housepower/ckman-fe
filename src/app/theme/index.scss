@@ -1,10 +1,14 @@
 // theme 目录统一入口
 // 1. 字体（必须最先，浏览器先发起请求）
-@import '@fontsource/inter/400.css';
-@import '@fontsource/inter/500.css';
-@import '@fontsource/inter/600.css';
-@import '@fontsource/inter/700.css';
-@import '@fontsource/jetbrains-mono/400.css';
+@import '~@fontsource/inter/400.css';
+@import '~@fontsource/inter/500.css';
+@import '~@fontsource/inter/600.css';
+@import '~@fontsource/inter/700.css';
+@import '~@fontsource/jetbrains-mono/400.css';
 
 // 2. Tokens
 @import './tokens';
+
+// 3. 第三方组件主题覆盖
+@import './element-ui-override';
+@import './vxe-table-override';
