@@ -439,8 +439,6 @@ export default {
   display: inline-flex;
   align-items: center;
   gap: var(--s-3);
-  opacity: 0;
-  transition: opacity var(--du-fast) var(--ease-out);
 
   &__open {
     color: var(--c-primary-fg);
@@ -464,14 +462,6 @@ export default {
     }
   }
 
-}
-
-::v-deep .el-table__row:hover .row-actions {
-  opacity: 1;
-}
-
-::v-deep .el-table__row:focus-within .row-actions {
-  opacity: 1;
 }
 
 ::v-deep .el-table {
