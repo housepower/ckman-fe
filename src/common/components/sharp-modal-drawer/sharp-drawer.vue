@@ -32,21 +32,37 @@
   };
 </script>
 <style lang="scss" scoped>
-  ::v-deep .el-drawer__body {
-    display: flex;
-    flex-direction: column;
-  }
+::v-deep .el-drawer {
+  box-shadow: var(--sh-lg);
+}
 
-  .sharp-drawer__body {
-    flex: 1;
-    overflow-y: auto;
-    padding: 20px;
-  }
+::v-deep .el-drawer__header {
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+  color: var(--c-text-primary);
+  padding: var(--s-4) var(--s-5);
+  margin-bottom: 0;
+  border-bottom: 1px solid var(--c-surface-3);
+  background: var(--c-surface-0);
+}
 
-  .footer {
-    background: white;
-    border-top: solid 1px #E2E2E2;
-    padding: 10px 20px 20px;
-    text-align: right;
-  }
+::v-deep .el-drawer__body {
+  display: flex;
+  flex-direction: column;
+}
+
+.sharp-drawer__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--s-5);
+  color: var(--c-text-primary);
+  font-size: var(--fs-base);
+}
+
+.footer {
+  background: var(--c-surface-1);
+  border-top: 1px solid var(--c-surface-3);
+  padding: var(--s-3) var(--s-5);
+  text-align: right;
+}
 </style>

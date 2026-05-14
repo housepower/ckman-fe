@@ -30,7 +30,38 @@
   };
 </script>
 <style lang="scss" scoped>
-  ::v-deep .el-dialog__body {
-    padding: 20px;
+::v-deep .el-dialog {
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-lg);
+  overflow: hidden;
+}
+
+::v-deep .el-dialog__header {
+  padding: var(--s-4) var(--s-5);
+  border-bottom: 1px solid var(--c-surface-3);
+  background: var(--c-surface-0);
+
+  .el-dialog__title {
+    font-size: var(--fs-md);
+    font-weight: var(--fw-semibold);
+    color: var(--c-text-primary);
   }
+
+  .el-dialog__headerbtn {
+    top: var(--s-4);
+    right: var(--s-5);
+  }
+}
+
+::v-deep .el-dialog__body {
+  padding: var(--s-5);
+  color: var(--c-text-primary);
+  font-size: var(--fs-base);
+}
+
+::v-deep .el-dialog__footer {
+  padding: var(--s-3) var(--s-5);
+  border-top: 1px solid var(--c-surface-3);
+  background: var(--c-surface-1);
+}
 </style>
