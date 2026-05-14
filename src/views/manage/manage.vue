@@ -98,34 +98,33 @@
         v-bind="gridOptions"
         :data="queryList"
       >
-        <vxe-column v-for="(col, index) in columns"
+        <vxe-column
+          v-for="(col, index) in columns"
           :key="index"
           :field="col.prop"
           show-overflow-tooltip
           :title="col.label"
           :filters="col.filters || null"
           sortable
-          align="center">
-          <template slot-scope="{row, column}">
-            <div v-if="col.prop === 'status'" class="flex flex-between">
-              <span>
-                <span class="dot mr-5" :class="row.status"></span>
-                <span>{{row.status}}</span>
-              </span>
-              <span class="ml-10 pull-right">{{row.uptime}}</span>
+          align="left">
+          <template slot-scope="{ row, column }">
+            <div v-if="col.prop === 'status'" class="status-cell">
+              <span class="status-dot" :class="`status-dot--${row.status}`"></span>
+              <span class="status-cell__text">{{ row.status }}</span>
+              <span class="status-cell__uptime">{{ row.uptime }}</span>
             </div>
             <div v-else-if="col.prop === 'ip'" class="ip-cell">
-              <span class="ip-text">{{ row.ip }}</span>
+              <span class="ip-cell__text">{{ row.ip }}</span>
               <el-tooltip :content="$t('manage.Open Play UI')" placement="top">
                 <el-button
                   type="text"
                   icon="el-icon-link"
-                  class="ip-action"
+                  class="ip-cell__action"
                   @click="openHttpWeb(row.ip, httpPort)"
                 />
               </el-tooltip>
             </div>
-            <span v-else>{{row[column.property]}}</span>
+            <span v-else>{{ row[column.property] }}</span>
           </template>
         </vxe-column>
         <vxe-column :title="$t('home.Actions')"
@@ -544,17 +543,39 @@ export default {
     width: 240px;
   }
 }
-.dot {
+.status-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  &__text {
+    text-transform: capitalize;
+  }
+
+  &__uptime {
+    margin-left: 8px;
+    color: #909399;
+    font-size: 12px;
+  }
+}
+
+.status-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
   display: inline-block;
-  &.green {
+  flex-shrink: 0;
+
+  &--green {
     background-color: #1ac51a;
   }
 
-  &.red {
+  &--red {
     background-color: #f50600;
+  }
+
+  &--yellow {
+    background-color: #f5a623;
   }
 }
 </style>
@@ -568,11 +589,11 @@ export default {
   align-items: center;
   gap: 6px;
 }
-.ip-cell .ip-text {
+.ip-cell .ip-cell__text {
   user-select: text;
   cursor: text;
 }
-.ip-cell .ip-action {
+.ip-cell .ip-cell__action {
   padding: 0;
 }
 </style>
