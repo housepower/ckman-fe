@@ -1,9 +1,8 @@
 <template>
   <div class="overview-page">
     <PageHeader
-      :crumb="[$t('layout.ClickHouse Management Console'), clusterName, $t('home.Overview')]"
-      :title="clusterName"
-      :subtitle="$t('home.Overview')"
+      :crumb="[$t('layout.ClickHouse Management Console'), clusterName]"
+      :title="$t('home.Overview')"
     >
       <template #actions>
         <time-filter
