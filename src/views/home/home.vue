@@ -83,32 +83,43 @@
           :label="$t('home.Cluster')"
         >
           <template #default="{ row }">
-            <div class="cluster-cell">
-              <span
-                class="cluster-cell__dot"
-                :class="row.mode === 'deploy' ? 'cluster-cell__dot--deploy' : 'cluster-cell__dot--import'"
-              ></span>
-              <div class="cluster-cell__main">
-                <div class="cluster-cell__name">{{ row.cluster }}</div>
-                <div class="cluster-cell__meta">
-                  <span v-if="row.logic_cluster">{{ row.logic_cluster }} ·</span>
-                  <span>{{ row.count }} {{ $t('home.nodes') }}</span>
-                  <span class="cluster-cell__hosts" v-if="row.hosts">· {{ truncateHosts(row.hosts) }}</span>
+            <el-tooltip :content="row.comment" placement="top" :disabled="!row.comment">
+              <div class="cluster-cell">
+                <span
+                  class="cluster-cell__dot"
+                  :class="row.mode === 'deploy' ? 'cluster-cell__dot--deploy' : 'cluster-cell__dot--import'"
+                ></span>
+                <div class="cluster-cell__main">
+                  <div class="cluster-cell__name">{{ row.cluster }}</div>
+                  <div class="cluster-cell__meta">
+                    <span v-if="row.logic_cluster">{{ row.logic_cluster }} ·</span>
+                    <span>{{ row.count }} {{ $t('home.nodes') }}</span>
+                    <span class="cluster-cell__hosts" v-if="row.hosts">· {{ truncateHosts(row.hosts) }}</span>
+                  </div>
                 </div>
               </div>
-            </div>
+            </el-tooltip>
           </template>
         </el-table-column>
-        <el-table-column prop="mode"
-                         show-overflow-tooltip
-                         :filters="[{ text: 'deploy', value: 'deploy' }, { text: 'import', value: 'import' }]"
-                         :filter-method="filterHandler"
-                         :label="$t('home.Mode')" />
-        <el-table-column prop="isReplica"
-                         show-overflow-tooltip
-                         :filters="[{ text: 'true', value: true }, { text: 'false', value: false }]"
-                         :filter-method="filterHandler"
-                         :label="$t('home.Replica')" />
+        <el-table-column
+          prop="mode"
+          width="100"
+          :label="$t('home.Mode')"
+        >
+          <template #default="{ row }">
+            <span class="mode-badge" :class="`mode-badge--${row.mode}`">{{ row.mode }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="isReplica"
+          width="100"
+          :label="$t('home.Replica')"
+        >
+          <template #default="{ row }">
+            <span v-if="row.isReplica" class="replica-yes">✓</span>
+            <span v-else class="replica-no">—</span>
+          </template>
+        </el-table-column>
         <el-table-column :label="$t('home.Actions')"
                          #default="{ row }">
           <el-link type="primary"
@@ -385,5 +396,34 @@ export default {
   &__hosts {
     margin-left: var(--s-1);
   }
+}
+
+.mode-badge {
+  display: inline-block;
+  padding: 2px var(--s-2);
+  border-radius: var(--r-sm);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  text-transform: capitalize;
+  line-height: var(--lh-tight);
+
+  &--deploy {
+    background: var(--c-info-bg);
+    color: var(--c-info-fg);
+  }
+
+  &--import {
+    background: var(--c-surface-2);
+    color: var(--c-text-secondary);
+  }
+}
+
+.replica-yes {
+  color: var(--c-success-fg);
+  font-weight: var(--fw-semibold);
+}
+
+.replica-no {
+  color: var(--c-text-tertiary);
 }
 </style>
