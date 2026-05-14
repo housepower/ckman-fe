@@ -248,7 +248,6 @@ header {
 main {
   background: var(--c-surface-1);
   padding: 0 var(--s-5);
-  padding-top: var(--s-3);
 }
 
 .cluster-tabs {
