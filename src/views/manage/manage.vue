@@ -520,75 +520,99 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.upgrade-card {
-  border-bottom: 1px solid #eaeef4;
-  padding: 15px 0;
+.manage-page {
+  padding-bottom: var(--s-8);
+}
 
+.upgrade-card,
+.node-card {
+  background: var(--c-surface-0);
+  border: 1px solid var(--c-surface-3);
+  border-radius: var(--r-lg);
+  padding: var(--s-4);
+  margin-top: var(--s-3);
+}
+
+.upgrade-card {
   &__title {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 15px;
+    font-size: var(--fs-md);
+    font-weight: var(--fw-semibold);
+    color: var(--c-text-primary);
+    margin: 0 0 var(--s-3);
+    line-height: var(--lh-tight);
   }
 
   &__row {
     display: flex;
     align-items: center;
-    gap: 10px;
     flex-wrap: wrap;
+    gap: var(--s-3);
+    font-size: var(--fs-sm);
+    margin-bottom: var(--s-2);
+
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 
   &__label {
-    font-size: 14px;
-    font-weight: bold;
+    color: var(--c-text-secondary);
+    font-weight: var(--fw-medium);
   }
 
   &__value {
-    font-size: 14px;
+    color: var(--c-text-primary);
+    font-weight: var(--fw-semibold);
   }
 
   &__select {
-    width: 160px;
+    width: 200px;
   }
 }
-.node-card {
-  padding: 15px 0;
 
+.node-card {
   &__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 15px;
+    margin-bottom: var(--s-3);
+    gap: var(--s-3);
   }
 
   &__title {
-    font-size: 18px;
-    font-weight: bold;
+    font-size: var(--fs-md);
+    font-weight: var(--fw-semibold);
+    color: var(--c-text-primary);
     margin: 0;
+    line-height: var(--lh-tight);
   }
 
   &__actions {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--s-2);
   }
 
   &__search {
-    width: 240px;
+    width: 280px;
   }
 }
+
 .status-cell {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--s-2);
 
   &__text {
+    color: var(--c-text-primary);
+    font-weight: var(--fw-medium);
     text-transform: capitalize;
   }
 
   &__uptime {
-    margin-left: 8px;
-    color: #909399;
-    font-size: 12px;
+    color: var(--c-text-tertiary);
+    font-size: var(--fs-xs);
+    margin-left: var(--s-2);
   }
 }
 
@@ -596,37 +620,52 @@ export default {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  display: inline-block;
   flex-shrink: 0;
 
-  &--green {
-    background-color: #1ac51a;
+  &--green  { background: var(--c-success-solid); }
+  &--red    { background: var(--c-danger-solid); }
+  &--yellow { background: var(--c-warning-solid); }
+}
+
+.ip-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-1);
+
+  &__text {
+    font-variant-numeric: tabular-nums;
+    color: var(--c-text-primary);
   }
 
-  &--red {
-    background-color: #f50600;
-  }
+  &__action {
+    color: var(--c-text-tertiary);
+    padding: 0 var(--s-1);
 
-  &--yellow {
-    background-color: #f5a623;
+    &:hover {
+      color: var(--c-primary-solid);
+    }
+  }
+}
+
+.node-row-more {
+  color: var(--c-text-tertiary);
+  font-size: var(--fs-md);
+  cursor: pointer;
+  padding: var(--s-1);
+
+  &:hover {
+    color: var(--c-text-primary);
   }
 }
 </style>
 
-<style scoped>
-.no-border {
-  border: none;
-}
-.ip-cell {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-.ip-cell .ip-cell__text {
-  user-select: text;
-  cursor: text;
-}
-.ip-cell .ip-cell__action {
-  padding: 0;
+<!-- 非 scoped 全局规则：el-dropdown-menu 被 Element UI teleport 到 body，scoped 选择器不可达 -->
+<style lang="scss">
+.node-row-delete-item {
+  color: var(--c-danger-fg) !important;
+
+  i {
+    margin-right: var(--s-1);
+  }
 }
 </style>
