@@ -18,48 +18,59 @@
       </template>
     </PageHeader>
     <div class="upgrade-card">
-      <h3 class="upgrade-card__title">{{ $t('manage.Upgrade Cluster') }}</h3>
-      <div class="upgrade-card__row">
-        <span class="upgrade-card__label">{{ $t('home.ClickHouse Version') }}:</span>
-        <span class="upgrade-card__value">{{ list.version }}</span>
+      <div class="upgrade-card__header">
+        <h3 class="upgrade-card__title">{{ $t('manage.Upgrade Cluster') }}</h3>
+        <div class="upgrade-card__current">
+          <span class="upgrade-card__current-label">{{ $t('home.ClickHouse Version') }}</span>
+          <span class="upgrade-card__current-pill">{{ list.version || '—' }}</span>
+        </div>
       </div>
-      <div class="upgrade-card__row" v-if="mode === 'deploy'">
-        <span class="upgrade-card__label">{{ $t('manage.Upgrade to') }}:</span>
-        <el-select
-          v-model="packageVersion"
-          size="small"
-          clearable
-          filterable
-          class="upgrade-card__select"
-        >
-          <el-option
-            v-for="item in versionOptions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          ></el-option>
-        </el-select>
-        <span class="upgrade-card__label">{{ $t('manage.Policy') }}:</span>
-        <el-select
-          v-model="policy"
-          size="small"
-          clearable
-          filterable
-          class="upgrade-card__select"
-        >
-          <el-option :label="$t('manage.Full')" value="Full"></el-option>
-          <el-option :label="$t('manage.Rolling')" value="Rolling"></el-option>
-        </el-select>
-        <el-checkbox v-model="skip">{{ $t('manage.skip same version') }}</el-checkbox>
-        <el-checkbox v-model="keeper">{{ $t('manage.skip keeper') }}</el-checkbox>
-        <el-button
-          type="primary"
-          size="small"
-          :disabled="!packageVersion"
-          @click="clusterOperation('upgrade')"
-        >
-          {{ $t('common.Upgrade') }}
-        </el-button>
+      <div v-if="mode === 'deploy'" class="upgrade-card__form">
+        <div class="upgrade-card__field">
+          <label class="upgrade-card__field-label">{{ $t('manage.Upgrade to') }}</label>
+          <el-select
+            v-model="packageVersion"
+            size="small"
+            clearable
+            filterable
+            class="upgrade-card__select"
+          >
+            <el-option
+              v-for="item in versionOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
+        </div>
+        <div class="upgrade-card__field">
+          <label class="upgrade-card__field-label">{{ $t('manage.Policy') }}</label>
+          <el-select
+            v-model="policy"
+            size="small"
+            clearable
+            filterable
+            class="upgrade-card__select"
+          >
+            <el-option :label="$t('manage.Full')" value="Full"></el-option>
+            <el-option :label="$t('manage.Rolling')" value="Rolling"></el-option>
+          </el-select>
+        </div>
+        <div class="upgrade-card__options">
+          <el-checkbox v-model="skip">{{ $t('manage.skip same version') }}</el-checkbox>
+          <el-checkbox v-model="keeper">{{ $t('manage.skip keeper') }}</el-checkbox>
+        </div>
+        <div class="upgrade-card__action">
+          <el-button
+            type="primary"
+            size="medium"
+            :disabled="!packageVersion"
+            @click="clusterOperation('upgrade')"
+          >
+            <i class="el-icon-upload2"></i>
+            {{ $t('common.Upgrade') }}
+          </el-button>
+        </div>
       </div>
     </div>
     <div class="node-card">
@@ -534,39 +545,89 @@ export default {
 }
 
 .upgrade-card {
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-3);
+    padding-bottom: var(--s-3);
+    border-bottom: 1px solid var(--c-surface-2);
+    margin-bottom: var(--s-4);
+  }
+
   &__title {
     font-size: var(--fs-md);
     font-weight: var(--fw-semibold);
     color: var(--c-text-primary);
-    margin: 0 0 var(--s-3);
+    margin: 0;
     line-height: var(--lh-tight);
   }
 
-  &__row {
-    display: flex;
+  &__current {
+    display: inline-flex;
     align-items: center;
-    flex-wrap: wrap;
-    gap: var(--s-3);
-    font-size: var(--fs-sm);
-    margin-bottom: var(--s-2);
-
-    &:last-child {
-      margin-bottom: 0;
-    }
+    gap: var(--s-2);
   }
 
-  &__label {
-    color: var(--c-text-secondary);
+  &__current-label {
+    font-size: var(--fs-xs);
+    color: var(--c-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     font-weight: var(--fw-medium);
   }
 
-  &__value {
-    color: var(--c-text-primary);
+  &__current-pill {
+    display: inline-block;
+    font-size: var(--fs-sm);
     font-weight: var(--fw-semibold);
+    color: var(--c-primary-fg);
+    background: var(--c-primary-bg);
+    border: 1px solid var(--c-primary-border);
+    border-radius: var(--r-pill);
+    padding: 2px var(--s-3);
+    font-variant-numeric: tabular-nums;
+    line-height: var(--lh-tight);
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+  }
+
+  &__field {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+  }
+
+  &__field-label {
+    width: 96px;
+    flex-shrink: 0;
+    text-align: right;
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-medium);
+    color: var(--c-text-secondary);
   }
 
   &__select {
-    width: 200px;
+    width: 280px;
+  }
+
+  &__options {
+    display: flex;
+    align-items: center;
+    gap: var(--s-4);
+    padding-left: calc(96px + var(--s-3));
+  }
+
+  &__action {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: var(--s-3);
+    border-top: 1px solid var(--c-surface-2);
+    margin-top: var(--s-2);
   }
 }
 
