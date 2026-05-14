@@ -17,44 +17,52 @@
         </el-button>
       </template>
     </PageHeader>
-    <section class="container">
-      <div class="uprade ptb-15">
-        <span class="fs-18 font-bold mb-15 inline-block">{{$t('manage.Upgrade Cluster')}}</span>
-        <div class="">
-          <span class="fs-14 font-bold">{{$t('home.ClickHouse Version')}}: {{ list.version }}</span>
-          <template v-if="mode === 'deploy'">
-            <span class="fs-14 font-bold ml-30">{{$t('manage.Upgrade to')}}:</span>
-            <el-select v-model="packageVersion"
-              size="small"
-              clearable
-              filterable
-              class="ml-10 mr-10">
-              <el-option v-for="item in versionOptions"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-              </el-option>
-            </el-select>
-            <span class="fs-14 font-bold ml-0">{{$t('manage.Policy')}}:</span>
-            <el-select v-model="policy"
-              size="small"
-              clearable
-              filterable
-              class="ml-10 mr-20">
-              <el-option :label="$t('manage.Full')" value="Full"></el-option>
-              <el-option :label="$t('manage.Rolling')" value="Rolling"></el-option>
-            </el-select>
-            <el-checkbox v-model="skip" class="mr-50">{{$t('manage.skip same version')}}</el-checkbox>
-            <el-checkbox v-model="keeper" class="mr-50">{{$t('manage.skip keeper')}}</el-checkbox>
-            <el-button type="primary"
-              size="mini"
-              class="fs-16"
-              :disabled="!packageVersion"
-              @click="clusterOperation('upgrade')">{{$t('common.Upgrade')}}</el-button>
-          </template>
-        </div>
+    <div class="upgrade-card">
+      <h3 class="upgrade-card__title">{{ $t('manage.Upgrade Cluster') }}</h3>
+      <div class="upgrade-card__row">
+        <span class="upgrade-card__label">{{ $t('home.ClickHouse Version') }}:</span>
+        <span class="upgrade-card__value">{{ list.version }}</span>
       </div>
-      <div class="node-list">
+      <div class="upgrade-card__row" v-if="mode === 'deploy'">
+        <span class="upgrade-card__label">{{ $t('manage.Upgrade to') }}:</span>
+        <el-select
+          v-model="packageVersion"
+          size="small"
+          clearable
+          filterable
+          class="upgrade-card__select"
+        >
+          <el-option
+            v-for="item in versionOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          ></el-option>
+        </el-select>
+        <span class="upgrade-card__label">{{ $t('manage.Policy') }}:</span>
+        <el-select
+          v-model="policy"
+          size="small"
+          clearable
+          filterable
+          class="upgrade-card__select"
+        >
+          <el-option :label="$t('manage.Full')" value="Full"></el-option>
+          <el-option :label="$t('manage.Rolling')" value="Rolling"></el-option>
+        </el-select>
+        <el-checkbox v-model="skip">{{ $t('manage.skip same version') }}</el-checkbox>
+        <el-checkbox v-model="keeper">{{ $t('manage.skip keeper') }}</el-checkbox>
+        <el-button
+          type="primary"
+          size="small"
+          :disabled="!packageVersion"
+          @click="clusterOperation('upgrade')"
+        >
+          {{ $t('common.Upgrade') }}
+        </el-button>
+      </div>
+    </div>
+    <div class="node-list">
         <h3 class="mt-15 mb-30">{{$t('home.ClickHouse Node List')}}</h3>
         <div class="search flex flex-between pull-left">
           <el-button type="primary"
@@ -135,7 +143,7 @@
           </vxe-column>
         </vxe-table>
       </div>
-    </section>
+    </div>
     <DeleteNodeComponent :visible.sync="deleteNodeDialogVisible" :password="password" :ip="deleteIp" @onOk="onAddNodeSuccess" @close="deleteNodeDialogVisible = false" />
   </main>
 </template>
@@ -481,8 +489,35 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.uprade {
+.upgrade-card {
   border-bottom: 1px solid #eaeef4;
+  padding: 15px 0;
+
+  &__title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  &__label {
+    font-size: 14px;
+    font-weight: bold;
+  }
+
+  &__value {
+    font-size: 14px;
+  }
+
+  &__select {
+    width: 160px;
+  }
 }
 .dot {
   width: 8px;
