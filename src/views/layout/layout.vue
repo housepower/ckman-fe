@@ -40,23 +40,25 @@
       </div>
     </header>
 
+    <nav class="cluster-tabs" v-if="$route.params.id">
+      <div class="cluster-tabs__inner">
+        <a
+          v-for="item of menus"
+          :key="item.name"
+          href="javascript:void(0)"
+          class="ctab"
+          :class="{ 'ctab--active': currentMenu === item.path, 'ctab--hidden': item.name === 'Settings' && mode !== 'deploy' }"
+          @click="handleMenuClick(item, $event)"
+        >
+          {{ $t('home.' + item.name) }}
+        </a>
+      </div>
+    </nav>
+
     <main class="plr-20 pt-10 flex-1"
           style="overflow: auto;">
       <router-view />
     </main>
-    <transition name="el-fade-in-linear"
-                appear>
-      <footer class="flex-center width-full"
-              v-if="$route.params.id">
-        <div class="flex-center list-content width-1000">
-          <a href="javascript:void(0)" class="flex flex-1 flex-center height-full pointer"
-            :class="{ 'router-active': currentMenu === item.path, 'list-item': item.name !== 'Settings' || mode === 'deploy' }"
-            @click="handleMenuClick(item, $event)" v-for="item of menus" :key="item.name">
-            <span class="fs-20">{{$t('home.' + item.name) }}<span style="display: none">{{currentMenu}} {{item.path}}</span></span>
-          </a>
-        </div>
-      </footer>
-    </transition>
   </div>
 </template>
 <script>
@@ -230,28 +232,47 @@ header {
   .ml-15 { margin-left: var(--s-3) !important; }
 }
 
-footer {
+.cluster-tabs {
   position: sticky;
-  width: 100%;
-  bottom: 0px;
-  left: 0;
-  z-index: 100;
-  //transform: translateX(-50%);
-  margin: 0 auto;
-  background-color: #eaeef4;
-  .list-content {
-    height: 65px;
+  top: 48px;
+  z-index: 99;
+  background: var(--c-surface-0);
+  border-bottom: 1px solid var(--c-surface-3);
+  height: 40px;
 
-    .list-item {
-      &:hover,
-      &.router-active {
-        background: var(--primary-color);
-        transition: ease 0.5s;
+  &__inner {
+    display: flex;
+    gap: var(--s-4);
+    padding: 0 var(--s-5);
+    height: 100%;
+    align-items: stretch;
+  }
 
-        span {
-          color: var(--color-white);
-        }
-      }
+  .ctab {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 var(--s-1);
+    font-size: var(--fs-sm);
+    color: var(--c-text-secondary);
+    text-decoration: none;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color var(--du-fast) var(--ease-out),
+                border-color var(--du-fast) var(--ease-out);
+
+    &:hover {
+      color: var(--c-text-primary);
+    }
+
+    &--active {
+      color: var(--c-text-primary);
+      font-weight: var(--fw-semibold);
+      border-bottom-color: var(--c-primary-solid);
+    }
+
+    &--hidden {
+      display: none;
     }
   }
 }
