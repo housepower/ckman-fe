@@ -118,7 +118,7 @@
       />
       <vxe-table
         v-bind="gridOptions"
-        :data="queryList"
+        :data="pagedList"
       >
         <vxe-column
           v-for="(col, index) in columns"
@@ -180,6 +180,16 @@
           </template>
         </vxe-column>
       </vxe-table>
+      <el-pagination
+        v-if="queryList.length > pageSize"
+        class="node-card__pagination"
+        :current-page.sync="currentPage"
+        :page-size.sync="pageSize"
+        :page-sizes="[10, 20, 50, 100]"
+        :total="queryList.length"
+        layout="total, sizes, prev, pager, next, jumper"
+        background
+      />
     </div>
     <DeleteNodeComponent :visible.sync="deleteNodeDialogVisible" :password="password" :ip="deleteIp" @onOk="onAddNodeSuccess" @close="deleteNodeDialogVisible = false" />
   </main>
@@ -202,6 +212,8 @@ export default {
   data() {
     return {
       upgradeExpanded: false,
+      currentPage: 1,
+      pageSize: 10,
       addNodeDialogVisible: false,
       reBalanceDialogVisible: false,
       deleteNodeDialogVisible: false,
@@ -256,6 +268,13 @@ export default {
         return node.hostname.includes(input) || node.ip.includes(input) || node.status.includes(input);
       });
     },
+    pagedList() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      return this.queryList.slice(start, start + this.pageSize);
+    },
+    totalPages() {
+      return Math.max(1, Math.ceil(this.queryList.length / this.pageSize));
+    },
     columns() {
       return [
         {
@@ -297,6 +316,19 @@ export default {
         }
       ];
     }
+  },
+  watch: {
+    input() {
+      this.currentPage = 1;
+    },
+    pageSize() {
+      this.currentPage = 1;
+    },
+    totalPages(value) {
+      if (this.currentPage > value) {
+        this.currentPage = value;
+      }
+    },
   },
   mounted() {
     this.clusterStatus = Object.keys(ClusterStatus)
@@ -698,6 +730,11 @@ export default {
 
   &__search {
     width: 280px;
+  }
+
+  &__pagination {
+    margin-top: var(--s-3);
+    text-align: right;
   }
 }
 
