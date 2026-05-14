@@ -161,4 +161,49 @@ $tokens-fs-base: 13px;
   --sh-md:    0 2px 8px rgba(17, 24, 39, 0.08);
   --sh-lg:    0 8px 24px rgba(17, 24, 39, 0.10);
   --sh-inset: inset 0 1px 0 rgba(17, 24, 39, 0.04);
+
+  // ─────────────────────────────────────────────────
+  // Type · 字族
+  // ─────────────────────────────────────────────────
+  --f-display: "Inter", -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --f-body:    "Inter", -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --f-mono:    "JetBrains Mono", "SF Mono", "Menlo", "Consolas", "Courier New", monospace;
+
+  // ─────────────────────────────────────────────────
+  // Type · 字号（9 阶，base = 13px 与现状一致）
+  // ─────────────────────────────────────────────────
+  --fs-xs:      11px;
+  --fs-sm:      12px;
+  --fs-base:    13px;
+  --fs-md:      14px;
+  --fs-lg:      16px;
+  --fs-xl:      18px;
+  --fs-2xl:     22px;
+  --fs-3xl:     28px;
+  --fs-display: 36px;
+
+  // ─────────────────────────────────────────────────
+  // Type · 字重
+  // ─────────────────────────────────────────────────
+  --fw-regular:  400;
+  --fw-medium:   500;
+  --fw-semibold: 600;
+  --fw-bold:     700;
+
+  // ─────────────────────────────────────────────────
+  // Type · 行高
+  // ─────────────────────────────────────────────────
+  --lh-tight:   1.25;
+  --lh-normal:  1.5;
+  --lh-relaxed: 1.75;
+
+  // ─────────────────────────────────────────────────
+  // Motion
+  // ─────────────────────────────────────────────────
+  --du-fast: 120ms;
+  --du-base: 180ms;
+  --du-slow: 240ms;
+
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
 }

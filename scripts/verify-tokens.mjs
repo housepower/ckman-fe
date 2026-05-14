@@ -37,6 +37,18 @@ const required = [
   '--r-sm:', '--r-md:', '--r-lg:', '--r-pill:',
   // Shadow (5 个)
   '--sh-xs:', '--sh-sm:', '--sh-md:', '--sh-lg:', '--sh-inset:',
+  // Type · 字族
+  '--f-display:', '--f-body:', '--f-mono:',
+  // Type · 字号 (9 个)
+  '--fs-xs:', '--fs-sm:', '--fs-base:', '--fs-md:', '--fs-lg:',
+  '--fs-xl:', '--fs-2xl:', '--fs-3xl:', '--fs-display:',
+  // Type · 字重 (4 个)
+  '--fw-regular:', '--fw-medium:', '--fw-semibold:', '--fw-bold:',
+  // Type · 行高 (3 个)
+  '--lh-tight:', '--lh-normal:', '--lh-relaxed:',
+  // Motion (5 个)
+  '--du-fast:', '--du-base:', '--du-slow:',
+  '--ease-out:', '--ease-in-out:',
 ];
 
 const missing = required.filter(name => !css.includes(name));
@@ -48,4 +60,4 @@ if (!css.includes('--c-gold-500: #C9A100')) {
   console.error('FAIL: gold-500 anchor mismatch');
   process.exit(1);
 }
-console.log('PASS: 70 tokens verified');
+console.log('PASS: 94 tokens verified');
