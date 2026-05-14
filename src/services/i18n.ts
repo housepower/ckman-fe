@@ -135,6 +135,7 @@ const messages = {
       Cluster: 'Cluster',
       nodes: 'nodes',
       Open: 'Open',
+      'No clusters': 'No clusters yet. Click "Create" or "Import" to add one.',
     },
     manage: {
       'Upgrade Cluster': 'Upgrade Cluster',
@@ -970,6 +971,7 @@ const messages = {
       Cluster: '集群',
       nodes: '节点',
       Open: '打开',
+      'No clusters': '暂无集群。点击右上角"创建"或"导入"添加一个。',
     },
     manage: {
       'Upgrade Cluster': '升级集群',

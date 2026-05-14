@@ -39,7 +39,7 @@
       </div>
     </div>
 
-    <div class="list mt-50">
+    <div class="list-card">
       <div class="toolbar">
   <el-input
     v-model="key"
@@ -73,9 +73,10 @@
     >{{ $t('home.Replica only') }}</button>
   </div>
 </div>
-      <el-table :data="queryList"
-                border
-                header-cell-class-name="header-cell-class-name">
+      <el-table
+        :data="queryList"
+        :empty-text="$t('home.No clusters')"
+      >
         <el-table-column
           prop="cluster"
           sortable
@@ -244,11 +245,6 @@ export default {
       this.fetchData();
     },
 
-    filterHandler(value, row, column) {
-      const property = column['property'];
-      return row[property] === value;
-    },
-
     truncateHosts(hosts) {
       if (!hosts) return '';
       const arr = typeof hosts === 'string' ? hosts.split(',') : hosts;
@@ -260,21 +256,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.title {
-  color: var(--color-black);
+.home {
+  padding-bottom: var(--s-8);
 }
-.btns {
-  width: 300px;
-  .el-button {
-    margin: 0;
-    height: 42px;
-  }
-}
-// .list {
-//   ::v-deep .header-cell-class-name {
-//     background: var(--primary-color);
-//   }
-// }
 
 .stat-row {
   display: grid;
@@ -322,6 +306,13 @@ export default {
     margin-top: var(--s-1);
     font-variant-numeric: tabular-nums;
   }
+}
+
+.list-card {
+  background: var(--c-surface-0);
+  border: 1px solid var(--c-surface-3);
+  border-radius: var(--r-lg);
+  padding: var(--s-4);
 }
 
 .toolbar {
@@ -482,13 +473,28 @@ export default {
   }
 }
 
-// hover 行时显示 actions
 ::v-deep .el-table__row:hover .row-actions {
   opacity: 1;
 }
 
-// 避免 hover-only 在键盘焦点时不可达：focus-within 也显示
 ::v-deep .el-table__row:focus-within .row-actions {
   opacity: 1;
+}
+
+::v-deep .el-table {
+  font-size: var(--fs-sm);
+
+  th {
+    background: var(--c-surface-1);
+    color: var(--c-text-secondary);
+    font-weight: var(--fw-medium);
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  td {
+    color: var(--c-text-primary);
+  }
 }
 </style>
