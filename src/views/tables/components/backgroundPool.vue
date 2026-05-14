@@ -1,37 +1,52 @@
 <template>
-  <div class="backgroundPool pb-20">
-    <div class="title flex flex-between flex-vcenter ptb-10">
-      <span class="fs-20 font-bold">{{ $t('tables.Background Pool') }}</span>
-      <el-select v-model="selectedHost" placeholder="select host" class="host-select"
-        @change="handleHostChange">
-        <el-option v-for="server in tableData" :key="server.host" :label="server.host" :value="server.host" />
+  <div class="bgpool">
+    <div class="bgpool__header">
+      <span class="bgpool__title">{{ $t('tables.Background Pool') }}</span>
+      <el-select
+        v-model="selectedHost"
+        placeholder="select host"
+        class="bgpool__host"
+        @change="handleHostChange"
+      >
+        <el-option
+          v-for="server in tableData"
+          :key="server.host"
+          :label="server.host"
+          :value="server.host"
+        />
       </el-select>
     </div>
 
-    <!-- 单个主机展示 -->
-    <div v-if="currentServer" class="server-container mb-30">
-      <div class="pool-grid">
-        <div v-for="(pool, name) in currentServer.background_pool" :key="name" class="pool-item">
-          <el-progress 
-            type="circle" 
-            :percentage="Math.round(pool.usage * 100)" 
-            :color="getProgressColor(pool.usage * 100)" 
-            :width="120"
-            :stroke-width="8">
+    <div v-if="currentServer" class="bgpool__board">
+      <div class="bgpool__grid">
+        <div
+          v-for="(pool, name) in currentServer.background_pool"
+          :key="name"
+          class="bgpool__item"
+        >
+          <el-progress
+            type="circle"
+            :percentage="Math.round(pool.usage * 100)"
+            :color="getProgressColor(pool.usage * 100)"
+            :width="110"
+            :stroke-width="8"
+          >
             <template #default="{ percentage }">
-              <div class="progress-content">
-                <span class="progress-value">{{ percentage }}%</span>
-                <span class="progress-task">{{ pool.task }}/{{ pool.size }}</span>
+              <div class="bgpool__progress">
+                <span class="bgpool__progress-pct">{{ percentage }}%</span>
+                <span class="bgpool__progress-task">{{ pool.task }}/{{ pool.size }}</span>
               </div>
             </template>
           </el-progress>
-          <div class="pool-name">{{ name }}</div>
+          <div class="bgpool__name">{{ name }}</div>
         </div>
       </div>
     </div>
 
-    <!-- 空数据提示 -->
-    <el-empty v-else-if="!currentServer && tableData.length > 0" :description="$t('common.No Data')" />
+    <el-empty
+      v-else-if="!currentServer && tableData.length > 0"
+      :description="$t('common.No Data')"
+    />
   </div>
 </template>
 
@@ -45,13 +60,12 @@ export default {
       tableData: [],
       selectedHost: '',
       currentServer: null,
-      // 优化后的颜色配置 - 更符合监控场景的颜色阈值
       progressColors: [
-        { color: '#67C23A', percentage: 50 },   // 绿色：0-50%
-        { color: '#E6A23C', percentage: 70 },   // 橙色：50-70%
-        { color: '#F56C6C', percentage: 85 },   // 红色：70-85%
-        { color: '#C0392B', percentage: 100 }  // 深红：85-100%
-      ]
+        { color: '#10B981', percentage: 50 },
+        { color: '#F59E0B', percentage: 70 },
+        { color: '#EF4444', percentage: 85 },
+        { color: '#B91C1C', percentage: 100 },
+      ],
     };
   },
   watch: {
@@ -64,13 +78,7 @@ export default {
         } else {
           this.currentServer = null;
         }
-      }
-    }
-  },
-  computed: {
-    // 保留原配置用于兼容，同时提供新的动态颜色方法
-    customColors() {
-      return this.progressColors;
+      },
     },
   },
   mounted() {
@@ -79,7 +87,7 @@ export default {
   methods: {
     handleHostChange(host) {
       this.currentServer = this.tableData.find(
-        server => server.host === host
+        (server) => server.host === host
       );
     },
     async fetchData() {
@@ -93,7 +101,6 @@ export default {
         this.tableData = [];
       }
     },
-    // 根据百分比获取对应的颜色
     getProgressColor(percentage) {
       const roundedPercentage = Math.round(percentage);
       for (const item of this.progressColors) {
@@ -102,94 +109,104 @@ export default {
         }
       }
       return this.progressColors[this.progressColors.length - 1].color;
-    }
+    },
   },
 };
 </script>
 
 <style lang="scss" scoped>
-.backgroundPool {
-  padding: 20px;
-}
+.bgpool {
+  padding: var(--s-3) 0 var(--s-6);
 
-.server-container {
-  padding: 24px;
-  border: 1px solid #ebeef5;
-  border-radius: 8px;
-  background: #fff;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
-  transition: box-shadow 0.3s ease;
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-3);
+    margin-bottom: var(--s-4);
+  }
 
-  &:hover {
-    box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.1);
+  &__title {
+    font-size: var(--fs-md);
+    font-weight: var(--fw-semibold);
+    color: var(--c-text-primary);
+    line-height: var(--lh-tight);
+  }
+
+  &__host {
+    width: 240px;
+  }
+
+  &__board {
+    background: var(--c-surface-0);
+    border: 1px solid var(--c-surface-3);
+    border-radius: var(--r-lg);
+    padding: var(--s-5);
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: var(--s-4) var(--s-3);
+    justify-items: center;
+  }
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--s-3) var(--s-2);
+    border-radius: var(--r-md);
+    transition: background-color var(--du-fast) var(--ease-out);
+
+    &:hover {
+      background: var(--c-surface-1);
+    }
+  }
+
+  &__progress {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: var(--lh-tight);
+  }
+
+  &__progress-pct {
+    font-size: var(--fs-xl);
+    font-weight: var(--fw-semibold);
+    color: var(--c-text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__progress-task {
+    font-size: var(--fs-xs);
+    color: var(--c-text-tertiary);
+    margin-top: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__name {
+    margin-top: var(--s-2);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-medium);
+    color: var(--c-text-secondary);
+    text-align: center;
+    word-break: break-word;
+    max-width: 140px;
+    line-height: var(--lh-normal);
   }
 }
 
-.pool-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 30px;
-  justify-items: center;
-}
-
-.pool-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 16px;
-  border-radius: 8px;
-  transition: transform 0.2s ease, background-color 0.2s ease;
-  cursor: default;
-
-  &:hover {
-    transform: translateY(-4px);
-    background-color: rgba(64, 158, 255, 0.04);
-  }
-}
-
-.progress-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  line-height: 1.4;
-}
-
-.progress-value {
-  font-size: 18px;
-  font-weight: 600;
-  color: #303133;
-}
-
-.progress-task {
-  font-size: 12px;
-  color: #909399;
-  margin-top: 2px;
-}
-
-.pool-name {
-  margin-top: 16px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #303133;
-  text-align: center;
-  word-break: break-word;
-}
-
-.host-select {
-  width: 240px;
-  margin-left: 20px;
-}
-
-// 响应式适配
 @media (max-width: 768px) {
-  .pool-grid {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 20px;
-  }
+  .bgpool {
+    &__grid {
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: var(--s-3);
+    }
 
-  .host-select {
-    width: 180px;
-    margin-left: 12px;
+    &__host {
+      width: 180px;
+    }
   }
 }
 </style>
