@@ -49,7 +49,7 @@ body[data-page] {
   border-radius: 100%;
   color: white;
   font-size: 12px;
-  background: $primary-color;
+  background: var(--c-primary-solid);
   text-align: center;
   margin-right: 5px;
 }
@@ -104,7 +104,7 @@ body[data-page] {
     z-index: 2;
     width: 13px;
     height: 13px;
-    background-color: $primary-color;
+    background-color: var(--c-primary-solid);
     border-radius: 100%;
     text-align: center;
     color: white;
@@ -119,7 +119,7 @@ body[data-page] {
     left: -24px;
     z-index: 1;
     height: 100%;
-    border-left: 1px solid $primary-color;
+    border-left: 1px solid var(--c-primary-solid);
   }
 }
 
