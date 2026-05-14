@@ -127,17 +127,34 @@
             <span v-else>{{ row[column.property] }}</span>
           </template>
         </vxe-column>
-        <vxe-column :title="$t('home.Actions')"
+        <vxe-column
+          :title="$t('home.Actions')"
           v-if="mode === 'deploy'"
-          width="250"
-          align="center">
+          width="100"
+          align="center"
+        >
           <template slot-scope="{ row }">
-            <el-button type="text" v-if="row.status === 'green'" @click="offlineClusterNode(row)" :loading="row.offlineLoading">{{ $t('manage.Offline') }}</el-button>
-            <el-button type="text" v-if="row.status === 'red'" @click="onlineClusterNode(row)" :loading="row.onlineLoading">{{ $t('manage.Online') }}</el-button>
-            <el-button type="text" @click="viewClusterLog(row)">{{ $t('manage.View Log') }}</el-button>
-            <el-button type="text" @click="remove(row)">{{ $t('common.Delete') }}</el-button>
-          </template>
-          <template>
+            <el-dropdown trigger="click" @command="onNodeCommand($event, row)">
+              <i class="fa fa-ellipsis-v node-row-more"></i>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item v-if="row.status === 'green'" command="offline">
+                  <i class="el-icon-turn-off"></i>
+                  {{ $t('manage.Offline') }}
+                </el-dropdown-item>
+                <el-dropdown-item v-if="row.status === 'red'" command="online">
+                  <i class="el-icon-open"></i>
+                  {{ $t('manage.Online') }}
+                </el-dropdown-item>
+                <el-dropdown-item command="log">
+                  <i class="el-icon-document"></i>
+                  {{ $t('manage.View Log') }}
+                </el-dropdown-item>
+                <el-dropdown-item command="delete" class="node-row-delete-item">
+                  <i class="el-icon-delete"></i>
+                  {{ $t('common.Delete') }}
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
           </template>
         </vxe-column>
       </vxe-table>
@@ -364,6 +381,22 @@ export default {
       }
       this.deleteIp = item.ip;
       this.deleteNodeDialogVisible = true;
+    },
+    onNodeCommand(command, row) {
+      switch (command) {
+        case 'offline':
+          this.offlineClusterNode(row);
+          break;
+        case 'online':
+          this.onlineClusterNode(row);
+          break;
+        case 'log':
+          this.viewClusterLog(row);
+          break;
+        case 'delete':
+          this.remove(row);
+          break;
+      }
     },
     async clusterOperation(type) {
       type = lowerFirst(type);
