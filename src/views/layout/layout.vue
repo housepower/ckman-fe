@@ -1,7 +1,10 @@
 <template>
   <div class="layout flex flex-column overflow-hidden">
     <header class="flex-between flex-vcenter plr-20">
-      <router-link to="/" class="fs-18 font-bold">{{title}}  {{version}}</router-link>
+      <router-link to="/" class="brand-link">
+        <span class="brand-dot"></span>
+        <span class="brand-text">{{title}} <span class="brand-version">{{version}}</span></span>
+      </router-link>
       <div class="header-right flex flex-vcenter">
 
         <div class="flex flex-vcenter mr-15 pointer" @click="viewTaskList">
@@ -163,15 +166,70 @@ header {
   width: 100%;
   top: 0;
   z-index: 100;
-  height: 50px;
-  color: var(--color-white);
-  background: var(--primary-color);
+  height: 48px;
+  color: var(--c-surface-0);
+  background: var(--c-gray-700);
+  border-bottom: 2px solid var(--c-primary-solid);
+  font-size: var(--fs-sm);
 
   .user,
   i {
-    color: var(--color-white);
+    color: var(--c-surface-0);
+  }
+
+  a, .router-link-active {
+    color: var(--c-surface-0);
+    text-decoration: none;
+  }
+
+  .brand-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--c-primary-solid);
+    margin-right: var(--s-2);
+    vertical-align: 1px;
   }
 }
+.brand-link {
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.3px;
+}
+
+.brand-version {
+  font-weight: var(--fw-regular);
+  opacity: 0.5;
+  margin-left: var(--s-1);
+  font-size: var(--fs-xs);
+}
+
+.header-right {
+  font-size: var(--fs-sm);
+
+  > * {
+    margin-left: var(--s-3);
+  }
+
+  i {
+    font-size: var(--fs-md);
+    margin-right: var(--s-1);
+  }
+
+  .fs-16, .fs-20 {
+    font-size: inherit !important;
+  }
+
+  .mr-15 { margin-right: 0 !important; }
+  .mr-5 { margin-right: var(--s-1) !important; }
+  .ml-5 { margin-left: var(--s-1) !important; }
+  .ml-10 { margin-left: var(--s-2) !important; }
+  .ml-15 { margin-left: var(--s-3) !important; }
+}
+
 footer {
   position: sticky;
   width: 100%;
