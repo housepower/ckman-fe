@@ -206,7 +206,7 @@ export default {
       password: '',
       packageType: '',
       gridOptions: {
-        border: true,
+        border: false,
         resizable: true,
         showHeaderOverflow: true,
         showOverflow: true,
