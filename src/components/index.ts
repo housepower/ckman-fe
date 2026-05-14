@@ -8,10 +8,14 @@ import { default as Breadcrumb } from './breadcrumb.vue';
 import { default as OverviewBase } from './overview-base/overview-base.vue';
 import { default as SqlCodeMirror } from './sql-code-mirror/sql-code-mirror.vue';
 import { default as DForm } from './d-form/d-form.vue';
+import { PageHeader } from './page-header';
+import EmptyState from './empty-state';
 Object.entries({
   TimeFilter,
   Breadcrumb,
   OverviewBase,
+  PageHeader,
+  EmptyState,
 }).forEach(([name, component]) => Vue.component(name, component));
 
 export {
@@ -20,4 +24,6 @@ export {
   OverviewBase,
   SqlCodeMirror,
   DForm,
+  PageHeader,
+  EmptyState,
 };
