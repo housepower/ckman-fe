@@ -1,0 +1,55 @@
+@import './tokens';
+
+// vxe-table 全局覆盖
+// 注意：此文件不 import vxe-table CSS（已在 main.tsx 引入 'vxe-table/lib/style.css'），仅做样式覆盖
+
+.vxe-table {
+  // 表头
+  .vxe-table--header-wrapper,
+  .vxe-table--fixed-left-wrapper .vxe-table--header-wrapper,
+  .vxe-table--fixed-right-wrapper .vxe-table--header-wrapper {
+    background-color: var(--c-surface-1);
+  }
+
+  .vxe-header--column {
+    font-weight: var(--fw-semibold);
+    color: var(--c-text-secondary);
+    font-size: var(--fs-sm);
+    background-color: var(--c-surface-1);
+    border-bottom-color: var(--c-surface-3);
+  }
+
+  // 行
+  .vxe-body--row {
+    &:hover {
+      .vxe-body--column {
+        background-color: var(--c-surface-1) !important;
+      }
+    }
+  }
+
+  .vxe-body--column {
+    color: var(--c-text-primary);
+    font-size: var(--fs-base);
+    border-bottom-color: var(--c-surface-3);
+  }
+
+  // 排序图标 hover 用主色
+  .vxe-sort--asc-btn:hover,
+  .vxe-sort--desc-btn:hover,
+  .vxe-filter--btn:hover {
+    color: var(--c-primary-solid);
+  }
+}
+
+// 分页器
+.vxe-pager {
+  font-size: var(--fs-base);
+  color: var(--c-text-secondary);
+
+  .vxe-pager--num-btn.is--active {
+    background-color: var(--c-primary-solid);
+    color: var(--c-surface-0);
+    border-color: var(--c-primary-solid);
+  }
+}
