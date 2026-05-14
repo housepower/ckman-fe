@@ -2,6 +2,7 @@
 import sass from 'sass';
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
+import { readFileSync } from 'fs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const tokenFile = resolve(__dirname, '../src/app/theme/_tokens.scss');
@@ -58,6 +59,12 @@ if (missing.length) {
 }
 if (!css.includes('--c-gold-500: #C9A100')) {
   console.error('FAIL: gold-500 anchor mismatch');
+  process.exit(1);
+}
+// 一致性检查：tokens.ts 中的 gold-500 必须与 SCSS 中一致
+const tsSource = readFileSync(resolve(__dirname, '../src/app/theme/tokens.ts'), 'utf-8');
+if (!tsSource.includes("500: '#C9A100'")) {
+  console.error('FAIL: tokens.ts gold-500 anchor does not match SCSS');
   process.exit(1);
 }
 console.log('PASS: 94 tokens verified');
