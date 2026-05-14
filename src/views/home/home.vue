@@ -40,15 +40,39 @@
     </div>
 
     <div class="list mt-50">
-      <div class="font-bold mb-10 fs-18 overflow-hidden">{{$t('home.All ClickHouse Clusters')}}
-        
-        <el-input v-model="key"
-          :placeholder="$t('common.keyword search')"
-          autocomplete="false"
-          clearable
-          size="medium"
-          class="width-300 pull-right"></el-input>
-      </div>
+      <div class="toolbar">
+  <el-input
+    v-model="key"
+    :placeholder="$t('common.keyword search')"
+    autocomplete="false"
+    clearable
+    size="medium"
+    class="toolbar__search"
+    suffix-icon="el-icon-search"
+  ></el-input>
+  <div class="toolbar__chips">
+    <button
+      class="chip"
+      :class="{ 'chip--active': filterMode === 'all' && !filterReplica }"
+      @click="filterMode = 'all'; filterReplica = false"
+    >{{ $t('home.All') }}</button>
+    <button
+      class="chip"
+      :class="{ 'chip--active': filterMode === 'deploy' }"
+      @click="filterMode = 'deploy'"
+    >{{ $t('home.Deploy') }}</button>
+    <button
+      class="chip"
+      :class="{ 'chip--active': filterMode === 'import' }"
+      @click="filterMode = 'import'"
+    >{{ $t('home.Import') }}</button>
+    <button
+      class="chip"
+      :class="{ 'chip--active': filterReplica }"
+      @click="filterReplica = !filterReplica"
+    >{{ $t('home.Replica only') }}</button>
+  </div>
+</div>
       <el-table :data="queryList"
                 border
                 header-cell-class-name="header-cell-class-name">
@@ -105,16 +129,23 @@ export default {
       list: [],
       versionOptions: [],
       key: '',
+      filterMode: 'all',
+      filterReplica: false,
     };
   },
   computed: {
     queryList() {
-      const { list, key } = this;
+      const { list, key, filterMode, filterReplica } = this;
       return list.filter(item => {
-        return item.cluster.includes(key)
+        const matchKey = !key
+          || item.cluster.includes(key)
           || item.mode.includes(key)
           || item.logic_cluster?.includes(key)
-          || item.hosts.includes(key);
+          || item.hosts.includes(key)
+          || (item.comment || '').includes(key);
+        const matchMode = filterMode === 'all' || item.mode === filterMode;
+        const matchReplica = !filterReplica || item.isReplica === true;
+        return matchKey && matchMode && matchReplica;
       });
     },
     stats() {
@@ -250,6 +281,55 @@ export default {
     line-height: var(--lh-tight);
     margin-top: var(--s-1);
     font-variant-numeric: tabular-nums;
+  }
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  margin-bottom: var(--s-3);
+
+  &__search {
+    flex: 0 0 280px;
+  }
+
+  &__chips {
+    display: flex;
+    gap: var(--s-1);
+    flex-wrap: wrap;
+  }
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--s-1) var(--s-3);
+  border: 1px solid var(--c-surface-3);
+  background: var(--c-surface-0);
+  color: var(--c-text-secondary);
+  border-radius: var(--r-pill);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  transition: background var(--du-fast) var(--ease-out),
+              border-color var(--du-fast) var(--ease-out),
+              color var(--du-fast) var(--ease-out);
+
+  &:hover {
+    background: var(--c-surface-1);
+    color: var(--c-text-primary);
+  }
+
+  &--active {
+    background: var(--c-primary-bg);
+    border-color: var(--c-primary-border);
+    color: var(--c-primary-fg);
+    font-weight: var(--fw-medium);
+
+    &:hover {
+      background: var(--c-primary-bg);
+      color: var(--c-primary-fg);
+    }
   }
 }
 </style>

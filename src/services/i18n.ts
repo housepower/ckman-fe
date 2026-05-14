@@ -130,6 +130,8 @@ const messages = {
       Total: 'Total',
       Deploy: 'Deploy',
       Import: 'Import',
+      All: 'All',
+      'Replica only': 'Replica only',
     },
     manage: {
       'Upgrade Cluster': 'Upgrade Cluster',
@@ -960,6 +962,8 @@ const messages = {
       Total: '总数',
       Deploy: '自部署',
       Import: '已导入',
+      All: '全部',
+      'Replica only': '仅副本',
     },
     manage: {
       'Upgrade Cluster': '升级集群',
