@@ -20,6 +20,16 @@ const required = [
   '--c-gray-50:', '--c-gray-100:', '--c-gray-200:', '--c-gray-300:',
   '--c-gray-400:', '--c-gray-500:', '--c-gray-600:', '--c-gray-700:',
   '--c-gray-800:', '--c-gray-900:',
+  // 语义色 × 4 状态字段（5 状态：primary/success/warning/danger/info）
+  '--c-primary-bg:', '--c-primary-border:', '--c-primary-fg:', '--c-primary-solid:',
+  '--c-success-bg:', '--c-success-border:', '--c-success-fg:', '--c-success-solid:',
+  '--c-warning-bg:', '--c-warning-border:', '--c-warning-fg:', '--c-warning-solid:',
+  '--c-danger-bg:', '--c-danger-border:', '--c-danger-fg:', '--c-danger-solid:',
+  '--c-info-bg:', '--c-info-border:', '--c-info-fg:', '--c-info-solid:',
+  // 表面
+  '--c-surface-0:', '--c-surface-1:', '--c-surface-2:', '--c-surface-3:',
+  // 文字
+  '--c-text-primary:', '--c-text-secondary:', '--c-text-tertiary:', '--c-text-disabled:',
 ];
 
 const missing = required.filter(name => !css.includes(name));
@@ -31,4 +41,4 @@ if (!css.includes('--c-gold-500: #C9A100')) {
   console.error('FAIL: gold-500 anchor mismatch');
   process.exit(1);
 }
-console.log('PASS: 20 base color tokens verified');
+console.log('PASS: 48 color tokens verified');

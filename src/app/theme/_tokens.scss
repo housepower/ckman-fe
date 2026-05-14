@@ -30,6 +30,25 @@ $tokens-gray-700: #1A1D23;  // ★ 顶栏深色锚定
 $tokens-gray-800: #0F1115;
 $tokens-gray-900: #07080A;
 
+// 语义色（SCSS 变量，用于编译时 Element UI 主题等）
+$tokens-primary-solid: $tokens-gold-500;
+$tokens-success-solid: #10B981;
+$tokens-warning-solid: #F59E0B;
+$tokens-danger-solid:  #EF4444;
+$tokens-info-solid:    #3B82F6;
+
+// 文字（SCSS 变量）
+$tokens-text-primary:   #111827;
+$tokens-text-secondary: $tokens-gray-600;
+$tokens-text-tertiary:  $tokens-gray-400;
+$tokens-text-disabled:  $tokens-gray-300;
+
+// 表面（SCSS 变量）
+$tokens-surface-0: #FFFFFF;
+$tokens-surface-1: $tokens-gray-50;
+$tokens-surface-2: $tokens-gray-100;
+$tokens-surface-3: $tokens-gray-200;
+
 // ─────────────────────────────────────────────────
 // :root CSS 自定义属性导出
 // ─────────────────────────────────────────────────
@@ -56,4 +75,48 @@ $tokens-gray-900: #07080A;
   --c-gray-700: #{$tokens-gray-700};
   --c-gray-800: #{$tokens-gray-800};
   --c-gray-900: #{$tokens-gray-900};
+
+  // ─────────────────────────────────────────────────
+  // Color · 语义（5 × 4 = 20 个 token）
+  // ─────────────────────────────────────────────────
+  --c-primary-bg:     #{$tokens-gold-50};
+  --c-primary-border: #{$tokens-gold-200};
+  --c-primary-fg:     #{$tokens-gold-700};
+  --c-primary-solid:  #{$tokens-gold-500};
+
+  --c-success-bg:     #ECFDF5;
+  --c-success-border: #A7F3D0;
+  --c-success-fg:     #047857;
+  --c-success-solid:  #10B981;
+
+  --c-warning-bg:     #FFFBEB;
+  --c-warning-border: #FDE68A;
+  --c-warning-fg:     #B45309;
+  --c-warning-solid:  #F59E0B;
+
+  --c-danger-bg:      #FEF2F2;
+  --c-danger-border:  #FECACA;
+  --c-danger-fg:      #B91C1C;
+  --c-danger-solid:   #EF4444;
+
+  --c-info-bg:        #EFF6FF;
+  --c-info-border:    #BFDBFE;
+  --c-info-fg:        #1D4ED8;
+  --c-info-solid:     #3B82F6;
+
+  // ─────────────────────────────────────────────────
+  // Color · 表面（4 层）
+  // ─────────────────────────────────────────────────
+  --c-surface-0: #FFFFFF;            // 页面纯白卡片
+  --c-surface-1: #{$tokens-gray-50}; // 页面背景
+  --c-surface-2: #{$tokens-gray-100};// 卡片 hover / 次级背景
+  --c-surface-3: #{$tokens-gray-200};// 分隔色
+
+  // ─────────────────────────────────────────────────
+  // Color · 文字（4 层）
+  // ─────────────────────────────────────────────────
+  --c-text-primary:   #111827;
+  --c-text-secondary: #{$tokens-gray-600};
+  --c-text-tertiary:  #{$tokens-gray-400};
+  --c-text-disabled:  #{$tokens-gray-300};
 }
