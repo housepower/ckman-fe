@@ -9,6 +9,8 @@
     "lint": "node_modules/.bin/vue-cli-service lint"
   },
   "dependencies": {
+    "@fontsource/inter": "5",
+    "@fontsource/jetbrains-mono": "5",
     "@json-editor/json-editor": "^2.5.3",
     "ace-builds": "^1.4.12",
     "axios": "^0.21.1",
@@ -54,8 +56,13 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-jsdoc": "^32.3.1",
+    "postcss": "8",
+    "postcss-scss": "4",
     "sass": "^1.32.11",
     "sass-loader": "^10.1.0",
+    "stylelint": "14",
+    "stylelint-config-recommended-scss": "8",
+    "stylelint-scss": "4",
     "typescript": "~4.2.4",
     "vue-template-compiler": "^2.6.12"
   }
