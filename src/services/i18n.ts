@@ -132,6 +132,8 @@ const messages = {
       Import: 'Import',
       All: 'All',
       'Replica only': 'Replica only',
+      Cluster: 'Cluster',
+      nodes: 'nodes',
     },
     manage: {
       'Upgrade Cluster': 'Upgrade Cluster',
@@ -964,6 +966,8 @@ const messages = {
       Import: '已导入',
       All: '全部',
       'Replica only': '仅副本',
+      Cluster: '集群',
+      nodes: '节点',
     },
     manage: {
       'Upgrade Cluster': '升级集群',

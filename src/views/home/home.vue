@@ -76,14 +76,29 @@
       <el-table :data="queryList"
                 border
                 header-cell-class-name="header-cell-class-name">
-        <el-table-column prop="cluster"
-                         show-overflow-tooltip
-                         sortable
-                         :label="$t('home.Cluster Name')" />
-        <el-table-column prop="logic_cluster"
-                         show-overflow-tooltip
-                         sortable
-                         :label="$t('home.Belongs to Logic')" />
+        <el-table-column
+          prop="cluster"
+          sortable
+          min-width="280"
+          :label="$t('home.Cluster')"
+        >
+          <template #default="{ row }">
+            <div class="cluster-cell">
+              <span
+                class="cluster-cell__dot"
+                :class="row.mode === 'deploy' ? 'cluster-cell__dot--deploy' : 'cluster-cell__dot--import'"
+              ></span>
+              <div class="cluster-cell__main">
+                <div class="cluster-cell__name">{{ row.cluster }}</div>
+                <div class="cluster-cell__meta">
+                  <span v-if="row.logic_cluster">{{ row.logic_cluster }} ·</span>
+                  <span>{{ row.count }} {{ $t('home.nodes') }}</span>
+                  <span class="cluster-cell__hosts" v-if="row.hosts">· {{ truncateHosts(row.hosts) }}</span>
+                </div>
+              </div>
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column prop="mode"
                          show-overflow-tooltip
                          :filters="[{ text: 'deploy', value: 'deploy' }, { text: 'import', value: 'import' }]"
@@ -94,16 +109,6 @@
                          :filters="[{ text: 'true', value: true }, { text: 'false', value: false }]"
                          :filter-method="filterHandler"
                          :label="$t('home.Replica')" />
-        <el-table-column prop="hosts"
-                         show-overflow-tooltip
-                         :label="$t('home.ClickHouse Node IP')" />
-        <el-table-column prop="count"
-                         show-overflow-tooltip
-                         sortable
-                         :label="$t('home.ClickHouse Node Count')" />
-        <el-table-column prop="comment"
-                         show-overflow-tooltip
-                         :label="$t('home.Comment')" />
         <el-table-column :label="$t('home.Actions')"
                          #default="{ row }">
           <el-link type="primary"
@@ -214,7 +219,14 @@ export default {
     filterHandler(value, row, column) {
       const property = column['property'];
       return row[property] === value;
-    }
+    },
+
+    truncateHosts(hosts) {
+      if (!hosts) return '';
+      const arr = typeof hosts === 'string' ? hosts.split(',') : hosts;
+      if (arr.length <= 2) return arr.join(', ');
+      return `${arr[0]}, ${arr[1]} +${arr.length - 2}`;
+    },
   },
 };
 </script>
@@ -330,6 +342,48 @@ export default {
       background: var(--c-primary-bg);
       color: var(--c-primary-fg);
     }
+  }
+}
+
+.cluster-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+
+    &--deploy { background: var(--c-info-solid); }
+    &--import { background: var(--c-text-tertiary); }
+  }
+
+  &__main {
+    min-width: 0;
+    flex: 1;
+  }
+
+  &__name {
+    font-size: var(--fs-base);
+    font-weight: var(--fw-semibold);
+    color: var(--c-text-primary);
+    line-height: var(--lh-tight);
+  }
+
+  &__meta {
+    font-size: var(--fs-xs);
+    color: var(--c-text-tertiary);
+    margin-top: 2px;
+    line-height: var(--lh-tight);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__hosts {
+    margin-left: var(--s-1);
   }
 }
 </style>
