@@ -2,45 +2,61 @@
   <el-dialog
     v-bind="$attrs"
     :title="$t('manage.Add Node')"
+    width="560px"
     destroy-on-close
     @close="close"
+  >
+    <el-form
+      ref="Form"
+      :model="formModel"
+      :rules="rules"
+      label-position="top"
+      class="addnode-form"
     >
-    <section class="add-node">
-      <el-form ref="Form"
-              :model="formModel"
-              :rules="rules"
-              label-width="150px">
-        <el-form-item :label="$t('manage.New Node IP') + ':'"
-                      prop="ips">
-          <el-input type="textarea" v-model="formModel.ips"
-                    :placeholder="$t('common.placeholderIp')"
-                    class="width-350" />
-        </el-form-item>
-        <el-form-item :label="$t('manage.Node Shard') + ':'"
-                      prop="shard">
-          <el-input-number v-model="formModel.shard"
-                          :step="1"
-                          :min="numberRange[0]"
-                          :max="numberRange[1]"></el-input-number>
-        </el-form-item>
-        <el-form-item :label="$t('manage.Source Schema Host') + ':'"
-                      prop="sourceSchemaHost">
-          <el-select v-model="formModel.sourceSchemaHost" class="width-350">
-            <el-option
-              v-for="n in nodes"
-              :key="n.ip"
-              :label="`${n.ip} (${n.status})`"
-              :value="n.ip"
-              :disabled="n.status === 'red'" />
-          </el-select>
-        </el-form-item>
-      </el-form>
-    </section>
-    <span slot="footer" class="dialog-footer">
-      <el-checkbox v-model="force" class="mr-20">{{ $t('common.Force Override') }}</el-checkbox>
-      <el-button @click="close">{{$t("common.Cancel")}}</el-button>
-      <el-button type="primary" @click="onOk">{{$t("common.Save")}}</el-button>
-    </span>
+      <el-form-item :label="$t('manage.New Node IP')" prop="ips">
+        <el-input
+          type="textarea"
+          v-model="formModel.ips"
+          :placeholder="$t('common.placeholderIp')"
+          :rows="3"
+          class="addnode-form__textarea"
+        />
+      </el-form-item>
+      <el-form-item :label="$t('manage.Node Shard')" prop="shard">
+        <el-input-number
+          v-model="formModel.shard"
+          :step="1"
+          :min="numberRange[0]"
+          :max="numberRange[1]"
+        />
+      </el-form-item>
+      <el-form-item :label="$t('manage.Source Schema Host')" prop="sourceSchemaHost">
+        <el-select v-model="formModel.sourceSchemaHost" class="addnode-form__select">
+          <el-option
+            v-for="n in nodes"
+            :key="n.ip"
+            :label="`${n.ip} (${n.status})`"
+            :value="n.ip"
+            :disabled="n.status === 'red'"
+          />
+        </el-select>
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <div class="addnode-footer">
+        <label class="addnode-footer__force">
+          <el-switch v-model="force" />
+          <span>{{ $t('common.Force Override') }}</span>
+        </label>
+        <div class="addnode-footer__btns">
+          <el-button @click="close">{{ $t('common.Cancel') }}</el-button>
+          <el-button type="primary" @click="onOk">
+            <i class="el-icon-plus"></i>
+            {{ $t('common.Save') }}
+          </el-button>
+        </div>
+      </div>
+    </template>
   </el-dialog>
 </template>
 <script>
@@ -103,4 +119,51 @@ export default {
 };
 </script>
 
-<style></style>
+<style lang="scss" scoped>
+.addnode-form {
+  &__textarea {
+    ::v-deep .el-textarea__inner {
+      font-family: var(--f-mono);
+      font-size: var(--fs-sm);
+      line-height: var(--lh-normal);
+    }
+  }
+
+  &__select {
+    width: 100%;
+  }
+}
+
+.addnode-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+
+  &__force {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    cursor: pointer;
+    font-size: var(--fs-sm);
+    color: var(--c-text-secondary);
+  }
+
+  &__btns {
+    display: flex;
+    gap: var(--s-2);
+  }
+}
+
+::v-deep .el-form-item__label {
+  font-weight: var(--fw-medium);
+  color: var(--c-text-primary);
+  padding-bottom: var(--s-1) !important;
+  line-height: var(--lh-tight);
+}
+
+::v-deep .el-switch.is-checked .el-switch__core {
+  background-color: var(--c-primary-solid);
+  border-color: var(--c-primary-solid);
+}
+</style>
