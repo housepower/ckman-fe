@@ -1,17 +1,34 @@
 <template>
-  <el-form :model="formData" ref="form" style="line-height: 40px;">
+  <el-form :model="formData" ref="form" class="d-form">
     <DFormItem
       v-for="(item, key) in schema"
       :key="key"
       :schema="item"
       :origin-name="key"
       :prop-name="key"
-      v-model="formData">
+      v-model="formData"
+    >
     </DFormItem>
-    <el-form-item class="sticky-bottom" v-if="!noFooter">
-      <el-checkbox class="mr-20" v-model="force">{{$t('common.Force Override')}}</el-checkbox>
-      <el-button v-if="isShowSubmit" :loading="loading" @click="validate" type="primary">{{ submitText || $t("common.Create")}}</el-button>
-      <el-button v-if="isShowCancel" @click="cancel">{{ cancelText || $t("common.Cancel")}}</el-button>
+    <el-form-item class="d-form__footer" v-if="!noFooter">
+      <div class="d-form__footer-inner">
+        <label class="d-form__force">
+          <el-switch v-model="force" />
+          <span class="d-form__force-label">{{ $t('common.Force Override') }}</span>
+        </label>
+        <div class="d-form__btns">
+          <el-button v-if="isShowCancel" @click="cancel">
+            {{ cancelText || $t('common.Cancel') }}
+          </el-button>
+          <el-button
+            v-if="isShowSubmit"
+            :loading="loading"
+            @click="validate"
+            type="primary"
+          >
+            {{ submitText || $t('common.Create') }}
+          </el-button>
+        </div>
+      </div>
     </el-form-item>
   </el-form>
 </template>
@@ -135,12 +152,43 @@ export default {
   }
 }
 </script>
-<style lang="scss">
-.sticky-bottom {
-  position: sticky;
-  bottom: 0;
-  background: #fff;
-  padding: 10px 0;
-  text-align: center;
+<style lang="scss" scoped>
+.d-form {
+  line-height: var(--lh-normal);
+
+  &__footer {
+    position: sticky;
+    bottom: 0;
+    background: var(--c-surface-0);
+    border-top: 1px solid var(--c-surface-3);
+    padding: var(--s-3) var(--s-5);
+    margin: var(--s-4) calc(-1 * var(--s-5)) 0;
+    z-index: 10;
+  }
+
+  &__footer-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__force {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    cursor: pointer;
+    font-size: var(--fs-sm);
+    color: var(--c-text-secondary);
+  }
+
+  &__btns {
+    display: flex;
+    gap: var(--s-2);
+  }
+}
+
+::v-deep .el-switch.is-checked .el-switch__core {
+  background-color: var(--c-primary-solid);
+  border-color: var(--c-primary-solid);
 }
 </style>
