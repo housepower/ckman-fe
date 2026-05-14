@@ -42,9 +42,6 @@
             <div class="node-opt">
               <span class="node-opt__dot" :class="`node-opt__dot--${n.status}`"></span>
               <span class="node-opt__ip">{{ n.ip }}</span>
-              <span class="node-opt__status" :class="`node-opt__status--${n.status}`">
-                {{ statusLabel(n.status) }}
-              </span>
             </div>
           </el-option>
         </el-select>
@@ -104,11 +101,6 @@ export default {
     },
   },
   methods: {
-    statusLabel(status) {
-      const map = { green: 'statusGreen', red: 'statusRed', yellow: 'statusYellow' };
-      const key = map[status];
-      return key ? this.$t('manage.' + key) : status;
-    },
     close() {
       this.$emit('close');
     },
@@ -184,7 +176,7 @@ export default {
 <!-- 非 scoped 全局规则：el-select 下拉被 teleport 到 body，scoped 选择器不可达 -->
 <style lang="scss">
 .node-opt {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: var(--s-2);
 
@@ -202,15 +194,6 @@ export default {
   &__ip {
     font-variant-numeric: tabular-nums;
     color: var(--c-text-primary);
-  }
-
-  &__status {
-    margin-left: auto;
-    font-size: var(--fs-xs);
-
-    &--green  { color: var(--c-success-fg); }
-    &--red    { color: var(--c-danger-fg); }
-    &--yellow { color: var(--c-warning-fg); }
   }
 }
 </style>
