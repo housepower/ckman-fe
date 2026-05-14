@@ -1,19 +1,10 @@
 <template>
   <div class="layout flex flex-column overflow-hidden">
     <header class="flex-between flex-vcenter plr-20">
-      <div class="header-left flex flex-vcenter">
-        <router-link
-          to="/"
-          class="home-icon"
-          :class="{ 'home-icon--active': isClustersActive }"
-          v-tooltip="$t('home.All ClickHouse Clusters')"
-        >
-          <i class="fa fa-database"></i>
-        </router-link>
-        <router-link to="/" class="brand-link">
-          <span class="brand-text">{{title}} <span class="brand-version">{{version}}</span></span>
-        </router-link>
-      </div>
+      <router-link to="/" class="brand-link">
+        <span class="brand-dot"></span>
+        <span class="brand-text">{{title}} <span class="brand-version">{{version}}</span></span>
+      </router-link>
       <div class="header-right flex flex-vcenter">
 
         <div class="flex flex-vcenter mr-15 pointer" @click="viewTaskList">
@@ -51,6 +42,13 @@
 
     <nav class="cluster-tabs" v-if="$route.params.id">
       <div class="cluster-tabs__inner">
+        <router-link
+          to="/"
+          class="ctab-home"
+          v-tooltip="$t('home.All ClickHouse Clusters')"
+        >
+          <i class="fa fa-home"></i>
+        </router-link>
         <a
           v-for="item of menus"
           :key="item.name"
@@ -162,9 +160,6 @@ export default {
     title() {
       return this.$t('layout.ClickHouse Management Console');
     },
-    isClustersActive() {
-      return this.$route.path === '/' || this.$route.path.startsWith('/clusters');
-    },
   },
 };
 </script>
@@ -220,40 +215,6 @@ header {
   font-size: var(--fs-sm);
 }
 
-.header-left {
-  gap: var(--s-3);
-}
-
-.home-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: var(--r-md);
-  color: var(--c-surface-0);
-  background: rgba(255, 255, 255, 0.06);
-  transition: background var(--du-fast) var(--ease-out),
-              color var(--du-fast) var(--ease-out);
-
-  i {
-    font-size: var(--fs-lg);
-  }
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.14);
-  }
-
-  &--active {
-    background: var(--c-primary-solid);
-    color: var(--c-gray-700);
-
-    &:hover {
-      background: var(--c-primary-solid);
-    }
-  }
-}
-
 .header-right {
   font-size: var(--fs-md);
 
@@ -304,6 +265,27 @@ main {
     padding: 0 var(--s-5);
     height: 100%;
     align-items: stretch;
+  }
+
+  .ctab-home {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--c-text-tertiary);
+    text-decoration: none;
+    padding: 0 var(--s-1);
+    margin-right: var(--s-2);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color var(--du-fast) var(--ease-out);
+
+    i {
+      font-size: var(--fs-lg);
+    }
+
+    &:hover {
+      color: var(--c-primary-solid);
+    }
   }
 
   .ctab {
