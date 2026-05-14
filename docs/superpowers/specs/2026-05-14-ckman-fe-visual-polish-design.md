@@ -2,7 +2,7 @@
 
 **日期**：2026-05-14
 **类型**：UI 重构（视觉精雕 / IA 调整）
-**范围**：ckman-fe 全部 11 个 view + 共享组件 + 全局样式
+**范围**：ckman-fe 全部 12 个 view（home / home-setting / login / overview / manage / tables / data-manage / session / query-execution / settings / task / docs）+ 共享组件 + 全局样式
 **硬约束**：不动 Vue 2 / Element UI eoi 主版本；不动后端 API 契约；不动路由 URL
 
 ---
@@ -45,7 +45,7 @@
 | 字体托管 | 自托管 woff2，font-display: swap，仅预加载 Inter regular/medium |
 | 表格密度 | **舒适** — 行高 40px / 字号 13px（Element UI medium 同款） |
 | 6 个 IA 重排页面 | home / overview / manage / tables / data-manage / query-execution |
-| 5 个仅 token 升级页面 | login / home-setting / session / settings / task / docs |
+| 6 个仅 token 升级页面 | login / home-setting / session / settings / task / docs |
 
 ---
 
@@ -342,7 +342,7 @@ NodeStatus[]: { Host, Status: { EN, [lang] } }
 - 快捷键徽章常驻（`⌘ Enter` 执行、`⌘ /` 注释）
 - 执行失败结果区给可复制错误 + 位置高亮，替代 toast
 
-### 8.7 5 个仅 token 升级页面
+### 8.7 6 个仅 token 升级页面
 
 login / home-setting / session / settings / task / docs — IA 不动，只享受 token + 骨架。
 - login：表单居中、按钮换金色、加品牌字 hero
@@ -406,7 +406,7 @@ P4 残余 + 全局验收     ──
 
 | 维度 | 目标 |
 |---|---|
-| 视觉一致性 | 11 个 view 走读截图列在收官文档；找不出硬编码色/px |
+| 视觉一致性 | 12 个 view 走读截图列在收官文档；找不出硬编码色/px |
 | 性能 | 首屏 LCP 不增加 > 100ms；vxe-table 滚动帧率不降 |
 | 可访问性 | 主交互区 contrast ≥ AA（4.5:1） |
 | 回滚就绪 | 任一 PR 可 revert 不破坏其他 |
@@ -451,4 +451,4 @@ P4 残余 + 全局验收     ──
 - 不改 `src/apis/*` 任何函数签名 / URL / payload
 - 不改 `src/services/router.ts` 任何 path / name
 - Vue 2 + Element UI eoi + vxe-table + ECharts 4 全部就地复用
-- 11 个 view 路由不变、入口不变；用户书签可继续使用
+- 12 个 view 路由不变、入口不变；用户书签可继续使用
