@@ -167,11 +167,11 @@ header {
   width: 100%;
   top: 0;
   z-index: 100;
-  height: 48px;
+  height: 52px;
   color: var(--c-surface-0);
   background: var(--c-gray-700);
   border-bottom: 2px solid var(--c-primary-solid);
-  font-size: var(--fs-sm);
+  font-size: var(--fs-md);
 
   .user,
   i {
@@ -185,8 +185,8 @@ header {
 
   .brand-dot {
     display: inline-block;
-    width: 7px;
-    height: 7px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     background: var(--c-primary-solid);
     margin-right: var(--s-2);
@@ -196,7 +196,7 @@ header {
 .brand-link {
   display: inline-flex;
   align-items: center;
-  font-size: var(--fs-md);
+  font-size: var(--fs-lg);
   font-weight: var(--fw-semibold);
   letter-spacing: 0.3px;
 }
@@ -205,19 +205,26 @@ header {
   font-weight: var(--fw-regular);
   opacity: 0.5;
   margin-left: var(--s-1);
-  font-size: var(--fs-xs);
+  font-size: var(--fs-sm);
 }
 
 .header-right {
-  font-size: var(--fs-sm);
+  font-size: var(--fs-md);
 
   > * {
-    margin-left: var(--s-3);
+    margin-left: var(--s-4);
+    padding: var(--s-1) var(--s-2);
+    border-radius: var(--r-sm);
+    transition: background var(--du-fast) var(--ease-out);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
   }
 
   i {
-    font-size: var(--fs-md);
-    margin-right: var(--s-1);
+    font-size: var(--fs-xl);
+    margin-right: var(--s-2);
   }
 
   .fs-16, .fs-20 {
@@ -239,7 +246,7 @@ main {
 
 .cluster-tabs {
   position: sticky;
-  top: 48px;
+  top: 52px;
   z-index: 99;
   background: var(--c-surface-0);
   border-bottom: 1px solid var(--c-surface-3);
