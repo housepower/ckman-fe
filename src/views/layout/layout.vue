@@ -2,17 +2,16 @@
   <div class="layout flex flex-column overflow-hidden">
     <header class="flex-between flex-vcenter plr-20">
       <div class="header-left flex flex-vcenter">
-        <router-link to="/" class="brand-link">
-          <span class="brand-dot"></span>
-          <span class="brand-text">{{title}} <span class="brand-version">{{version}}</span></span>
-        </router-link>
         <router-link
           to="/"
-          class="main-nav-item"
-          :class="{ 'main-nav-item--active': isClustersActive }"
+          class="home-icon"
+          :class="{ 'home-icon--active': isClustersActive }"
+          v-tooltip="$t('home.All ClickHouse Clusters')"
         >
-          <i class="fa fa-th-large"></i>
-          <span>{{$t('home.All ClickHouse Clusters')}}</span>
+          <i class="fa fa-database"></i>
+        </router-link>
+        <router-link to="/" class="brand-link">
+          <span class="brand-text">{{title}} <span class="brand-version">{{version}}</span></span>
         </router-link>
       </div>
       <div class="header-right flex flex-vcenter">
@@ -222,33 +221,36 @@ header {
 }
 
 .header-left {
-  gap: var(--s-6);
+  gap: var(--s-3);
 }
 
-.main-nav-item {
+.home-icon {
   display: inline-flex;
   align-items: center;
-  gap: var(--s-1);
-  font-size: var(--fs-md);
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-md);
   color: var(--c-surface-0);
-  opacity: 0.75;
-  padding: var(--s-1) var(--s-2);
-  border-radius: var(--r-sm);
-  transition: opacity var(--du-fast) var(--ease-out),
-              background var(--du-fast) var(--ease-out);
+  background: rgba(255, 255, 255, 0.06);
+  transition: background var(--du-fast) var(--ease-out),
+              color var(--du-fast) var(--ease-out);
 
   i {
-    font-size: var(--fs-md);
+    font-size: var(--fs-lg);
   }
 
   &:hover {
-    opacity: 1;
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.14);
   }
 
   &--active {
-    opacity: 1;
-    color: var(--c-primary-solid);
+    background: var(--c-primary-solid);
+    color: var(--c-gray-700);
+
+    &:hover {
+      background: var(--c-primary-solid);
+    }
   }
 }
 
