@@ -127,6 +127,9 @@ const messages = {
       'ClickHouse HTTP Port': 'HTTP Port',
       'ClickHouse Protocol': 'Protocol',
       'TLS Secure': 'TLS Secure',
+      Total: 'Total',
+      Deploy: 'Deploy',
+      Import: 'Import',
     },
     manage: {
       'Upgrade Cluster': 'Upgrade Cluster',
@@ -954,6 +957,9 @@ const messages = {
       'ClickHouse HTTP Port': 'HTTP 端口',
       'ClickHouse Protocol': '连接协议',
       'TLS Secure': 'TLS 安全认证',
+      Total: '总数',
+      Deploy: '自部署',
+      Import: '已导入',
     },
     manage: {
       'Upgrade Cluster': '升级集群',

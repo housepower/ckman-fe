@@ -16,6 +16,29 @@
       </template>
     </PageHeader>
 
+    <div class="stat-row">
+      <div class="stat-card stat-card--total">
+        <div class="stat-card__icon-bar"></div>
+        <div class="stat-card__label">{{ $t('home.Total') }}</div>
+        <div class="stat-card__value">{{ stats.total }}</div>
+      </div>
+      <div class="stat-card stat-card--deploy">
+        <div class="stat-card__icon-bar"></div>
+        <div class="stat-card__label">{{ $t('home.Deploy') }}</div>
+        <div class="stat-card__value">{{ stats.deploy }}</div>
+      </div>
+      <div class="stat-card stat-card--import">
+        <div class="stat-card__icon-bar"></div>
+        <div class="stat-card__label">{{ $t('home.Import') }}</div>
+        <div class="stat-card__value">{{ stats.import }}</div>
+      </div>
+      <div class="stat-card stat-card--replica">
+        <div class="stat-card__icon-bar"></div>
+        <div class="stat-card__label">{{ $t('home.Replica') }}</div>
+        <div class="stat-card__value">{{ stats.replica }}</div>
+      </div>
+    </div>
+
     <div class="list mt-50">
       <div class="font-bold mb-10 fs-18 overflow-hidden">{{$t('home.All ClickHouse Clusters')}}
         
@@ -93,7 +116,16 @@ export default {
           || item.logic_cluster?.includes(key)
           || item.hosts.includes(key);
       });
-    }
+    },
+    stats() {
+      const { list } = this;
+      return {
+        total: list.length,
+        deploy: list.filter(c => c.mode === 'deploy').length,
+        import: list.filter(c => c.mode === 'import').length,
+        replica: list.filter(c => c.isReplica === true).length,
+      };
+    },
   },
   mounted() {
     this.fetchData();
@@ -172,4 +204,52 @@ export default {
 //     background: var(--primary-color);
 //   }
 // }
+
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--s-3);
+  margin: var(--s-4) 0 var(--s-5);
+}
+
+.stat-card {
+  position: relative;
+  background: var(--c-surface-0);
+  border: 1px solid var(--c-surface-3);
+  border-radius: var(--r-lg);
+  padding: var(--s-3) var(--s-4) var(--s-3) var(--s-4);
+  overflow: hidden;
+
+  &__icon-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--c-text-tertiary);
+  }
+
+  &--total &__icon-bar    { background: var(--c-primary-solid); }
+  &--deploy &__icon-bar   { background: var(--c-info-solid); }
+  &--import &__icon-bar   { background: var(--c-text-tertiary); }
+  &--replica &__icon-bar  { background: var(--c-success-solid); }
+
+  &__label {
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-medium);
+    color: var(--c-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    line-height: var(--lh-tight);
+  }
+
+  &__value {
+    font-size: var(--fs-3xl);
+    font-weight: var(--fw-semibold);
+    color: var(--c-text-primary);
+    line-height: var(--lh-tight);
+    margin-top: var(--s-1);
+    font-variant-numeric: tabular-nums;
+  }
+}
 </style>
