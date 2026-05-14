@@ -1,0 +1,28 @@
+@import './tokens';
+
+// 喂入 Element UI 主题变量（SCSS 编译时）
+$--color-primary:         $tokens-primary-solid;
+$--color-success:         $tokens-success-solid;
+$--color-warning:         $tokens-warning-solid;
+$--color-danger:          $tokens-danger-solid;
+$--color-info:            $tokens-info-solid;
+
+$--color-text-primary:    $tokens-text-primary;
+$--color-text-regular:    $tokens-text-secondary;
+$--color-text-secondary:  $tokens-text-tertiary;
+$--color-text-placeholder:$tokens-text-disabled;
+
+$--border-color-base:     $tokens-gray-300;
+$--border-color-light:    $tokens-gray-200;
+$--border-color-lighter:  $tokens-gray-100;
+$--border-color-extra-light: $tokens-gray-50;
+
+$--background-color-base: $tokens-surface-1;
+
+$--font-size-base:        $tokens-fs-base;
+$--border-radius-base:    $tokens-r-md;
+
+// Element UI 字体路径（必需）
+$--font-path: '~element-ui-eoi/lib/theme-chalk/fonts';
+
+@import '~element-ui-eoi/packages/theme-chalk/src/index';
