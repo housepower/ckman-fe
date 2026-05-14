@@ -11,7 +11,7 @@
   position: relative;
 
   &:focus {
-    border-color: $primary-color;
+    border-color: var(--c-primary-solid);
   }
 
   .ss-tag {
