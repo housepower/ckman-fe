@@ -1,27 +1,20 @@
 <template>
   <section class="home">
-    <section class="flex flex-wrap">
-      <div class="flex-1">
-        <div class="title flex flex-column mb-30">
-          <p class="mb-5"
-             style="font-size: 40px">
-            <i class="fa fa-database"></i>
-            <span class="inline-block ml-10 font-bold">Provision</span>
-          </p>
-          <p class="fs-14 font-bold">{{$t('home.Create or import a ClickHouse Cluster')}}</p>
-        </div>
-        <div class="btns flex flex-column width-6">
-          <el-button type="primary"
-                     size="large"
-                     class="mb-20 fs-18"
-                     @click="createCk">{{$t('home.Create a ClickHouse Cluster')}}</el-button>
-          <el-button type="primary"
-                     size="large"
-                     class="fs-18"
-                     @click="importCk">{{$t('home.Import a ClickHouse Cluster')}}</el-button>
-        </div>
-      </div>
-    </section>
+    <PageHeader
+      :crumb="[$t('layout.ClickHouse Management Console'), $t('home.All ClickHouse Clusters')]"
+      :title="$t('home.All ClickHouse Clusters')"
+    >
+      <template #actions>
+        <el-button @click="importCk">
+          <i class="el-icon-upload2"></i>
+          {{ $t('home.Import a ClickHouse Cluster') }}
+        </el-button>
+        <el-button type="primary" @click="createCk">
+          <i class="el-icon-plus"></i>
+          {{ $t('home.Create a ClickHouse Cluster') }}
+        </el-button>
+      </template>
+    </PageHeader>
 
     <div class="list mt-50">
       <div class="font-bold mb-10 fs-18 overflow-hidden">{{$t('home.All ClickHouse Clusters')}}
