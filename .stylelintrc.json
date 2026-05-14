@@ -1,0 +1,27 @@
+{
+  "extends": ["stylelint-config-recommended-scss"],
+  "plugins": ["stylelint-scss"],
+  "customSyntax": "postcss-scss",
+  "rules": {
+    "color-no-hex": [true, {
+      "severity": "warning",
+      "message": "Use var(--c-*) tokens instead of hex colors"
+    }],
+    "unit-allowed-list": [
+      ["%", "px", "em", "rem", "vh", "vw", "deg", "ms", "s", "fr"],
+      { "severity": "warning" }
+    ],
+    "declaration-no-important": [true, { "severity": "warning" }],
+    "scss/at-import-partial-extension": null,
+    "no-descending-specificity": null,
+    "no-duplicate-selectors": null,
+    "selector-class-pattern": null,
+    "scss/dollar-variable-pattern": null,
+    "scss/at-mixin-pattern": null,
+    "scss/at-function-pattern": null,
+    "scss/operator-no-unspaced": null,
+    "scss/at-extend-no-missing-placeholder": null,
+    "selector-pseudo-element-no-unknown": null,
+    "unit-no-unknown": null
+  }
+}

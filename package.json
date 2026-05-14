@@ -6,7 +6,8 @@
   "scripts": {
     "serve": "node_modules/.bin/vue-cli-service serve src/main.tsx",
     "build": "vue-cli-service build src/main.tsx",
-    "lint": "node_modules/.bin/vue-cli-service lint"
+    "lint": "node_modules/.bin/vue-cli-service lint",
+    "lint:style": "stylelint --allow-empty-input --max-warnings=99999 \"src/**/*.scss\""
   },
   "dependencies": {
     "@fontsource/inter": "5",
