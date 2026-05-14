@@ -1,16 +1,22 @@
 <template>
-  <main class="settings">
-    <breadcrumb :data="['Clusters', $route.params.id, 'manage']">
-      <template v-slot:default>
-        <el-button type="primary"
-                   size="mini"
-                   class="fs-14"
-                   v-for="item of clusterStatus"
-                   :key="item"
-                   :disabled="isStatusDisable(item)"
-                   @click="clusterOperation(item)">{{$t('manage.' + item + ' Cluster')}}</el-button>
+  <main class="manage-page">
+    <PageHeader
+      :crumb="[$t('layout.ClickHouse Management Console'), $route.params.id]"
+      :title="$t('home.Manage')"
+    >
+      <template #actions>
+        <el-button
+          v-for="item of clusterStatus"
+          :key="item"
+          :disabled="isStatusDisable(item)"
+          size="medium"
+          :type="item === 'Destroy' ? 'danger' : 'default'"
+          @click="clusterOperation(item)"
+        >
+          {{ $t('manage.' + item + ' Cluster') }}
+        </el-button>
       </template>
-    </breadcrumb>
+    </PageHeader>
     <section class="container">
       <div class="uprade ptb-15">
         <span class="fs-18 font-bold mb-15 inline-block">{{$t('manage.Upgrade Cluster')}}</span>
