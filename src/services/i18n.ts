@@ -922,7 +922,7 @@ const messages = {
       'Cluster Name': '集群名称',
       'ClickHouse TCP Port': 'TCP端口',
       'ClickHouse Node List': '节点列表',
-      'Replica': '是否设置副本',
+      'Replica': '启用副本',
       'Zookeeper Node List': 'Zookeeper集群列表',
       'ZooKeeper Port': 'Zookeeper端口',
       'ZK Status Port': 'Zookeeper监控端口',
