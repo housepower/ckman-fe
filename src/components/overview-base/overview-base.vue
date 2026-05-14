@@ -1,8 +1,23 @@
 <template>
   <section class="overview-base">
     <template v-if="!allEmpty">
-      <div v-for="(group, gIndex) of chartMetrics" :key="group.title" class="chart-group">
-        <h2 class="chart-group__title">{{ $t('ClickHouseEcharts.' + group.title) }}</h2>
+      <div class="metric-tabs" v-if="chartMetrics.length > 1">
+        <button
+          v-for="(group, gIndex) of chartMetrics"
+          :key="group.title"
+          class="metric-tab"
+          :class="{ 'metric-tab--active': gIndex === activeGroupIndex }"
+          @click="activeGroupIndex = gIndex"
+        >
+          {{ $t('ClickHouseEcharts.' + group.title) }}
+        </button>
+      </div>
+      <div
+        v-for="(group, gIndex) of chartMetrics"
+        :key="group.title"
+        class="chart-group"
+        v-show="gIndex === activeGroupIndex"
+      >
         <div class="chart-grid">
           <div
             v-for="(item, mIndex) of group.metrics"
@@ -82,6 +97,7 @@ export default {
   data() {
     return {
       chartMetrics: [],
+      activeGroupIndex: 0,
     };
   },
   mounted() {
@@ -151,16 +167,37 @@ export default {
 .overview-base {
   display: flex;
   flex-direction: column;
-  gap: var(--s-6);
+  gap: var(--s-4);
 }
 
-.chart-group {
-  &__title {
-    font-size: var(--fs-lg);
-    font-weight: var(--fw-semibold);
+.metric-tabs {
+  display: flex;
+  gap: var(--s-5);
+  border-bottom: 1px solid var(--c-surface-3);
+  padding: 0 var(--s-2);
+}
+
+.metric-tab {
+  appearance: none;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  padding: var(--s-2) var(--s-1);
+  font-size: var(--fs-md);
+  color: var(--c-text-secondary);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color var(--du-fast) var(--ease-out),
+              border-color var(--du-fast) var(--ease-out);
+
+  &:hover {
     color: var(--c-text-primary);
-    margin: 0 0 var(--s-3);
-    line-height: var(--lh-tight);
+  }
+
+  &--active {
+    color: var(--c-text-primary);
+    font-weight: var(--fw-semibold);
+    border-bottom-color: var(--c-primary-solid);
   }
 }
 
