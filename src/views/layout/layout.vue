@@ -1,10 +1,20 @@
 <template>
   <div class="layout flex flex-column overflow-hidden">
     <header class="flex-between flex-vcenter plr-20">
-      <router-link to="/" class="brand-link">
-        <span class="brand-dot"></span>
-        <span class="brand-text">{{title}} <span class="brand-version">{{version}}</span></span>
-      </router-link>
+      <div class="header-left flex flex-vcenter">
+        <router-link to="/" class="brand-link">
+          <span class="brand-dot"></span>
+          <span class="brand-text">{{title}} <span class="brand-version">{{version}}</span></span>
+        </router-link>
+        <router-link
+          to="/"
+          class="main-nav-item"
+          :class="{ 'main-nav-item--active': isClustersActive }"
+        >
+          <i class="fa fa-th-large"></i>
+          <span>{{$t('home.All ClickHouse Clusters')}}</span>
+        </router-link>
+      </div>
       <div class="header-right flex flex-vcenter">
 
         <div class="flex flex-vcenter mr-15 pointer" @click="viewTaskList">
@@ -152,7 +162,10 @@ export default {
   computed: {
     title() {
       return this.$t('layout.ClickHouse Management Console');
-    }
+    },
+    isClustersActive() {
+      return this.$route.path === '/' || this.$route.path.startsWith('/clusters');
+    },
   },
 };
 </script>
@@ -206,6 +219,37 @@ header {
   opacity: 0.5;
   margin-left: var(--s-1);
   font-size: var(--fs-sm);
+}
+
+.header-left {
+  gap: var(--s-6);
+}
+
+.main-nav-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-1);
+  font-size: var(--fs-md);
+  color: var(--c-surface-0);
+  opacity: 0.75;
+  padding: var(--s-1) var(--s-2);
+  border-radius: var(--r-sm);
+  transition: opacity var(--du-fast) var(--ease-out),
+              background var(--du-fast) var(--ease-out);
+
+  i {
+    font-size: var(--fs-md);
+  }
+
+  &:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  &--active {
+    opacity: 1;
+    color: var(--c-primary-solid);
+  }
 }
 
 .header-right {
