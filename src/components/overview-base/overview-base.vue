@@ -171,10 +171,17 @@ export default {
 }
 
 .metric-tabs {
+  position: sticky;
+  top: 0;
+  z-index: 10;
   display: flex;
   gap: var(--s-5);
   border-bottom: 1px solid var(--c-surface-3);
   padding: 0 var(--s-2);
+  background: var(--c-surface-1);
+  margin: 0 calc(-1 * var(--s-5));
+  padding-left: var(--s-7, 28px);
+  padding-right: var(--s-5);
 }
 
 .metric-tab {
