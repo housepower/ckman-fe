@@ -62,87 +62,86 @@
         </el-button>
       </div>
     </div>
-    <div class="node-list">
-        <h3 class="mt-15 mb-30">{{$t('home.ClickHouse Node List')}}</h3>
-        <div class="search flex flex-between pull-left">
-          <el-button type="primary"
-            v-if="mode === 'deploy'"
+    <div class="node-card">
+      <div class="node-card__header">
+        <h3 class="node-card__title">{{ $t('home.ClickHouse Node List') }}</h3>
+        <div class="node-card__actions">
+          <el-input
+            v-model="input"
+            :placeholder="$t('common.keyword search')"
+            autocomplete="off"
+            clearable
             size="medium"
-            class="fs-16"
-            @click="addNode">{{$t('manage.Add Node')}}</el-button>
-        </div>
-
-        
-        <AddNodeDialog
-          :visible.sync="addNodeDialogVisible"
-          :nodes="list.nodes"
-          @close="addNodeDialogVisible = false"
-          @onOk="onAddNodeSuccess"
-          :numberRange="numberRange"
-          :password="password" />
-
-        <vxe-toolbar zoom custom class="pull-right">
-          <template #buttons>
-            <el-input v-model="input"
-              :placeholder="$t('common.keyword search')"
-              autocomplete="false"
-              clearable
-              size="medium"
-              suffix-icon="el-icon-search"
-              class="width-300"></el-input>
-          </template>
-        </vxe-toolbar>
-
-        <vxe-table class="mt-10"
-          style="clear: both;"
-          v-bind="gridOptions"
-          :data="queryList"
-          border>
-          <vxe-column v-for="(col, index) in columns"
-            :key="index"
-            :field="col.prop"
-            show-overflow-tooltip
-            :title="col.label"
-            :filters="col.filters || null"
-            sortable
-            align="center">
-            <template slot-scope="{row, column}">
-              <div v-if="col.prop === 'status'" class="flex flex-between">
-                <span>
-                  <span class="dot mr-5" :class="row.status"></span>
-                  <span>{{row.status}}</span>
-                </span>
-                <span class="ml-10 pull-right">{{row.uptime}}</span>
-              </div>
-              <div v-else-if="col.prop === 'ip'" class="ip-cell">
-                <span class="ip-text">{{ row.ip }}</span>
-                <el-tooltip :content="$t('manage.Open Play UI')" placement="top">
-                  <el-button
-                    type="text"
-                    icon="el-icon-link"
-                    class="ip-action"
-                    @click="openHttpWeb(row.ip, httpPort)"
-                  />
-                </el-tooltip>
-              </div>
-              <span v-else>{{row[column.property]}}</span>
-            </template>
-          </vxe-column>
-          <vxe-column :title="$t('home.Actions')"
+            suffix-icon="el-icon-search"
+            class="node-card__search"
+          />
+          <el-button
             v-if="mode === 'deploy'"
-            width="250"
-            align="center">
-            <template slot-scope="{ row }">
-              <el-button type="text" v-if="row.status === 'green'" @click="offlineClusterNode(row)" :loading="row.offlineLoading">{{ $t('manage.Offline') }}</el-button>
-              <el-button type="text" v-if="row.status === 'red'" @click="onlineClusterNode(row)" :loading="row.onlineLoading">{{ $t('manage.Online') }}</el-button>
-              <el-button type="text" @click="viewClusterLog(row)">{{ $t('manage.View Log') }}</el-button>
-              <el-button type="text" @click="remove(row)">{{ $t('common.Delete') }}</el-button>
-            </template>
-            <template>
-            </template>
-          </vxe-column>
-        </vxe-table>
+            type="primary"
+            size="medium"
+            @click="addNode"
+          >
+            <i class="el-icon-plus"></i>
+            {{ $t('manage.Add Node') }}
+          </el-button>
+        </div>
       </div>
+      <AddNodeDialog
+        :visible.sync="addNodeDialogVisible"
+        :nodes="list.nodes"
+        @close="addNodeDialogVisible = false"
+        @onOk="onAddNodeSuccess"
+        :numberRange="numberRange"
+        :password="password"
+      />
+      <vxe-table
+        v-bind="gridOptions"
+        :data="queryList"
+      >
+        <vxe-column v-for="(col, index) in columns"
+          :key="index"
+          :field="col.prop"
+          show-overflow-tooltip
+          :title="col.label"
+          :filters="col.filters || null"
+          sortable
+          align="center">
+          <template slot-scope="{row, column}">
+            <div v-if="col.prop === 'status'" class="flex flex-between">
+              <span>
+                <span class="dot mr-5" :class="row.status"></span>
+                <span>{{row.status}}</span>
+              </span>
+              <span class="ml-10 pull-right">{{row.uptime}}</span>
+            </div>
+            <div v-else-if="col.prop === 'ip'" class="ip-cell">
+              <span class="ip-text">{{ row.ip }}</span>
+              <el-tooltip :content="$t('manage.Open Play UI')" placement="top">
+                <el-button
+                  type="text"
+                  icon="el-icon-link"
+                  class="ip-action"
+                  @click="openHttpWeb(row.ip, httpPort)"
+                />
+              </el-tooltip>
+            </div>
+            <span v-else>{{row[column.property]}}</span>
+          </template>
+        </vxe-column>
+        <vxe-column :title="$t('home.Actions')"
+          v-if="mode === 'deploy'"
+          width="250"
+          align="center">
+          <template slot-scope="{ row }">
+            <el-button type="text" v-if="row.status === 'green'" @click="offlineClusterNode(row)" :loading="row.offlineLoading">{{ $t('manage.Offline') }}</el-button>
+            <el-button type="text" v-if="row.status === 'red'" @click="onlineClusterNode(row)" :loading="row.onlineLoading">{{ $t('manage.Online') }}</el-button>
+            <el-button type="text" @click="viewClusterLog(row)">{{ $t('manage.View Log') }}</el-button>
+            <el-button type="text" @click="remove(row)">{{ $t('common.Delete') }}</el-button>
+          </template>
+          <template>
+          </template>
+        </vxe-column>
+      </vxe-table>
     </div>
     <DeleteNodeComponent :visible.sync="deleteNodeDialogVisible" :password="password" :ip="deleteIp" @onOk="onAddNodeSuccess" @close="deleteNodeDialogVisible = false" />
   </main>
@@ -517,6 +516,32 @@ export default {
 
   &__select {
     width: 160px;
+  }
+}
+.node-card {
+  padding: 15px 0;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+  }
+
+  &__title {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  &__search {
+    width: 240px;
   }
 }
 .dot {
