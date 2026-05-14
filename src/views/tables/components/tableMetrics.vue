@@ -467,9 +467,7 @@ export default {
   }
 
   &:hover {
-    color: #ffdf40;
-    /* 悬停时使用浅黄色 */
-    opacity: 0.8;
+    color: var(--c-primary-fg);
   }
 }
 
