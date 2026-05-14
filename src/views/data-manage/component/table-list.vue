@@ -23,8 +23,7 @@
       row-key="key"
       border
       style="width:100%"
-      :row-class-name="() => 'table-row-clickable'"
-      @row-click="handleRowClick"
+      @sort-change="onSortChange"
     >
       <el-table-column :label="$t('history.Database Table')" min-width="240" show-overflow-tooltip>
         <template #default="{ row }">
@@ -54,7 +53,8 @@
           <span v-else class="muted">—</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('history.Latest Backup')" min-width="180" show-overflow-tooltip>
+      <el-table-column :label="$t('history.Latest Backup')" min-width="180" show-overflow-tooltip
+        prop="_latestBackupTime" sortable="custom">
         <template #default="{ row }">
           <template v-if="metaMap[row.key] && metaMap[row.key].latestBackup">
             <span class="muted">{{ formatDate(metaMap[row.key].latestBackup.time) }}</span>
@@ -69,7 +69,8 @@
           <span v-else class="muted">—</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('history.Latest Restore')" min-width="180" show-overflow-tooltip>
+      <el-table-column :label="$t('history.Latest Restore')" min-width="180" show-overflow-tooltip
+        prop="_latestRestoreTime" sortable="custom">
         <template #default="{ row }">
           <template v-if="metaMap[row.key] && metaMap[row.key].latestRestore">
             <span class="muted">{{ formatDate(metaMap[row.key].latestRestore.time) }}</span>
@@ -125,6 +126,8 @@ export default {
       currentPage: 1,
       pageSize: 20,
       metaMap: {},
+      sortField: '',
+      sortOrder: '',
     };
   },
   computed: {
@@ -160,9 +163,32 @@ export default {
       const q = this.searchKey.toLowerCase();
       return this.aggregatedRows.filter(r => `${r.database}.${r.table}`.toLowerCase().includes(q));
     },
+    sortedRows() {
+      const field = this.sortField;
+      if ((field !== '_latestBackupTime' && field !== '_latestRestoreTime') || !this.sortOrder) {
+        return this.filteredRows;
+      }
+      const pickTime = (row) => {
+        const m = this.metaMap[row.key];
+        if (!m) return '';
+        const key = field === '_latestBackupTime' ? 'latestBackup' : 'latestRestore';
+        return m[key] ? (m[key].time || '') : '';
+      };
+      const arr = [...this.filteredRows];
+      arr.sort((a, b) => {
+        const ta = pickTime(a);
+        const tb = pickTime(b);
+        if (ta === tb) return 0;
+        if (!ta) return 1;
+        if (!tb) return -1;
+        return ta < tb ? -1 : 1;
+      });
+      if (this.sortOrder === 'descending') arr.reverse();
+      return arr;
+    },
     pagedRows() {
       const s = (this.currentPage - 1) * this.pageSize;
-      return this.filteredRows.slice(s, s + this.pageSize);
+      return this.sortedRows.slice(s, s + this.pageSize);
     },
   },
   watch: {
@@ -208,10 +234,10 @@ export default {
         table: row.table,
       };
     },
-    handleRowClick(row, column) {
-      if (!column) return;
-      if ((column.className || '').includes('col-no-click')) return;
-      this.$emit('view-table', this.toViewPolicy(row));
+    onSortChange({ prop, order }) {
+      this.sortField = prop || '';
+      this.sortOrder = order || '';
+      this.currentPage = 1;
     },
     formatDate(s) {
       if (!s || s === '0001-01-01T00:00:00Z') return '—';
@@ -238,8 +264,6 @@ export default {
 .toolbar { display:flex; gap:10px; align-items:center; margin-bottom:14px; flex-wrap:wrap; }
 .auto-refresh { display:inline-flex; align-items:center; gap:6px; }
 .ar-label { font-size: 12px; color: #606266; }
-.table-row-clickable { cursor: pointer; }
-.table-row-clickable .col-no-click { cursor: default; }
 .table-name { font-weight: 500; }
 .muted { color: #909399; }
 .task-tag { margin-right: 4px; }

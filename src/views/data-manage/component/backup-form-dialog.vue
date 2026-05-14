@@ -3,12 +3,14 @@
         :visible="value"
         :title="$t('backup.New Backup Title')"
         width="760px"
+        top="6vh"
+        custom-class="backup-form-dialog"
         :close-on-click-modal="false"
         @update:visible="$emit('input', $event)"
         @opened="onOpened"
         @closed="onClosed"
     >
-        <el-form ref="form" :model="form" :rules="rules" label-width="130px" label-position="right" size="small">
+        <el-form ref="form" :model="form" :rules="rules" label-width="130px" label-position="right" size="small" class="scrollable-form">
 
             <!-- ① 调度 -->
             <div class="form-section">
@@ -35,11 +37,18 @@
                         <div v-if="cronHelpVisible" class="cron-help">
                             <p>{{ $t('backup.Common cron expressions') }}：</p>
                             <ul>
-                                <li>{{ $t('backup.Every hour') }}: <code>0 * * * *</code></li>
-                                <li>{{ $t('backup.Daily at 0 AM') }}: <code>0 0 * * *</code></li>
-                                <li>{{ $t('backup.Every Monday at 0 AM') }}: <code>0 0 * * 1</code></li>
-                                <li>{{ $t('backup.First day of each month at 0 AM') }}: <code>0 0 1 * *</code></li>
+                                <li>{{ $t('backup.Every hour') }}: <code>0 0 * * * *</code></li>
+                                <li>{{ $t('backup.Daily at 0 AM') }}: <code>0 0 0 * * *</code></li>
+                                <li>{{ $t('backup.Every Monday at 0 AM') }}: <code>0 0 0 * * 1</code></li>
+                                <li>{{ $t('backup.First day of each month at 0 AM') }}: <code>0 0 0 1 * *</code></li>
                             </ul>
+                        </div>
+                        <div v-if="cronPreview.runs.length" class="cron-preview">
+                            <span class="cron-preview-label">{{ $t('backup.Next Runs Preview') }}：</span>
+                            <span v-for="(t, i) in cronPreview.runs" :key="i" class="cron-preview-item">{{ t }}</span>
+                        </div>
+                        <div v-else-if="cronPreviewInvalid" class="cron-preview cron-preview-invalid">
+                            {{ $t('backup.Cron Invalid Preview') }}
                         </div>
                     </el-form-item>
 
@@ -195,10 +204,23 @@
                     </div>
                 </el-form-item>
 
-                <!-- 按时间段 -->
+                <!-- 按时间段：模式切换（仅 immediate 出现 radio） -->
+                <el-form-item
+                    key="range-mode"
+                    v-if="form.backupStyle === 'incremental' && form.backupType === 'daily' && form.scheduleType === 'immediate'"
+                    :label="$t('backup.Range Mode')"
+                >
+                    <el-radio-group v-model="form.rangeMode">
+                        <el-radio label="rolling">{{ $t('backup.Range Mode Rolling') }}</el-radio>
+                        <el-radio label="fixed">{{ $t('backup.Range Mode Fixed') }}</el-radio>
+                    </el-radio-group>
+                    <div v-if="form.rangeMode === 'fixed'" class="start-date-hint">{{ $t('backup.Range Mode Fixed Hint') }}</div>
+                </el-form-item>
+
+                <!-- 滚动窗口模式 -->
                 <el-form-item
                     key="daily-input"
-                    v-if="form.backupStyle === 'incremental' && form.backupType === 'daily'"
+                    v-if="form.backupStyle === 'incremental' && form.backupType === 'daily' && rangeModeEffective === 'rolling'"
                     :label="$t('backup.Time Range')"
                     prop="daysBefore"
                 >
@@ -215,6 +237,46 @@
                         />
                         {{ $t('backup.Days Ago Text') }}
                     </span>
+                </el-form-item>
+
+                <el-form-item
+                    key="start-date-input"
+                    v-if="form.backupStyle === 'incremental' && form.backupType === 'daily' && rangeModeEffective === 'rolling'"
+                    :label="$t('backup.Start Date')"
+                >
+                    <el-date-picker
+                        v-model="form.startDate"
+                        type="date"
+                        :placeholder="$t('backup.Start Date Optional')"
+                        format="yyyy-MM-dd"
+                        value-format="yyyyMMdd"
+                        style="width: 200px;"
+                    />
+                    <div class="start-date-hint">{{ $t('backup.Start Date Hint') }}</div>
+                    <div v-if="effectiveRangeText" class="effective-range" :class="{ 'effective-range-skip': effectiveRangeSkip }">
+                        {{ $t('backup.Effective Range') }}: {{ effectiveRangeText }}
+                    </div>
+                </el-form-item>
+
+                <!-- 固定区间模式 -->
+                <el-form-item
+                    key="fixed-range-input"
+                    v-if="form.backupStyle === 'incremental' && form.backupType === 'daily' && rangeModeEffective === 'fixed'"
+                    :label="$t('backup.Fixed Range')"
+                    prop="fixedRange"
+                >
+                    <el-date-picker
+                        v-model="form.fixedRange"
+                        type="daterange"
+                        :start-placeholder="$t('backup.Range Start Placeholder')"
+                        :end-placeholder="$t('backup.Range End Placeholder')"
+                        format="yyyy-MM-dd"
+                        value-format="yyyyMMdd"
+                        style="width: 320px;"
+                    />
+                    <div v-if="fixedRangeInvalid" class="effective-range effective-range-skip">
+                        {{ $t('backup.Range Invalid') }}
+                    </div>
                 </el-form-item>
             </div>
 
@@ -334,7 +396,7 @@
                     >
                         <el-switch v-model="form.checksum" :disabled="checksumDisabled" />
                     </el-tooltip>
-                    <span v-if="checksumDisabled" class="form-hint-text">
+                    <span v-if="checksumDisabled" class="checksum-hint">
                         {{ $t('backup.Checksum Disabled By Compression') }}
                     </span>
                 </el-form-item>
@@ -358,6 +420,7 @@
 
 <script>
 import { DataManageApi, ConfigApi } from '@/apis';
+import { parseCronNextRuns } from '@/helpers';
 
 export default {
     name: 'BackupFormDialog',
@@ -371,6 +434,8 @@ export default {
     data() {
         return {
             cronHelpVisible: false,
+            cronPreview: { valid: false, runs: [] },
+            cronPreviewTimer: null,
             instanceList: [],
             submitLoading: false,
             // Table summary state
@@ -424,11 +489,37 @@ export default {
                         required: false,
                         trigger: 'blur',
                         validator: (rule, value, callback) => {
-                            if (this.form.scheduleType === 'scheduled' && (!value || !value.trim())) {
-                                callback(new Error(this.$t('backup.Please enter cron expression')));
-                            } else {
+                            if (this.form.scheduleType !== 'scheduled') {
                                 callback();
+                                return;
                             }
+                            if (!value || !value.trim()) {
+                                callback(new Error(this.$t('backup.Please enter cron expression')));
+                                return;
+                            }
+                            if (value.trim().split(/\s+/).length !== 6) {
+                                callback(new Error(this.$t('backup.Invalid cron fields')));
+                                return;
+                            }
+                            callback();
+                        }
+                    }
+                ],
+                fixedRange: [
+                    {
+                        required: false,
+                        trigger: 'change',
+                        validator: (rule, value, callback) => {
+                            if (this.rangeModeEffective !== 'fixed') { callback(); return; }
+                            if (!Array.isArray(value) || value.length !== 2 || !value[0] || !value[1]) {
+                                callback(new Error(this.$t('backup.Range Start Placeholder') + ' / ' + this.$t('backup.Range End Placeholder')));
+                                return;
+                            }
+                            if (value[0] > value[1]) {
+                                callback(new Error(this.$t('backup.Range Invalid')));
+                                return;
+                            }
+                            callback();
                         }
                     }
                 ],
@@ -588,9 +679,63 @@ export default {
                 map[p.table] = p.task_name || `${p.database}.${p.table}`;
             }
             return map;
+        },
+        cronPreviewInvalid() {
+            if (this.form.scheduleType !== 'scheduled') return false;
+            const v = (this.form.crontab || '').trim();
+            return v.length > 0 && !this.cronPreview.valid;
+        },
+        windowEndDate() {
+            const d = new Date();
+            d.setDate(d.getDate() - (this.form.daysBefore || 0));
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        },
+        startDateFormatted() {
+            const s = this.form.startDate || '';
+            if (s.length !== 8) return '';
+            return `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}`;
+        },
+        effectiveRangeSkip() {
+            if (!this.startDateFormatted) return false;
+            return this.startDateFormatted > this.windowEndDate;
+        },
+        effectiveRangeText() {
+            if (this.form.backupStyle !== 'incremental' || this.form.backupType !== 'daily') return '';
+            const end = this.windowEndDate;
+            if (!this.startDateFormatted) {
+                return `${this.$t('backup.No Lower Bound')} ~ ${end}`;
+            }
+            if (this.effectiveRangeSkip) {
+                return `${this.startDateFormatted} ~ ${end}（${this.$t('backup.Effective Range Skip')}）`;
+            }
+            return `${this.startDateFormatted} ~ ${end}`;
+        },
+        // scheduled 强制为 rolling，避免被后端拒绝
+        rangeModeEffective() {
+            if (this.form.scheduleType !== 'immediate') return 'rolling';
+            return this.form.rangeMode || 'rolling';
+        },
+        fixedRangeInvalid() {
+            if (this.rangeModeEffective !== 'fixed') return false;
+            const r = this.form.fixedRange;
+            if (!Array.isArray(r) || r.length !== 2 || !r[0] || !r[1]) return false;
+            return r[0] > r[1];
         }
     },
     watch: {
+        'form.crontab'() {
+            this.schedulePreviewUpdate();
+        },
+        'form.scheduleType'(val) {
+            if (val !== 'scheduled') {
+                this.cronPreview = { valid: false, runs: [] };
+            } else {
+                this.schedulePreviewUpdate();
+            }
+        },
         'form.target'(val) {
             if (val === 'local') {
                 this.fetchDisks();
@@ -619,7 +764,20 @@ export default {
             }
         },
     },
+    beforeDestroy() {
+        if (this.cronPreviewTimer) clearTimeout(this.cronPreviewTimer);
+    },
     methods: {
+        schedulePreviewUpdate() {
+            if (this.cronPreviewTimer) clearTimeout(this.cronPreviewTimer);
+            this.cronPreviewTimer = setTimeout(() => {
+                if (this.form.scheduleType !== 'scheduled') {
+                    this.cronPreview = { valid: false, runs: [] };
+                    return;
+                }
+                this.cronPreview = parseCronNextRuns(this.form.crontab, 3);
+            }, 250);
+        },
         // ── Dialog lifecycle ───────────────────────────────────────
         onOpened() {
             this.fetchInstanceList();
@@ -639,6 +797,8 @@ export default {
             this.diskList = [];
             this.tablesFallback = false;
             this.cronHelpVisible = false;
+            this.cronPreview = { valid: false, runs: [] };
+            if (this.cronPreviewTimer) { clearTimeout(this.cronPreviewTimer); this.cronPreviewTimer = null; }
             // Reset form validation state
             this.$nextTick(() => {
                 if (this.$refs.form) {
@@ -666,6 +826,9 @@ export default {
                 compression: 'gzip',
                 backupType: 'partition',
                 daysBefore: 7,
+                startDate: '',
+                rangeMode: 'rolling',
+                fixedRange: null,
                 partitions: [],
                 backupStyle: 'full',
                 clean: false,
@@ -789,6 +952,9 @@ export default {
                 this.form.partitions = [];
                 // 切到定时备份时，把已选的冲突表清掉，避免提交时被后端拒绝
                 this.form.tables = this.form.tables.filter(t => !this.conflictingTables[t]);
+                // 固定区间仅 immediate 支持，切到 scheduled 时强制回滚动模式
+                this.form.rangeMode = 'rolling';
+                this.form.fixedRange = null;
             }
         },
 
@@ -835,7 +1001,6 @@ export default {
                 tables: this.form.tables,    // string[] — directly
                 backup_style: this.form.backupStyle,
                 backup_type: this.form.backupType,
-                days_before: this.form.daysBefore,
                 target: this.form.target,
                 compression: this.form.compression,
                 clean: this.form.clean,
@@ -854,6 +1019,17 @@ export default {
 
             if (this.form.backupStyle === 'incremental' && this.form.backupType === 'partition') {
                 params.partitions = this.form.partitions;
+            }
+
+            if (this.form.backupStyle === 'incremental' && this.form.backupType === 'daily') {
+                if (this.rangeModeEffective === 'fixed') {
+                    const r = this.form.fixedRange || [];
+                    params.range_start_date = r[0] || '';
+                    params.range_end_date = r[1] || '';
+                } else {
+                    params.days_before = this.form.daysBefore;
+                    params.start_date = this.form.startDate || '';
+                }
             }
 
             if (this.form.target === 'local') {
@@ -920,10 +1096,16 @@ export default {
 <style scoped lang="scss">
 @import '@/app/variables.scss';
 
+.scrollable-form {
+    max-height: calc(100vh - 220px);
+    overflow-y: auto;
+    padding-right: 6px;
+}
+
 .form-section {
     border-bottom: 1px solid #ebeef5;
-    padding-bottom: 16px;
-    margin-bottom: 18px;
+    padding-bottom: 12px;
+    margin-bottom: 12px;
 
     &:last-of-type {
         border-bottom: none;
@@ -978,6 +1160,30 @@ export default {
         border-radius: 3px;
         font-family: monospace;
     }
+}
+
+/* cron preview block: real-time next-run times */
+.cron-preview {
+    margin-top: 6px;
+    font-size: 12px;
+    color: #67c23a;
+    line-height: 1.6;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 10px;
+}
+.cron-preview-label {
+    color: #606266;
+}
+.cron-preview-item {
+    font-family: monospace;
+    background: #f0f9eb;
+    padding: 1px 6px;
+    border-radius: 3px;
+}
+.cron-preview-invalid {
+    color: #909399;
 }
 
 /* table option row in dropdown */
@@ -1077,6 +1283,32 @@ export default {
     color: #909399;
 }
 
+/* start-date hint + effective range preview */
+.start-date-hint {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #909399;
+    line-height: 1.5;
+}
+.effective-range {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #67c23a;
+    line-height: 1.5;
+}
+.effective-range-skip {
+    color: #e6a23c;
+}
+
+/* compression-disabled-checksum hint: very muted, do not distract */
+.checksum-hint {
+    display: block;
+    margin-top: 2px;
+    font-size: 11px;
+    line-height: 1.4;
+    color: #c0c4cc;
+}
+
 .warn-text {
     color: #ad6c00;
 }
@@ -1116,4 +1348,10 @@ export default {
         text-align: right;
     }
 }
+</style>
+
+<style>
+.backup-form-dialog .el-dialog__body { padding: 14px 20px; }
+.backup-form-dialog .el-dialog__header { padding: 14px 20px 10px; }
+.backup-form-dialog .el-dialog__footer { padding: 8px 20px 14px; }
 </style>

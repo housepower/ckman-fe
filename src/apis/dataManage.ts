@@ -38,6 +38,10 @@ export const DataManageApi = {
   triggerPolicy(policyId: string) {
     return axios.post(`${url}/backup/policy/${policyId}/trigger`);
   },
+  // 返回 scheduled+enabled 任务的下次触发时间；其它情况 next_run_at 为空串
+  getPolicyNextRun(policyId: string) {
+    return axios.get(`${url}/backup/policy/${policyId}/next_run`);
+  },
 
   // ============ Run 详情 + 台账 ============
   getRun(runId: string) {

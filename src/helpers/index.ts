@@ -9,3 +9,4 @@ export * from './lineFeed';
 export * from './byteConvert';
 export * from './percentiles';
 export * from './parseDurationBySplit';
+export * from './parseCronNextRuns';

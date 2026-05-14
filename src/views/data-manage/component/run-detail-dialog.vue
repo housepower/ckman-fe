@@ -104,7 +104,7 @@ export default {
     runId: { type: String, default: '' },
   },
   data() {
-    return { run: null, loading: false, pollTimer: null };
+    return { run: null, loading: false };
   },
   computed: {
     succCount() {
@@ -129,8 +129,6 @@ export default {
       if (visible && this.runId) {
         this.run = null;
         this.fetchRun();
-      } else {
-        this.stopPoll();
       }
     },
     runId(newId) {
@@ -147,7 +145,6 @@ export default {
         const res = await DataManageApi.getRun(this.runId);
         if (res.data.retCode === '0000') {
           this.run = res.data.entity;
-          this.maybeStartPoll();
         }
       } catch (e) {
         this.$message.error(this.$t('history.Fetch Run Failed') + ': ' + e.message);
@@ -155,21 +152,7 @@ export default {
         this.loading = false;
       }
     },
-    maybeStartPoll() {
-      this.stopPoll();
-      if (!this.run || !this.value) return;
-      // dialog 打开期间一直 5s 轮询（看 elapsed / partition 状态推进）；
-      // 关闭时由 watch(value) 调 stopPoll 停掉。
-      this.pollTimer = setTimeout(() => this.fetchRun(), 5000);
-    },
-    stopPoll() {
-      if (this.pollTimer) {
-        clearTimeout(this.pollTimer);
-        this.pollTimer = null;
-      }
-    },
     onClosed() {
-      this.stopPoll();
       this.run = null;
     },
     onRestoreFromRun() {
@@ -214,9 +197,6 @@ export default {
       if (b < 1073741824) return (b / 1048576).toFixed(2) + ' MB';
       return (b / 1073741824).toFixed(2) + ' GB';
     },
-  },
-  beforeDestroy() {
-    this.stopPoll();
   },
 };
 </script>

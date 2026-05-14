@@ -3,12 +3,14 @@
     :visible="value"
     :title="$t('restore.New Restore')"
     width="880px"
+    top="6vh"
+    custom-class="restore-form-dialog"
     :close-on-click-modal="false"
     @update:visible="$emit('input', $event)"
     @opened="onOpened"
     @closed="onClosed"
   >
-    <el-form ref="form" :model="form" label-width="120px" size="small">
+    <el-form ref="form" :model="form" label-width="120px" size="small" class="scrollable-form">
 
       <!-- Section 1: 恢复范围 -->
       <div class="form-section">
@@ -699,10 +701,16 @@ export default {
 <style scoped lang="scss">
 @import '@/app/variables.scss';
 
+.scrollable-form {
+  max-height: calc(100vh - 220px);
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
 .form-section {
   border-bottom: 1px solid #ebeef5;
-  padding-bottom: 16px;
-  margin-bottom: 18px;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
 
   &:last-of-type {
     border-bottom: none;
@@ -886,4 +894,10 @@ export default {
     border: 1px solid #e9e9eb;
   }
 }
+</style>
+
+<style>
+.restore-form-dialog .el-dialog__body { padding: 14px 20px; }
+.restore-form-dialog .el-dialog__header { padding: 14px 20px 10px; }
+.restore-form-dialog .el-dialog__footer { padding: 8px 20px 14px; }
 </style>

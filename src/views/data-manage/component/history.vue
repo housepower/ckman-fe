@@ -9,6 +9,7 @@
           @refresh="fetchPolicies"
           @update:auto-refresh="autoRefresh = $event"
           @view-task="onViewTask"
+          @edit-task="onEditTask"
           @go-backup="backupDialogVisible = true"
           @go-restore="onGoRestore"
         />

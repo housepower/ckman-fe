@@ -277,33 +277,17 @@ export default {
   },
   beforeDestroy() {
     if (this.onResize) window.removeEventListener('resize', this.onResize);
-    this.stopAutoRefresh();
   },
   methods: {
     onOpened() {
       if (this.policy) this.fetchRuns();
-      // dialog 打开期间 5s 自动刷新 ops（看正在跑的 run 状态变化）
-      this.startAutoRefresh();
     },
     onClosed() {
-      this.stopAutoRefresh();
       this.runs = [];
       this.selectedPartitions = [];
       this.filterDateRange = null;
       this.filterPartitionName = '';
       this.currentPage = 1;
-    },
-    startAutoRefresh() {
-      this.stopAutoRefresh();
-      this.refreshTimer = setInterval(() => {
-        if (this.policy && !this.loading) this.fetchRuns();
-      }, 5000);
-    },
-    stopAutoRefresh() {
-      if (this.refreshTimer) {
-        clearInterval(this.refreshTimer);
-        this.refreshTimer = null;
-      }
     },
     async fetchRuns() {
       this.loading = true;

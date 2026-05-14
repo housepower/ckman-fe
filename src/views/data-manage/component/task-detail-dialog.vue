@@ -3,7 +3,10 @@
     :visible="value"
     :title="$t('history.Task Detail Title', { name: displayName })"
     width="720px"
+    top="6vh"
+    custom-class="task-detail-dialog"
     @update:visible="$emit('input', $event)"
+    @opened="onOpened"
   >
     <div v-if="task" class="task-detail">
       <!-- ① 调度 -->
@@ -19,6 +22,10 @@
         <template v-if="task.schedule_type === 'scheduled'">
           <div class="kv-row"><span class="kv-key">Crontab</span><span class="kv-val mono">{{ task.crontab }}</span></div>
           <div class="kv-row"><span class="kv-key">{{ $t('backup.Instance') }}</span><span class="kv-val">{{ task.instance || '—' }}</span></div>
+          <div class="kv-row" v-if="task.enabled">
+            <span class="kv-key">{{ $t('history.Next Run At') }}</span>
+            <span class="kv-val">{{ nextRunAt ? formatDate(nextRunAt) : '—' }}</span>
+          </div>
         </template>
         <div class="kv-row"><span class="kv-key">{{ $t('history.Enabled') }}</span>
           <span class="kv-val">
@@ -54,7 +61,13 @@
           <div class="kv-row"><span class="kv-key">{{ $t('backup.Incremental Method') }}</span>
             <span class="kv-val">{{ firstPolicy.backup_type === 'partition' ? $t('backup.By Partition Name') : $t('backup.By Time Period') }}</span>
           </div>
-          <div v-if="firstPolicy.backup_type === 'daily'" class="kv-row"><span class="kv-key">{{ $t('backup.Time Range') }}</span><span class="kv-val">{{ firstPolicy.days_before }} {{ $t('backup.Days Ago Text') }}</span></div>
+          <template v-if="firstPolicy.backup_type === 'daily' && (firstPolicy.range_start_date || firstPolicy.range_end_date)">
+            <div class="kv-row"><span class="kv-key">{{ $t('backup.Fixed Range') }}</span><span class="kv-val mono">{{ formatStartDate(firstPolicy.range_start_date) }} ~ {{ formatStartDate(firstPolicy.range_end_date) }}</span></div>
+          </template>
+          <template v-else-if="firstPolicy.backup_type === 'daily'">
+            <div class="kv-row"><span class="kv-key">{{ $t('backup.Time Range') }}</span><span class="kv-val">{{ firstPolicy.days_before }} {{ $t('backup.Days Ago Text') }}</span></div>
+            <div class="kv-row"><span class="kv-key">{{ $t('backup.Start Date') }}</span><span class="kv-val mono">{{ formatStartDate(firstPolicy.start_date) }}</span></div>
+          </template>
         </template>
       </div>
 
@@ -89,12 +102,17 @@
 </template>
 
 <script>
+import { DataManageApi } from '@/apis';
+
 export default {
   name: 'TaskDetailDialog',
   model: { prop: 'value', event: 'input' },
   props: {
     value: { type: Boolean, default: false },
     task: { type: Object, default: null },
+  },
+  data() {
+    return { nextRunAt: '' };
   },
   computed: {
     firstPolicy() {
@@ -108,7 +126,31 @@ export default {
       return `${ps[0].database}.${ps[0].table} (+${ps.length - 1})`;
     },
   },
+  watch: {
+    value(visible) {
+      if (!visible) this.nextRunAt = '';
+    },
+  },
   methods: {
+    async onOpened() {
+      this.nextRunAt = '';
+      if (!this.task || this.task.schedule_type !== 'scheduled' || !this.task.enabled) return;
+      const pid = this.firstPolicy.policy_id;
+      if (!pid) return;
+      try {
+        const res = await DataManageApi.getPolicyNextRun(pid);
+        if (res.data.retCode === '0000') this.nextRunAt = res.data.entity?.next_run_at || '';
+      } catch { /* silent */ }
+    },
+    formatDate(s) {
+      if (!s) return '—';
+      const d = new Date(s);
+      return isNaN(d.getTime()) ? s : d.toLocaleString('zh-CN', { hour12: false });
+    },
+    formatStartDate(s) {
+      if (!s || s.length !== 8) return '—';
+      return `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}`;
+    },
     onEdit() {
       this.$emit('edit-task', this.task);
       this.$emit('input', false);
@@ -118,11 +160,22 @@ export default {
 </script>
 
 <style scoped>
-.section { margin-bottom: 16px; }
-.section-title { font-size: 14px; font-weight: 500; color: #303133; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-.section-title .num { background: #C9A100; color: white; width: 20px; height: 20px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; }
-.kv-row { display: grid; grid-template-columns: 140px 1fr; gap: 12px; margin-bottom: 6px; align-items: start; }
-.kv-key { color: #909399; font-size: 13px; text-align: right; padding-top: 4px; }
-.kv-val { color: #303133; font-size: 13px; padding-top: 4px; }
+.task-detail {
+  max-height: calc(100vh - 220px);
+  overflow-y: auto;
+  padding-right: 6px;
+}
+.section { margin-bottom: 10px; }
+.section + .section { padding-top: 8px; border-top: 1px dashed #ebeef5; }
+.section-title { font-size: 13px; font-weight: 500; color: #303133; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+.section-title .num { background: #C9A100; color: white; width: 18px; height: 18px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; }
+.kv-row { display: grid; grid-template-columns: 120px 1fr; gap: 10px; margin-bottom: 3px; align-items: start; }
+.kv-key { color: #909399; font-size: 12px; text-align: right; padding-top: 2px; line-height: 1.5; }
+.kv-val { color: #303133; font-size: 12px; padding-top: 2px; line-height: 1.5; }
 .kv-val.mono { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; }
+</style>
+<style>
+.task-detail-dialog .el-dialog__body { padding: 14px 20px; }
+.task-detail-dialog .el-dialog__header { padding: 14px 20px 10px; }
+.task-detail-dialog .el-dialog__footer { padding: 8px 20px 14px; }
 </style>

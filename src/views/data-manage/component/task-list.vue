@@ -30,8 +30,7 @@
       row-key="task_id"
       border
       style="width:100%"
-      :row-class-name="() => 'task-row-clickable'"
-      @row-click="handleRowClick"
+      @sort-change="onSortChange"
     >
       <el-table-column :label="$t('history.Task Name')" min-width="240" show-overflow-tooltip>
         <template #default="{ row: t }">
@@ -70,7 +69,8 @@
           <span v-else class="muted">—</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('history.Latest Run')" min-width="180" show-overflow-tooltip>
+      <el-table-column :label="$t('history.Latest Run')" min-width="180" show-overflow-tooltip
+        prop="_latestRunTime" sortable="custom">
         <template #default="{ row: t }">
           <template v-if="taskLatestRun(t)">
             <span class="muted" style="margin-right:6px">{{ formatDate(taskLatestRun(t).start_time || taskLatestRun(t).create_time) }}</span>
@@ -81,8 +81,10 @@
           <span v-else class="muted">—</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('history.Actions')" width="200" fixed="right" class-name="col-no-click">
+      <el-table-column :label="$t('history.Actions')" width="260" fixed="right" class-name="col-no-click">
         <template #default="{ row: t }">
+          <el-button type="text" size="mini" @click="$emit('view-task', t)">{{ $t('history.View') }}</el-button>
+          <el-button type="text" size="mini" @click="$emit('edit-task', t)">{{ $t('history.Edit') }}</el-button>
           <el-button type="text" size="mini" @click="triggerTask(t)">{{ $t('history.Trigger Now') }}</el-button>
           <el-button type="text" size="mini" style="color:#F56C6C" @click="deleteTask(t)">{{ $t('history.Delete') }}</el-button>
         </template>
@@ -119,6 +121,8 @@ export default {
       currentPage: 1,
       pageSize: 20,
       latestRunMap: {},
+      sortField: '',
+      sortOrder: '',
     };
   },
   computed: {
@@ -160,9 +164,25 @@ export default {
         return true;
       });
     },
+    sortedTasks() {
+      if (this.sortField !== '_latestRunTime' || !this.sortOrder) return this.filteredTasks;
+      const arr = [...this.filteredTasks];
+      arr.sort((a, b) => {
+        const ra = this.taskLatestRun(a);
+        const rb = this.taskLatestRun(b);
+        const ta = ra ? (ra.start_time || ra.create_time || '') : '';
+        const tb = rb ? (rb.start_time || rb.create_time || '') : '';
+        if (ta === tb) return 0;
+        if (!ta) return 1;
+        if (!tb) return -1;
+        return ta < tb ? -1 : 1;
+      });
+      if (this.sortOrder === 'descending') arr.reverse();
+      return arr;
+    },
     pagedTasks() {
       const s = (this.currentPage - 1) * this.pageSize;
-      return this.filteredTasks.slice(s, s + this.pageSize);
+      return this.sortedTasks.slice(s, s + this.pageSize);
     },
   },
   watch: {
@@ -201,10 +221,10 @@ export default {
       }
       return latest;
     },
-    handleRowClick(row, column) {
-      if (!column) return;
-      if ((column.className || '').includes('col-no-click')) return;
-      this.$emit('view-task', row);
+    onSortChange({ prop, order }) {
+      this.sortField = prop || '';
+      this.sortOrder = order || '';
+      this.currentPage = 1;
     },
     capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; },
     statusType(s) {
@@ -286,8 +306,6 @@ export default {
 .toolbar { display:flex; gap:10px; align-items:center; margin-bottom:14px; flex-wrap:wrap; }
 .auto-refresh { display:inline-flex; align-items:center; gap:6px; }
 .ar-label { font-size: 12px; color: #606266; }
-.task-row-clickable { cursor: pointer; }
-.task-row-clickable .col-no-click { cursor: default; }
 .task-name { font-weight: 500; }
 .muted { color: #909399; }
 .task-pagination { margin-top: 12px; text-align: right; }

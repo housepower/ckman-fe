@@ -20,7 +20,8 @@ axios.interceptors.response.use((value: AxiosResponse) => {
   if (value.config.url.startsWith(`/api`)) {
     if(value.data) {
       if(value.data.retCode !== '0000') {
-        if (InvalidTokenCode.includes(value.data.retCode)) {
+        const isInvalidToken = InvalidTokenCode.includes(value.data.retCode);
+        if (isInvalidToken) {
           if ($router.currentRoute.name !== 'Login') {
             setTimeout(() => {
               $router.push({
@@ -36,6 +37,9 @@ axios.interceptors.response.use((value: AxiosResponse) => {
           request: value.request,
           response: value,
           isAxiosError: true,
+          message: isInvalidToken
+            ? '登录已过期，请重新登录'
+            : (value.data.retMsg || '请求失败'),
         });
       }
     }
