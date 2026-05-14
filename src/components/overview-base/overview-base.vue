@@ -1,24 +1,37 @@
 <template>
-  <main class="settings">
-    <breadcrumb :data="breadcrumbInfo"></breadcrumb>
-    <section class="container">
-      <div v-for="(item, index) of chartMetrics" :key="item.title">
-        <div class="title flex flex-vcenter flex-between">
-          <span class="fs-18 font-bold mtb-20">{{ $t('ClickHouseEcharts.' + item.title) }}</span>
-          <time-filter v-model="timeFilter" localKey="overviewBaseTimeFilter" :refreshDuration.sync="refresh"
-            @input="timeFilterChange" @on-refresh="timeFilterRefresh" v-if="index === 0" />
+  <section class="overview-base">
+    <div v-for="(group, gIndex) of chartMetrics" :key="group.title" class="chart-group">
+      <h2 class="chart-group__title">{{ $t('ClickHouseEcharts.' + group.title) }}</h2>
+      <div class="chart-grid">
+        <div
+          v-for="(item, mIndex) of group.metrics"
+          :key="`${gIndex}-${mIndex}`"
+          class="chart-card"
+        >
+          <p class="chart-card__title">{{ $t('ClickHouseEcharts.' + item.expect) }}</p>
+          <div class="chart-card__body">
+            <vue-echarts
+              v-if="item.option && !item.isEmpty"
+              ref="Charts"
+              :option="item.option"
+              theme="ckman"
+              @mousemove.native="mousemove('series', $event)"
+            />
+            <EmptyState
+              v-else-if="item.isEmpty"
+              :title="$t('home.No data')"
+              :description="$t('home.No data hint')"
+              icon-class="el-icon-data-line"
+              compact
+            />
+            <div v-else class="chart-card__loading">
+              <i class="el-icon-loading"></i>
+            </div>
+          </div>
         </div>
-        <ul class="charts flex flex-wrap">
-          <li class="chart-item mb-50" v-for="(item, index) of item.metrics" :key="index">
-            <p class="mtb-10 fs-16 font-bold expect">{{ $t('ClickHouseEcharts.' + item.expect) }}</p>
-            <vue-echarts v-if="item.option" ref="Charts" :option="item.option"
-              @mousemove.native="mousemove('series', $event)" />
-          </li>
-        </ul>
       </div>
-
-    </section>
-  </main>
+    </div>
+  </section>
 </template>
 <script>
 import echarts from "echarts";
@@ -27,21 +40,23 @@ import { MetricApi } from "@/apis";
 import { convertTimeBounds } from "@/helpers";
 
 export default {
+  name: 'OverviewBase',
   props: {
-    breadcrumbInfo: {
-      type: Array,
-      default: [],
-    },
     metrics: {
       type: Array,
-      default: [],
+      default: () => [],
+    },
+    timeFilter: {
+      type: Array,
+      default: () => ["now-1h", "now"],
+    },
+    refreshDuration: {
+      type: Number,
+      default: null,
     },
   },
   data() {
     return {
-      timeFilter: ["now-1h", "now"],
-      refresh: null,
-      chartOption: null,
       chartMetrics: [],
     };
   },
@@ -49,58 +64,58 @@ export default {
     this.chartMetrics = (this.metrics || []).map(({ title, metrics }) => {
       return {
         title,
-        metrics: (metrics || [])
+        metrics: (metrics || []).map(m => ({ ...m, option: null, isEmpty: false })),
       };
     });
     this.fetchData();
   },
-  methods: {
-    fetchData() {
-      this.chartMetrics.forEach((item, index) => {
-        item.metrics.forEach((metric, index) => {
-          this.fetchChartData(metric, index);
-        });
-      });
-    },  
-    async fetchChartData(chart, index) {
-      const { duration, min, max } = convertTimeBounds(this.timeFilter);
-      let step = step = Math.floor(+duration / 360 / 1000);
-      step = step < 60 ? 60 : step;
-      const {
-        data: { entity },
-      } = await MetricApi.queryMetric(this.$route.params.id, {
-        metric: chart.expect,
-        start: Math.floor(min / 1000),
-        end: Math.floor(max / 1000),
-        step,
-      });
-      this.$set(chart, "option", chartOption(entity, min, max));
-      this.$nextTick(() => {
-        this.$refs.Charts[index] && this.$refs.Charts[index].refreshChart();
-        const chartInstances = (this.$refs.Charts || []).map((item) => item.chart);
-        echarts.connect(chartInstances);
-      });
-    },
-    mousemove(params, $event) { },
-    timeFilterChange() {
+  watch: {
+    timeFilter() {
       this.fetchData();
     },
-    timeFilterRefresh() {
+    refreshDuration() {
       this.fetchData();
     },
   },
-  components: {},
+  methods: {
+    fetchData() {
+      this.chartMetrics.forEach((group) => {
+        group.metrics.forEach((metric, index) => {
+          this.fetchChartData(metric, index);
+        });
+      });
+    },
+    async fetchChartData(chart, index) {
+      const { duration, min, max } = convertTimeBounds(this.timeFilter);
+      let step = Math.floor(+duration / 360 / 1000);
+      step = step < 60 ? 60 : step;
+      try {
+        const {
+          data: { entity },
+        } = await MetricApi.queryMetric(this.$route.params.id, {
+          metric: chart.expect,
+          start: Math.floor(min / 1000),
+          end: Math.floor(max / 1000),
+          step,
+        });
+        const hasData = Array.isArray(entity) && entity.length > 0;
+        this.$set(chart, "isEmpty", !hasData);
+        if (hasData) {
+          this.$set(chart, "option", chartOption(entity, min, max));
+        }
+      } catch (e) {
+        this.$set(chart, "isEmpty", true);
+        this.$set(chart, "option", null);
+      }
+      this.$nextTick(() => {
+        if (this.$refs.Charts && this.$refs.Charts[index]) {
+          this.$refs.Charts[index].refreshChart();
+          const chartInstances = (this.$refs.Charts || []).map((item) => item.chart);
+          echarts.connect(chartInstances);
+        }
+      });
+    },
+    mousemove(params, $event) { },
+  },
 };
 </script>
-
-<style lang="scss" scoped>
-.chart-item {
-  height: 500px;
-  width: 33%;
-
-  .expect {
-    height: 36px;
-    overflow: hidden;
-  }
-}
-</style>

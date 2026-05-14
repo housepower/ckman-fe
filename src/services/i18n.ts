@@ -136,6 +136,8 @@ const messages = {
       nodes: 'nodes',
       Open: 'Open',
       'No clusters': 'No clusters yet. Click "Create" or "Import" to add one.',
+      'No data': 'No data',
+      'No data hint': 'No metrics returned for this period. Check Prometheus integration or expand time range.',
     },
     manage: {
       'Upgrade Cluster': 'Upgrade Cluster',
@@ -972,6 +974,8 @@ const messages = {
       nodes: '节点',
       Open: '打开',
       'No clusters': '暂无集群。点击右上角"创建"或"导入"添加一个。',
+      'No data': '无数据',
+      'No data hint': '该时间区间未返回指标。请确认 Prometheus 接入是否正常，或扩大时间范围。',
     },
     manage: {
       'Upgrade Cluster': '升级集群',
