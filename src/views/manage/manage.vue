@@ -565,7 +565,7 @@ export default {
 
   &__current {
     display: inline-flex;
-    align-items: center;
+    align-items: baseline;
     gap: var(--s-2);
   }
 
@@ -579,14 +579,15 @@ export default {
 
   &__current-pill {
     display: inline-block;
-    font-size: var(--fs-sm);
-    font-weight: var(--fw-semibold);
-    color: var(--c-primary-fg);
+    font-size: var(--fs-xl);
+    font-weight: var(--fw-bold);
+    color: var(--c-primary-solid);
     background: var(--c-primary-bg);
     border: 1px solid var(--c-primary-border);
-    border-radius: var(--r-pill);
-    padding: 2px var(--s-3);
+    border-radius: var(--r-md);
+    padding: var(--s-1) var(--s-3);
     font-variant-numeric: tabular-nums;
+    letter-spacing: 0.3px;
     line-height: var(--lh-tight);
   }
 
