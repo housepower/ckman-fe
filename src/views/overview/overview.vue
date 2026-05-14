@@ -10,6 +10,7 @@
           v-model="timeFilter"
           localKey="overviewBaseTimeFilter"
           :refreshDuration.sync="refresh"
+          @on-refresh="onRefreshTick"
         />
       </template>
     </PageHeader>
@@ -17,6 +18,7 @@
       :metrics="metrics"
       :time-filter="timeFilter"
       :refresh-duration="refresh"
+      :refresh-tick="refreshTick"
     />
   </div>
 </template>
@@ -31,11 +33,17 @@ export default {
       metrics: Metrics,
       timeFilter: ["now-1h", "now"],
       refresh: null,
+      refreshTick: 0,
     };
   },
   computed: {
     clusterName() {
       return this.$route.params.id || '';
+    },
+  },
+  methods: {
+    onRefreshTick() {
+      this.refreshTick++;
     },
   },
 };

@@ -59,8 +59,12 @@ export default {
       default: () => ["now-1h", "now"],
     },
     refreshDuration: {
-      type: Number,
+      type: [String, Number],
       default: null,
+    },
+    refreshTick: {
+      type: Number,
+      default: 0,
     },
   },
   computed: {
@@ -96,12 +100,16 @@ export default {
     refreshDuration() {
       this.fetchData();
     },
+    refreshTick() {
+      this.fetchData();
+    },
   },
   methods: {
     fetchData() {
+      let flatIndex = 0;
       this.chartMetrics.forEach((group) => {
-        group.metrics.forEach((metric, index) => {
-          this.fetchChartData(metric, index);
+        group.metrics.forEach((metric) => {
+          this.fetchChartData(metric, flatIndex++);
         });
       });
     },
