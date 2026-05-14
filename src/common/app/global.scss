@@ -41,7 +41,7 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Pingfang SC", "Segoe UI", "Helvetica Neue", Verdana, Arial, STHeiti, "Microsoft Yahei", sans-serif;
   color: #2c3e50;
   font-size: 13px;
-  background-color: #eaeef4;
+  background-color: var(--c-surface-1);
 }
 
 #app {

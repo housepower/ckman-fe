@@ -55,8 +55,7 @@
       </div>
     </nav>
 
-    <main class="plr-20 pt-10 flex-1"
-          style="overflow: auto;">
+    <main class="flex-1" style="overflow: auto;">
       <router-view />
     </main>
   </div>
@@ -230,6 +229,12 @@ header {
   .ml-5 { margin-left: var(--s-1) !important; }
   .ml-10 { margin-left: var(--s-2) !important; }
   .ml-15 { margin-left: var(--s-3) !important; }
+}
+
+main {
+  background: var(--c-surface-1);
+  padding: 0 var(--s-5);
+  padding-top: var(--s-3);
 }
 
 .cluster-tabs {
