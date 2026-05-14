@@ -1,41 +1,22 @@
 <template>
   <el-form-item :prop="propName" v-if="isVisible" :class="className" :rules="rules" class="mb-0">
-    <div slot="label" class="dfi-label" @click="isSlideUp = !isSlideUp">
-      <div class="dfi-label__main">
-        <i
-          v-if="isShowCaret"
-          class="fa dfi-caret"
-          :class="{ 'fa-caret-right': !isSlideUp, 'fa-caret-down': isSlideUp }"
-        ></i>
-        <span class="dfi-label__name">{{ schema['label_' + lang] || originName }}</span>
-        <span class="dfi-required" v-if="isRequired">*</span>
-        <el-tooltip
-          v-if="description.length"
-          class="item"
-          effect="dark"
-          placement="top"
-        >
+    <div slot="label" class="width-full text-left relative" @click="isSlideUp = !isSlideUp">
+      <div class="pointer text-ellipsis" style="display: inline-block; width: 250px;">
+        <i v-if="isShowCaret" class="fa" :class="{ 'fa-caret-right': !isSlideUp, 'fa-caret-down': isSlideUp }"></i>
+        {{schema['label_' + lang] || schema['label_' + lang] || originName}}
+        <el-tooltip class="item" effect="dark" placement="top">
           <div slot="content" style="line-height: 1.5">
-            <p v-for="(item, index) in description" :key="index" class="mb-2">{{ item }}</p>
+            <p v-for="(item, index) in description" :key="index" class="mb-2">{{item}}</p>
           </div>
-          <i class="fa fa-info-circle dfi-info"></i>
+          <i class="fa fa-info-circle pointer"></i>
         </el-tooltip>
-        <el-button
-          v-if="isShowAddIcon && schema.editable === 'true'"
-          @click.stop="addItem"
-          size="mini"
-          class="dfi-add"
-        >
-          <i class="fa fa-plus"></i>
+        <span class="fc-red bold ml-5" v-if="isRequired">*</span>
+        <span>：</span>
+        <el-button v-if="isShowAddIcon && schema.editable === 'true'" @click.stop="addItem" size="mini" class="absolute" :style="{ 'left': isCascade ? '300px' : '260px' }">
+          <i class="fa fa-plus pointer el-link--primary"></i>
         </el-button>
+        <span class="fc-red absolute error-message">{{errorMessage}}</span>
       </div>
-      <p
-        class="dfi-description"
-        v-if="schema['description_' + lang]"
-      >
-        {{ schema['description_' + lang] }}
-      </p>
-      <p class="dfi-error" v-if="errorMessage">{{ errorMessage }}</p>
     </div>
     <!-- {{propName}} -->
     <!-- {{ originName }} -->
@@ -43,7 +24,7 @@
     <!-- {{ schema.type }} -->
     <!-- {{formModel}} -->
     <template v-if="schema.candidates && schema.candidates.length > 0">
-      <el-select v-model="formModel[originName]" :disabled="schema.editable === 'false'" size="medium" class="dfi-input" :placeholder="$t('common.Please choose')">
+      <el-select v-model="formModel[originName]" :disabled="schema.editable === 'false'" size="medium" class="width-350" :placeholder="$t('common.Please choose')">
         <el-option v-for="(item, index) in getFilterOption(schema.candidates)" :key="index" :label="item['label_' + lang]" :value="['int', 'float'].includes(schema.type) ? Number(item.value) : item.value"></el-option>
       </el-select>
     </template>
@@ -51,11 +32,11 @@
     <template v-else>
       <template v-if="schema.type === 'string'">
         <!-- 单行文本 -->
-        <el-input class="dfi-input" size="medium" :disabled="schema.editable === 'false'" v-model="formModel[originName]" :placeholder="$t('common.Please fill out')" v-if="schema.input_type === 'text'"></el-input>
+        <el-input class="width-350" size="medium" :disabled="schema.editable === 'false'" v-model="formModel[originName]" :placeholder="$t('common.Please fill out')" v-if="schema.input_type === 'text'"></el-input>
         <!-- 多行文本 -->
-        <el-input class="dfi-input" size="medium" :disabled="schema.editable === 'false'" type="textarea" v-model="formModel[originName]" :placeholder="$t('common.Please fill out')" v-if="schema.input_type === 'textarea'"></el-input>
+        <el-input class="width-350" size="medium" :disabled="schema.editable === 'false'" type="textarea" v-model="formModel[originName]" :placeholder="$t('common.Please fill out')" v-if="schema.input_type === 'textarea'"></el-input>
         <!-- 密码 -->
-        <el-input class="dfi-input" size="medium" :disabled="schema.editable === 'false'" autocomplete="new-password" v-model="formModel[originName]" :placeholder="$t('common.Please fill out')" v-if="schema.input_type === 'password'" show-password></el-input>
+        <el-input class="width-350" size="medium" :disabled="schema.editable === 'false'" autocomplete="new-password" v-model="formModel[originName]" :placeholder="$t('common.Please fill out')" v-if="schema.input_type === 'password'" show-password></el-input>
       </template>
       
       <!-- switch -->
@@ -69,7 +50,7 @@
       <!-- 数字输入-整数 -->
       <el-input-number
         :disabled="schema.editable === 'false'"
-        class="dfi-input"
+        class="width-350"
         size="medium"
         v-model="formModel[originName]"
         :controls="false"
@@ -82,7 +63,7 @@
       <!-- 数字输入-小数 -->
       <el-input-number
         :disabled="schema.editable === 'false'"
-        class="dfi-input"
+        class="width-350"
         size="medium"
         v-model="formModel[originName]"
         :controls="false"
@@ -312,6 +293,19 @@ export default {
       errorMessage: '',
     }
   },
+  mounted() {
+  // 如果是 bool 类型且没有初始值，则根据 schema.default 设置默认值
+  console.log('this.formModel[this.originName]', this.formModel[this.originName]);
+    if (this.schema.type === 'bool' && this.formModel[this.originName] !== undefined) {
+      // 将字符串 "true" 或 true 转换为布尔值 true，其他情况转换为 false
+      const defaultValue = this.schema.default === "true" || this.schema.default === true;
+      console.log('this.schema.default', this.schema.default);
+      console.log('defaultValue', defaultValue);
+      //this.$set(this.formModel, this.originName, defaultValue);
+      console.log('this.formModel[this.originName]', this.formModel[this.originName]);
+    }
+  },
+
   methods: {
     getFilterOption(candidates) {
       const { filter } = this.schema;
@@ -422,94 +416,5 @@ export default {
       left: 300px !important;
     }
   }
-}
-
-// 紧凑化：label-position=top 下整体压缩高度
-::v-deep .el-form-item {
-  margin-bottom: var(--s-3);
-}
-
-::v-deep .el-form-item__label {
-  padding: 0 0 var(--s-1);
-  line-height: var(--lh-tight);
-  width: 100% !important;
-}
-
-::v-deep .el-form-item__content {
-  line-height: var(--lh-normal);
-  margin-left: 0 !important;
-}
-
-.dfi-label {
-  display: block;
-  text-align: left;
-  cursor: pointer;
-  line-height: var(--lh-tight);
-
-  &__main {
-    display: flex;
-    align-items: center;
-    gap: var(--s-1);
-    font-size: var(--fs-sm);
-    font-weight: var(--fw-medium);
-    color: var(--c-text-primary);
-  }
-
-  &__name {
-    line-height: var(--lh-tight);
-  }
-}
-
-.dfi-caret {
-  color: var(--c-text-tertiary);
-  font-size: var(--fs-xs);
-}
-
-.dfi-required {
-  color: var(--c-primary-solid);
-  font-weight: var(--fw-bold);
-  margin-left: 2px;
-}
-
-.dfi-info {
-  color: var(--c-text-tertiary);
-  cursor: help;
-  font-size: var(--fs-sm);
-}
-
-.dfi-add {
-  margin-left: var(--s-2);
-}
-
-.dfi-description {
-  font-size: var(--fs-xs);
-  color: var(--c-text-tertiary);
-  margin: 2px 0 0;
-  line-height: var(--lh-tight);
-}
-
-.dfi-error {
-  font-size: var(--fs-xs);
-  color: var(--c-danger-fg);
-  margin: 2px 0 0;
-  line-height: var(--lh-tight);
-}
-
-::v-deep .dfi-input {
-  max-width: 480px;
-  width: 100% !important;
-
-  &.el-input--medium .el-input__inner,
-  &.el-input-number--medium .el-input__inner {
-    border-radius: var(--r-sm);
-  }
-}
-
-::v-deep .dfi-input.is-disabled .el-input__inner,
-::v-deep .dfi-input .el-input.is-disabled .el-input__inner {
-  background: var(--c-surface-1);
-  color: var(--c-text-secondary);
-  border-color: var(--c-surface-3);
-  cursor: default;
 }
 </style>
