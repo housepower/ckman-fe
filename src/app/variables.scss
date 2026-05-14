@@ -1,1 +1,8 @@
-$primary-color: #C9A100;
+// 兼容层（P1）：旧 SCSS 变量名 → 新 tokens
+// 通过 vue.config.js 的 additionalData 注入到所有 SCSS 文件
+// P4 阶段计划全面替换为 var(--c-primary-solid) 后删除本文件
+
+@import "./theme/tokens";
+
+// 旧名 → 新 token 别名
+$primary-color: $tokens-primary-solid;
