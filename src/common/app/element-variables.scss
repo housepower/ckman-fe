@@ -2,8 +2,8 @@
 // 这里只放 .el-* 选择器的二次微调
 
 .el-button--default:not(.default) {
-  border-color: var(--c-primary);
-  color: var(--c-primary);
+  border-color: var(--c-primary-solid);
+  color: var(--c-primary-solid);
 }
 
 .el-button--primary:not(.default) {
