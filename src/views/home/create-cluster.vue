@@ -1,8 +1,17 @@
 <template>
-  <div>
-    <breadcrumb :data="breadcrumbInfo"></breadcrumb>
-    <d-form :loading="loading" class="mt-30" v-if="schema" :schema="schema" :form-model="formModel" @submit="onSubmit"></d-form>
-  </div>
+  <main class="create-cluster">
+    <PageHeader
+      :crumb="[$t('layout.ClickHouse Management Console')]"
+      :title="$t('home.Create a ClickHouse Cluster')"
+    />
+    <d-form
+      v-if="schema"
+      :loading="loading"
+      :schema="schema"
+      :form-model="formModel"
+      @submit="onSubmit"
+    />
+  </main>
 </template>
 <script>
 import { DForm } from '@/components/';
@@ -22,7 +31,6 @@ export default {
     return {
       schema: null,
       formModel: {},
-      breadcrumbInfo: ["Clusters", this.$t("home.Create a ClickHouse Cluster")],
       loading: false,
     }
   },
@@ -70,3 +78,9 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.create-cluster {
+  padding-bottom: var(--s-8);
+}
+</style>

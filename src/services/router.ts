@@ -40,6 +40,11 @@ export const $router = new Router({
           component: () => import('@/views/home/create-cluster.vue'),
         },
         {
+          path: 'cluster/import',
+          name: 'importCluster',
+          component: () => import('@/views/home/import-cluster.vue'),
+        },
+        {
           path: 'setting',
           name: 'HomeSetting',
           component: () => import('@/views/home-setting/homeSetting.vue'),
