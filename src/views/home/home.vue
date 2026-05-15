@@ -1,7 +1,7 @@
 <template>
   <section class="home">
     <PageHeader
-      :crumb="[$t('layout.ClickHouse Management Console'), $t('home.All ClickHouse Clusters')]"
+      :crumb="[$t('layout.ClickHouse Management Console')]"
       :title="$t('home.All ClickHouse Clusters')"
     >
       <template #actions>
@@ -18,24 +18,32 @@
 
     <div class="stat-row">
       <div class="stat-card stat-card--total">
-        <div class="stat-card__icon-bar"></div>
-        <div class="stat-card__label">{{ $t('home.Total') }}</div>
-        <div class="stat-card__value">{{ stats.total }}</div>
+        <div class="stat-card__icon"><i class="fa fa-cubes"></i></div>
+        <div class="stat-card__body">
+          <div class="stat-card__label">{{ $t('home.Total') }}</div>
+          <div class="stat-card__value">{{ stats.total }}</div>
+        </div>
       </div>
       <div class="stat-card stat-card--deploy">
-        <div class="stat-card__icon-bar"></div>
-        <div class="stat-card__label">{{ $t('home.Deploy') }}</div>
-        <div class="stat-card__value">{{ stats.deploy }}</div>
+        <div class="stat-card__icon"><i class="fa fa-rocket"></i></div>
+        <div class="stat-card__body">
+          <div class="stat-card__label">{{ $t('home.Deploy') }}</div>
+          <div class="stat-card__value">{{ stats.deploy }}</div>
+        </div>
       </div>
       <div class="stat-card stat-card--import">
-        <div class="stat-card__icon-bar"></div>
-        <div class="stat-card__label">{{ $t('home.Import') }}</div>
-        <div class="stat-card__value">{{ stats.import }}</div>
+        <div class="stat-card__icon"><i class="fa fa-download"></i></div>
+        <div class="stat-card__body">
+          <div class="stat-card__label">{{ $t('home.Import') }}</div>
+          <div class="stat-card__value">{{ stats.import }}</div>
+        </div>
       </div>
       <div class="stat-card stat-card--replica">
-        <div class="stat-card__icon-bar"></div>
-        <div class="stat-card__label">{{ $t('home.Replica') }}</div>
-        <div class="stat-card__value">{{ stats.replica }}</div>
+        <div class="stat-card__icon"><i class="fa fa-clone"></i></div>
+        <div class="stat-card__body">
+          <div class="stat-card__label">{{ $t('home.Replica') }}</div>
+          <div class="stat-card__value">{{ stats.replica }}</div>
+        </div>
       </div>
     </div>
 
@@ -80,26 +88,48 @@
         <el-table-column
           prop="cluster"
           sortable
-          min-width="280"
+          min-width="220"
           :label="$t('home.Cluster')"
         >
           <template #default="{ row }">
-            <el-tooltip :content="row.comment" placement="top" :disabled="!row.comment">
-              <div class="cluster-cell">
-                <span
-                  class="cluster-cell__dot"
-                  :class="row.mode === 'deploy' ? 'cluster-cell__dot--deploy' : 'cluster-cell__dot--import'"
-                ></span>
-                <div class="cluster-cell__main">
-                  <div class="cluster-cell__name">{{ row.cluster }}</div>
-                  <div class="cluster-cell__meta">
-                    <span v-if="row.logic_cluster">{{ row.logic_cluster }} ·</span>
-                    <span>{{ row.count }} {{ $t('home.nodes') }}</span>
-                    <span class="cluster-cell__hosts" v-if="row.hosts">· {{ truncateHosts(row.hosts) }}</span>
-                  </div>
-                </div>
+            <div class="cluster-cell">
+              <i class="cluster-cell__icon fa fa-database"></i>
+              <div class="cluster-cell__main">
+                <div class="cluster-cell__name">{{ row.cluster }}</div>
+                <div v-if="row.comment" class="cluster-cell__comment">{{ row.comment }}</div>
               </div>
-            </el-tooltip>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="logic_cluster"
+          sortable
+          min-width="140"
+          :label="$t('home.Logic Name')"
+        >
+          <template #default="{ row }">
+            <span v-if="row.logic_cluster">{{ row.logic_cluster }}</span>
+            <span v-else class="cell-empty">—</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="count"
+          sortable
+          width="100"
+          align="right"
+          :label="$t('home.Nodes')"
+        >
+          <template #default="{ row }">
+            <span class="cell-count">{{ row.count }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="hosts"
+          min-width="240"
+          :label="$t('home.ClickHouse Node IP')"
+        >
+          <template #default="{ row }">
+            <span class="cell-hosts">{{ row.hosts }}</span>
           </template>
         </el-table-column>
         <el-table-column
@@ -108,12 +138,13 @@
           :label="$t('home.Mode')"
         >
           <template #default="{ row }">
-            <span class="mode-badge" :class="`mode-badge--${row.mode}`">{{ row.mode }}</span>
+            <span class="mode-badge" :class="`mode-badge--${row.mode}`">{{ modeLabel(row.mode) }}</span>
           </template>
         </el-table-column>
         <el-table-column
           prop="isReplica"
-          width="100"
+          width="90"
+          align="center"
           :label="$t('home.Replica')"
         >
           <template #default="{ row }">
@@ -148,15 +179,12 @@
   </section>
 </template>
 <script>
-import ImportCk from "./modals/importCk";
-import { $modal } from "@/services";
 import { ClusterApi } from "@/apis";
 export default {
   name: "Home",
   data() {
     return {
       list: [],
-      versionOptions: [],
       key: '',
       filterMode: 'all',
       filterReplica: false,
@@ -207,23 +235,8 @@ export default {
         name: 'createCluster'
       });
     },
-    async importCk() {
-      await $modal({
-        component: ImportCk,
-        props: {
-          title: this.$t("home.Import a ClickHouse Cluster"),
-          width: 600,
-          customClass: 'create-cluster-modal',
-          cancelText: this.$t("common.Cancel"),
-          okText: this.$t("common.Import"),
-        },
-        data: {
-          versionOptions: this.versionOptions,
-        },
-      });
-      const tip = this.$t('common.Import') + this.$t('common.Success');
-      this.$message.success(`${tip}`);
-      this.fetchData();
+    importCk() {
+      this.$router.push({ name: 'importCluster' });
     },
     toCluster(item) {
       this.$root.clusterBench = item;
@@ -233,6 +246,11 @@ export default {
       if (command === 'delete') {
         this.remove(row);
       }
+    },
+    modeLabel(mode) {
+      if (!mode) return '';
+      const key = `home.${mode.charAt(0).toUpperCase()}${mode.slice(1)}`;
+      return this.$t(key);
     },
     async remove(item) {
       await this.$confirm(this.$t("common.Confirm Delete"), this.$t("common.tips"), {
@@ -245,12 +263,6 @@ export default {
       this.fetchData();
     },
 
-    truncateHosts(hosts) {
-      if (!hosts) return '';
-      const arr = typeof hosts === 'string' ? hosts.split(',') : hosts;
-      if (arr.length <= 2) return arr.join(', ');
-      return `${arr[0]}, ${arr[1]} +${arr.length - 2}`;
-    },
   },
 };
 </script>
@@ -269,25 +281,54 @@ export default {
 
 .stat-card {
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
   background: var(--c-surface-0);
   border: 1px solid var(--c-surface-3);
   border-radius: var(--r-lg);
-  padding: var(--s-3) var(--s-4) var(--s-3) var(--s-4);
+  padding: var(--s-3) var(--s-4);
   overflow: hidden;
+  transition: border-color var(--du-fast) var(--ease-out),
+              box-shadow var(--du-fast) var(--ease-out);
 
-  &__icon-bar {
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: 3px;
-    background: var(--c-text-tertiary);
+  &:hover {
+    border-color: var(--c-surface-4, var(--c-surface-3));
+    box-shadow: 0 4px 12px -6px rgba(15, 23, 42, 0.08);
   }
 
-  &--total &__icon-bar    { background: var(--c-primary-solid); }
-  &--deploy &__icon-bar   { background: var(--c-info-solid); }
-  &--import &__icon-bar   { background: var(--c-text-tertiary); }
-  &--replica &__icon-bar  { background: var(--c-success-solid); }
+  &__icon {
+    flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+  }
+
+  &__body {
+    min-width: 0;
+    flex: 1;
+  }
+
+  &--total &__icon {
+    background: rgba(201, 161, 0, 0.10);
+    color: var(--c-primary-solid);
+  }
+  &--deploy &__icon {
+    background: var(--c-info-bg);
+    color: var(--c-info-solid);
+  }
+  &--import &__icon {
+    background: var(--c-surface-2);
+    color: var(--c-text-secondary);
+  }
+  &--replica &__icon {
+    background: var(--c-success-bg);
+    color: var(--c-success-solid);
+  }
 
   &__label {
     font-size: var(--fs-xs);
@@ -366,17 +407,16 @@ export default {
 
 .cluster-cell {
   display: flex;
-  align-items: center;
-  gap: var(--s-3);
+  align-items: flex-start;
+  gap: var(--s-2);
 
-  &__dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
+  &__icon {
     flex-shrink: 0;
-
-    &--deploy { background: var(--c-info-solid); }
-    &--import { background: var(--c-text-tertiary); }
+    width: 16px;
+    margin-top: 4px;
+    font-size: 14px;
+    color: var(--c-primary-solid);
+    text-align: center;
   }
 
   &__main {
@@ -391,19 +431,31 @@ export default {
     line-height: var(--lh-tight);
   }
 
-  &__meta {
+  &__comment {
+    margin-top: 2px;
     font-size: var(--fs-xs);
     color: var(--c-text-tertiary);
-    margin-top: 2px;
-    line-height: var(--lh-tight);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    line-height: var(--lh-normal);
+    word-break: break-word;
   }
+}
 
-  &__hosts {
-    margin-left: var(--s-1);
-  }
+.cell-empty {
+  color: var(--c-text-tertiary);
+}
+
+.cell-count {
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--fw-medium);
+  color: var(--c-text-primary);
+}
+
+.cell-hosts {
+  font-family: var(--f-mono);
+  font-size: var(--fs-xs);
+  color: var(--c-text-secondary);
+  word-break: break-all;
+  line-height: var(--lh-normal);
 }
 
 .mode-badge {
