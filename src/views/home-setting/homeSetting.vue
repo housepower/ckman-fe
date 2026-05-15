@@ -1,32 +1,30 @@
 <template>
   <main class="home-package">
-    <breadcrumb :data="['package']"></breadcrumb>
-    <section class="pkgs">
-      <el-divider content-position="left">{{$t('homePackage.ClickHouse Packages')}}</el-divider>
-      <pkg-list />
-    </section>
+    <PageHeader
+      :crumb="[$t('layout.ClickHouse Management Console')]"
+      :title="$t('homePackage.ClickHouse Packages')"
+    >
+      <template #actions>
+        <el-button type="primary" size="small" icon="el-icon-upload2" @click="$refs.pkgList.chooseFile()">
+          {{ $t('homePackage.Upload Packages') }}
+        </el-button>
+      </template>
+    </PageHeader>
+    <pkg-list ref="pkgList" />
   </main>
 </template>
+
 <script>
-import PkgList from "./component/pkgs";
+import PkgList from './component/pkgs';
 
 export default {
-    name: "homePackage",
-  data() {
-    return {
-      formModel: {},
-    };
-  },
-  components: {
-    PkgList,
-  },
+  name: 'homePackage',
+  components: { PkgList },
 };
 </script>
 
 <style lang="scss" scoped>
 .home-package {
-  .ml-360 {
-    margin-left: 360px;
-  }
+  padding-bottom: var(--s-8);
 }
 </style>
