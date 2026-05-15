@@ -1,227 +1,221 @@
 <template>
-<multipane class="vertical-panes sql-select-tool custom-resizer " layout="vertical" style="border: none;">
-  <div class="pane" :style="{ minWidth: '100px', width: '280px', maxWidth: '400px' }">
-    <el-tabs value="table" class="custom-tab db-tree-tabs">
-        <el-tab-pane :label="$t('queryExecution.Database')" name="table">
-          <dbTree></dbTree>
-        </el-tab-pane>
-      </el-tabs>
-  </div>
-  <multipane-resizer></multipane-resizer>
-    <div class="pane" :style="{ flexGrow: 1, flex: 1 }">
-      <multipane class="horizontal-panes custom-resizer" layout="horizontal">
-        <div class="pane" :style="{ minWidth: '100%', width: '100%', maxWidth: '100%', height: '50%', minHeight: '20%', maxHeight: '90%' }">
-          <el-tabs value="console" class="custom-tab custom-tab-flex">
-            <el-tab-pane :label="$t('queryExecution.SQL Console')" name="console">
-              <sql-editor ref="sqlEditor" @startRun="bottomActiveTab = 'result'"></sql-editor>
-            </el-tab-pane>
-          </el-tabs>
+  <multipane class="sql-tool" layout="vertical">
+    <div class="sql-tool__aside">
+      <div class="sql-tool__pane-head">{{ $t('queryExecution.Database') }}</div>
+      <dbTree class="sql-tool__pane-body" />
+    </div>
+    <multipane-resizer class="sql-tool__resizer sql-tool__resizer--v"></multipane-resizer>
+    <div class="sql-tool__work">
+      <multipane class="sql-tool__work-panes" layout="horizontal">
+        <div class="sql-tool__editor">
+          <div class="sql-tool__pane-head">{{ $t('queryExecution.SQL Console') }}</div>
+          <sql-editor
+            ref="sqlEditor"
+            class="sql-tool__pane-body"
+            @startRun="bottomActiveTab = 'result'"
+          />
         </div>
-        <multipane-resizer></multipane-resizer>
-        <div class="pane" :style="{ flexGrow: 1, flex: 1, width: '100%' }">
-          <el-tabs v-model="bottomActiveTab" @tab-click="handleClick" class="custom-tab-flex custom-tab-bottom">
-            <el-tab-pane :label="$t('queryExecution.Query History')" name="history">
-              <run-history @addSql="onAddSql"></run-history>
-            </el-tab-pane>
-            <el-tab-pane :label="$t('queryExecution.Result')" name="result">
-              <sql-result></sql-result>
-            </el-tab-pane>
-          </el-tabs>
+        <multipane-resizer class="sql-tool__resizer sql-tool__resizer--h"></multipane-resizer>
+        <div class="sql-tool__bottom">
+          <div class="sql-tool__tabs">
+            <button
+              v-for="tab in tabs"
+              :key="tab.key"
+              class="sql-tool__tab"
+              :class="{ 'sql-tool__tab--active': bottomActiveTab === tab.key }"
+              @click="bottomActiveTab = tab.key"
+            >
+              {{ $t(tab.label) }}
+            </button>
+          </div>
+          <div class="sql-tool__bottom-body">
+            <run-history v-show="bottomActiveTab === 'history'" @addSql="onAddSql" />
+            <sql-result v-show="bottomActiveTab === 'result'" />
+          </div>
         </div>
       </multipane>
     </div>
-</multipane>
+  </multipane>
 </template>
+
 <script>
 import { Multipane, MultipaneResizer } from 'vue-multipane';
 import { dbTree, sqlEditor, sqlResult, runHistory } from './components/';
 import store from '@/store';
+
 export default {
   name: 'sqlSelectTool',
-  components: {
-    Multipane,
-    MultipaneResizer,
-    dbTree,
-    sqlEditor,
-    sqlResult,
-    runHistory,
-  },
+  components: { Multipane, MultipaneResizer, dbTree, sqlEditor, sqlResult, runHistory },
   data() {
     return {
-      leftActiveTab: 'table',
       bottomActiveTab: 'result',
+      tabs: [
+        { key: 'history', label: 'queryExecution.Query History' },
+        { key: 'result',  label: 'queryExecution.Result' },
+      ],
     };
   },
   beforeDestroy() {
     store.commit('sqlSelect/clear');
   },
   methods: {
-    handleClick() {
-      //
-    },
     onAddSql(str) {
       this.$refs.sqlEditor.addSql(str);
-    }
-  }
-}
+    },
+  },
+};
 </script>
-<style lang="scss">
-.db-tree-tabs {
-  height: 100%;
+
+<style lang="scss" scoped>
+.sql-tool {
+  flex: 1;
+  min-height: 0;
   display: flex;
-  flex-direction: column;
+  width: 100%;
+  background: var(--c-surface-0);
+  border: 1px solid var(--c-surface-3);
+  border-radius: var(--r-md);
+  overflow: hidden;
 
-  .el-tabs__content {
-    margin-bottom: 5px;
-    flex: 1;
-    .el-tab-pane {
-      height: 100%;
-    }
-  }
-}
-
-.custom-tab {
-  .el-tabs__item {
-    padding: 0 10px !important;
-  }
-  .el-tabs__active-bar {
-    transform: none !important;
-  }
-  .el-tabs__header {
-    margin-bottom: 10px;
-  }
-
-  &-flex {
-    height: 100%;
+  &__aside {
     display: flex;
     flex-direction: column;
-    .el-tabs__content {
-      flex: 1;
+    min-width: 200px;
+    width: 280px;
+    max-width: 400px;
+  }
+
+  &__work {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+  }
+
+  &__work-panes {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  &__editor {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 50%;
+    min-height: 20%;
+    max-height: 90%;
+  }
+
+  &__bottom {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  &__pane-head {
+    flex: 0 0 auto;
+    padding: var(--s-2) var(--s-3);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    color: var(--c-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    background: var(--c-surface-1);
+    border-bottom: 1px solid var(--c-surface-3);
+  }
+
+  &__pane-body {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+  }
+
+  &__tabs {
+    flex: 0 0 auto;
+    display: flex;
+    gap: var(--s-4);
+    padding: 0 var(--s-3);
+    background: var(--c-surface-1);
+    border-bottom: 1px solid var(--c-surface-3);
+  }
+
+  &__tab {
+    appearance: none;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    padding: var(--s-2) var(--s-1);
+    font-size: var(--fs-sm);
+    color: var(--c-text-secondary);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color var(--du-fast) var(--ease-out),
+                border-color var(--du-fast) var(--ease-out);
+
+    &:hover {
+      color: var(--c-text-primary);
     }
-    .el-tab-pane {
+
+    &--active {
+      color: var(--c-text-primary);
+      font-weight: var(--fw-semibold);
+      border-bottom-color: var(--c-primary-solid);
+    }
+  }
+
+  &__bottom-body {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+
+    > * {
       height: 100%;
     }
   }
 
-  &-bottom {
-    // height: 100%;
-    // display: flex;
-    // flex-direction: column;
-    .el-tabs__item {
-      padding: 0 10px !important;
-    }
-    // .el-tabs__content {
-    //   flex: 1;
-    // }
-
-    .el-tab-pane {
-      height: 100%;
-    }
-    .el-tabs__header {
-      margin-bottom: 0;
-    }
-  }
-}
-
-.sql-select-tool {
-  border: 1px solid #e8eaec;
-}
-</style>
-
-<style lang="scss">
-.vertical-panes {
-  width: 100%;
-  // height: 400px;
-  // border: 1px solid #EBEEF5;
-}
-
-.vertical-panes > .pane {
-  // text-align: left;
-  // overflow: hidden;
-  // background: #eee;
-  border: 1px solid #EBEEF5;
-}
-
-.vertical-panes > .pane ~ .pane {
-  border-left: 1px solid #EBEEF5;
-}
-
-.horizontal-panes {
-  width: 100%;
-  height: 100%;
-  // border: 1px solid #ccc;
-}
-
-.horizontal-panes > .pane {
-  text-align: left;
-  overflow: hidden;
-  // background: #eee;
-}
-
-.horizontal-panes > .pane ~ .pane {
-  border-top: 1px solid #EBEEF5;
-}
-
-.custom-resizer {
-  width: 100%;
-  height: 100%;
-}
-
-.custom-resizer > .pane {
-  text-align: left;
-  // padding: 15px;
-  overflow: hidden;
-  // background: #eee;
-  // border: 1px solid #EBEEF5;
-}
-
-.custom-resizer > .pane ~ .pane {
-}
-
-.custom-resizer {
-  &.vertical-panes > .multipane-resizer {
-    margin: 0;
-    left: 0;
+  &__resizer {
     position: relative;
-    &:before {
-      display: block;
-      content: "";
-      width: 1px;
-      height: 40px;
+    background: transparent;
+    transition: background-color var(--du-fast) var(--ease-out);
+
+    &::before {
+      content: '';
       position: absolute;
       top: 50%;
       left: 50%;
-      margin-top: -20px;
-      margin-left: -2px;
-      border-left: 1px solid #ccc;
-      border-right: 1px solid #ccc;
+      transform: translate(-50%, -50%);
+      background: var(--c-surface-3);
+      transition: background-color var(--du-fast) var(--ease-out);
     }
+
     &:hover {
-      &:before {
-        border-color: #999;
+      background: var(--c-surface-1);
+      &::before {
+        background: var(--c-primary-solid);
       }
     }
-  }
-  &.horizontal-panes > .multipane-resizer {
-    margin: 0;
-    left: 0;
-    position: relative;
-    &:before {
-      display: block;
-      content: "";
-      width: 40px;
-      height: 1px;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      margin-top: -6px;
-      margin-left: -20px;
-      border-top: 1px solid #ccc;
-      border-bottom: 1px solid #ccc;
+
+    &--v {
+      width: 4px;
+      cursor: col-resize;
+
+      &::before {
+        width: 2px;
+        height: 32px;
+      }
     }
-    &:hover {
-      &:before {
-        border-color: #999;
+
+    &--h {
+      height: 4px;
+      cursor: row-resize;
+
+      &::before {
+        width: 32px;
+        height: 2px;
       }
     }
   }

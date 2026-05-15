@@ -1,35 +1,46 @@
 <template>
-<el-table
-  style="width: 100%;"
-  class="history-list"
-  border
-  :empty-text="$t('queryExecution.No Data')"
-  size="mini"
-  :data="historyList"
-  height="100%">
-  <el-table-column
-    v-for="(column, index) in columns"
-    :prop="column.prop"
-    :label="column.label"
-    :width="column.width"
-    :key="index">
+  <el-table
+    class="sql-history"
+    :data="historyList"
+    :empty-text="$t('queryExecution.No Data')"
+    height="100%"
+    size="small"
+    :border="false"
+  >
+    <el-table-column
+      v-for="(column, index) in columns"
+      :key="index"
+      :prop="column.prop"
+      :label="column.label"
+      :width="column.width"
+      show-overflow-tooltip
+    >
       <template slot-scope="scope">
-        <span class="text-ellipsis" :title="scope.row[column.prop]" @dblclick="onClickCell(scope)">{{scope.row[column.prop]}}</span>
-      </template>
-  </el-table-column>
-  <el-table-column
-      :label="$t('common.Action')"
-      width="100">
-      <template slot-scope="scope">
-        <el-button @click="copyItem(scope.row)" type="text" size="mini">{{$t('queryExecution.Copy')}}</el-button>
-        <el-button @click="deleteItem(scope.row)" type="text" size="mini">{{$t('common.Delete')}}</el-button>
+        <span
+          class="sql-history__cell"
+          :class="{ 'sql-history__cell--sql': column.prop === 'QuerySql' }"
+          :title="scope.row[column.prop]"
+          @dblclick="onClickCell(scope)"
+        >{{ scope.row[column.prop] }}</span>
       </template>
     </el-table-column>
-</el-table>
+    <el-table-column :label="$t('common.Action')" width="140">
+      <template slot-scope="scope">
+        <el-button type="text" size="small" @click="copyItem(scope.row)">
+          {{ $t('queryExecution.Copy') }}
+        </el-button>
+        <el-button type="text" size="small" @click="deleteItem(scope.row)">
+          {{ $t('common.Delete') }}
+        </el-button>
+      </template>
+    </el-table-column>
+  </el-table>
 </template>
+
 <script>
 import store from '@/store';
 import { $message } from '@/services';
+
 export default {
   computed: {
     historyList() {
@@ -37,16 +48,10 @@ export default {
     },
     columns() {
       return [
-        {
-          prop: 'QuerySql',
-          label: this.$t('queryExecution.SQL'),
-        },
-        {
-          prop: 'CreateTime',
-          label: this.$t('queryExecution.CreateTime'),
-        },
-      ]
-    }
+        { prop: 'QuerySql',   label: this.$t('queryExecution.SQL') },
+        { prop: 'CreateTime', label: this.$t('queryExecution.CreateTime'), width: 180 },
+      ];
+    },
   },
   created() {
     const { id: clusterName } = this.$route.params;
@@ -54,41 +59,48 @@ export default {
   },
   methods: {
     copyItem(item) {
+      const input = document.createElement('textarea');
+      input.value = item.QuerySql;
+      input.style.position = 'fixed';
+      input.style.opacity = '0';
+      document.body.appendChild(input);
+      input.select();
       try {
-        let input = document.createElement('textarea');
-        input.value = item.QuerySql;
-        input.style.border = '0';
-        input.style.padding = '0';
-        input.style.margin  = '0';
-        input.style.right = '999999em';
-        input.style.position = 'absolute';
-        document.body.appendChild(input);
-        input.select();
         document.execCommand('copy');
         $message.success(this.$t('queryExecution.Copy Success'));
-        input = null;
-      } catch (e) {
-        //
+      } finally {
+        document.body.removeChild(input);
       }
     },
     deleteItem({ CheckSum }) {
       const { id: clusterName } = this.$route.params;
-      store.dispatch('sqlSelect/deleteHistory', {
-        checksum: CheckSum,
-        clusterName
-      });
+      store.dispatch('sqlSelect/deleteHistory', { checksum: CheckSum, clusterName });
     },
-    onClickCell(scope) {
-      const { row, column } = scope;
+    onClickCell({ row, column }) {
       if (column.property === 'QuerySql') {
         this.$emit('addSql', row.QuerySql);
       }
+    },
+  },
+};
+</script>
+
+<style lang="scss" scoped>
+.sql-history {
+  width: 100%;
+
+  &__cell {
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    &--sql {
+      font-family: var(--f-mono);
+      font-size: var(--fs-sm);
+      cursor: pointer;
     }
   }
-}
-</script>
-<style lang="scss">
-.el-table--mini th, .el-table--mini td {
-  padding: 0;
 }
 </style>
