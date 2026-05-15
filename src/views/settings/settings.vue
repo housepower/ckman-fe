@@ -1,14 +1,22 @@
 <template>
-  <div class="flex flex-column height-full" v-if="mode">
-    <breadcrumb :data="breadcrumbInfo"></breadcrumb>
-    <div class="flex-1 flex" v-if="mode === 'import'">
-      <div class="fs-20" style="margin: 20px auto;">{{$t("home.The imported cluster does not support editing")}}</div>
+  <main class="cluster-settings" v-if="mode">
+    <PageHeader
+      :crumb="[$t('layout.ClickHouse Management Console'), $route.params.id]"
+      :title="$t('home.Settings')"
+    />
+    <div v-if="mode === 'import'" class="cluster-settings__import-tip">
+      {{ $t('home.The imported cluster does not support editing') }}
     </div>
-    <div v-else>
-      <d-form class="mt-30" :loading="loading" v-if="schema" :schema="schema" :form-model="formModel" @submit="onSubmit" :is-show-cancel="false" :submit-text="$t('common.Save')"></d-form>
-    </div>
-  </div>
-  
+    <d-form
+      v-else-if="schema"
+      :loading="loading"
+      :schema="schema"
+      :form-model="formModel"
+      :is-show-cancel="false"
+      :submit-text="$t('common.Save')"
+      @submit="onSubmit"
+    />
+  </main>
 </template>
 <script>
 import { DForm } from '@/components/';
@@ -28,7 +36,6 @@ export default {
     return {
       schema: null,
       formModel: {},
-      breadcrumbInfo: ["Clusters", this.$route.params.id, this.$t("settings")],
       mode: '',
       loading: false,
     }
@@ -80,8 +87,6 @@ export default {
     },
     async onSubmit({ data, force }) {
       let password = "";
-      console.log(data);
-      console.log(data["AuthenticateType"]);
       if (data["AuthenticateType"] === 1) {
         password = await this.openPasswordDialog();
       }
@@ -105,3 +110,16 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.cluster-settings {
+  padding-bottom: var(--s-8);
+
+  &__import-tip {
+    margin: var(--s-6) auto;
+    text-align: center;
+    color: var(--c-text-tertiary);
+    font-size: var(--fs-md);
+  }
+}
+</style>

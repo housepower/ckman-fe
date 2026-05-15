@@ -594,10 +594,10 @@ export default {
       await $modal({
         component: ViewLogComponent,
         props: {
-          title: this.$t("manage.clickhouse Log"),
-          width: 800,
+          title: `${this.$t("manage.clickhouse Log")} · ${ip}`,
+          width: 900,
           cancelText: null,
-          okText: null,
+          okText: this.$t("common.Close"),
         },
         data: {
           clusterName,
