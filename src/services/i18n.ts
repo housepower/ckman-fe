@@ -39,6 +39,8 @@ const messages = {
       'Files': 'Files',
       'Action': 'Action',
       'Upload File': 'Upload File',
+      'Upload Success': 'Upload success',
+      'Please select file': 'Please select a file',
       'tips': 'tips',
       'start': 'Confirm to start?',
       'stop': 'Confirm to stop?',
@@ -73,6 +75,24 @@ const messages = {
       'Force Override': 'Force Override',
       'Force Delete': 'Force Delete',
       'Help': 'Help',
+    },
+    errors: {
+      'Unknown': 'Unexpected error. Please contact the administrator.',
+      'Network': 'Network error. Please check your connection.',
+      'Timeout': 'Request timeout. Please try again.',
+      'Server': 'Server error ({status}). Please try again later.',
+      'Forbidden': 'You do not have permission to perform this action.',
+      'NotFound': 'Resource not found.',
+      'BadRequest': 'Bad request.',
+    },
+    login: {
+      'Brand': 'ckman Management Console',
+      'User': 'User',
+      'Password': 'Password',
+      'Login': 'Login',
+      'User Required': 'Please input user',
+      'Password Required': 'Please input password',
+      'Copyright': 'Copyright © 2016–{year} eoitek',
     },
     layout: {
       'ClickHouse Management Console': 'ClickHouse Management Console',
@@ -137,10 +157,12 @@ const messages = {
       'Replica only': 'Replica only',
       Cluster: 'Cluster',
       nodes: 'nodes',
+      Nodes: 'Nodes',
       Open: 'Open',
       'No clusters': 'No clusters yet. Click "Create" or "Import" to add one.',
       'No data': 'No data',
       'No data hint': 'No metrics returned for this period. Check Prometheus integration or expand time range.',
+      'Fullscreen': 'Fullscreen',
       'Metrics unavailable': 'Metrics unavailable',
       'Metrics unavailable hint': 'Could not load metrics. Verify Prometheus integration is configured for this cluster.',
     },
@@ -192,6 +214,7 @@ const messages = {
       'Columns': 'Columns',
       'Rows': 'Rows',
       'Partitions': 'Partitions',
+      'Partition Management': 'Partition Management',
       'Parts': 'Parts Count',
       'UnCompressed': 'Disk Space(uncompress)',
       'Compressed': 'Disk Space(compress)',
@@ -308,6 +331,7 @@ const messages = {
       'Node': 'Node',
       'Random': 'Random',
       'Export to Excel': 'Export to Excel',
+      'Elapsed': 'Elapsed',
     },
     homePackage: {
       'Upload Packages': 'Upload Packages',
@@ -369,18 +393,15 @@ const messages = {
       'Update Time': 'Update Time',
       'Duration': 'Duration',
       'Stop': 'Stop',
+      'statusDone': 'done',
+      'statusFailed': 'failed',
+      'statusRunning': 'running',
       'The current operation cannot be actually canceled, only the task status is changed to stopped':
           'The current operation cannot be actually canceled, only the task status is changed to stopped.Confirm the operation?',
     },
     dataManage: {
-      'backupRestore': 'Backup & Restore',
-      'backupData': 'Backup Data',
-      'backupHistory': 'Backup History',
       'backupManagement': 'Backup Management',
       'dataBalancing': 'Data Balancing',
-      'clusterMigration': 'Cluster Migration',
-      'selectFunction': 'Please select a function from the left menu',
-      "Coming Soon": "Coming Soon"
     },
     backup: {
       'Backup Type': 'Backup Type',
@@ -808,7 +829,11 @@ const messages = {
       'Sharding key cannot be empty': 'Sharding key cannot be empty',
       'Error rate cannot be empty': 'Error rate cannot be empty',
       'Please fill in the form completely': 'Please fill in the form completely',
-      "warning": "warning"
+      "warning": "warning",
+      'sectionTarget': 'TARGET',
+      'sectionStrategy': 'STRATEGY',
+      'sectionOptions': 'OPTIONS',
+      'description': 'Redistribute partitions across shards. Writes to the selected tables should be paused during the operation.'
     },
 
     // Export Component Translations
@@ -843,18 +868,6 @@ const messages = {
       'Form Reset': 'Form has been reset'
     },
 
-    // Migration Component Translations
-    migration: {
-      'Coming Soon': 'Data Migration Feature Coming Soon',
-      'Feature Description':
-          'We are working hard to develop the data migration feature, which will help you easily achieve:',
-      'Cross-cluster Migration': 'Cross-cluster data migration',
-      'Heterogeneous Migration': 'Heterogeneous database migration',
-      'Migration Monitoring': 'Data migration monitoring and management',
-      'Task Scheduling': 'Migration task scheduling',
-      'Any Questions': 'Any questions or suggestions?',
-      'Contact Us': 'Contact Us'
-    }
   },
   zh: {
     ...zhCN,
@@ -888,6 +901,8 @@ const messages = {
       'Files': '文件',
       'Action': '操作',
       'Upload File': '上传文件',
+      'Upload Success': '安装包上传成功',
+      'Please select file': '请选取文件',
       'tips': '提示',
       'start': '确认要进行 启动 操作么?',
       'stop': '确认要进行 停止 操作么?',
@@ -921,6 +936,24 @@ const messages = {
       'Force Override': '强制覆盖',
       'Force Delete': '强制删除',
       'Help': '帮助',
+    },
+    errors: {
+      'Unknown': '未知错误，请联系管理员',
+      'Network': '网络连接异常，请检查网络',
+      'Timeout': '请求超时，请稍后重试',
+      'Server': '服务器异常（{status}），请稍后重试',
+      'Forbidden': '没有权限执行该操作',
+      'NotFound': '请求的资源不存在',
+      'BadRequest': '请求参数有误',
+    },
+    login: {
+      'Brand': 'ckman 管理平台',
+      'User': '用户名',
+      'Password': '密码',
+      'Login': '登录',
+      'User Required': '请输入用户名',
+      'Password Required': '请输入密码',
+      'Copyright': 'Copyright © 2016–{year} 上海擎创信息技术有限公司',
     },
     layout: {
       'ClickHouse Management Console': 'ckman管理平台',
@@ -983,10 +1016,12 @@ const messages = {
       'Replica only': '仅副本',
       Cluster: '集群',
       nodes: '节点',
+      Nodes: '节点数',
       Open: '打开',
       'No clusters': '暂无集群。点击右上角"创建"或"导入"添加一个。',
       'No data': '无数据',
       'No data hint': '该时间区间未返回指标。请确认 Prometheus 接入是否正常，或扩大时间范围。',
+      'Fullscreen': '全屏查看',
       'Metrics unavailable': '指标暂不可用',
       'Metrics unavailable hint': '无法加载监控指标。请确认本集群的 Prometheus 接入配置已生效。',
     },
@@ -1037,6 +1072,7 @@ const messages = {
       'Columns': '列数',
       'Rows': '行数',
       'Partitions': '分区数',
+      'Partition Management': '分区管理',
       'Parts': 'Parts数量',
       'UnCompressed': '占用磁盘(压缩前)',
       'Compressed': '占用磁盘(压缩后)',
@@ -1152,7 +1188,8 @@ const messages = {
       'No Sql': '请输入sql语句',
       'Node': '节点',
       'Random': '随机',
-      'Export to Excel': '导出到Excel'
+      'Export to Excel': '导出到Excel',
+      'Elapsed': '耗时',
     },
     homePackage: {
       'Upload Packages': '上传安装包',
@@ -1213,18 +1250,15 @@ const messages = {
       'Update Time': '更新时间',
       'Duration': '持续时间',
       'Stop': '停止',
+      'statusDone': '已完成',
+      'statusFailed': '失败',
+      'statusRunning': '执行中',
       'The current operation cannot be actually canceled, only the task status is changed to stopped':
           '当前操作无法实际取消，仅将任务状态改为已停止。确认操作？',
     },
     dataManage: {
-      'backupRestore': '备份恢复',
-      'backupData': '备份数据',
-      'backupHistory': '备份历史',
       'backupManagement': '备份管理',
       'dataBalancing': '数据均衡',
-      'clusterMigration': '集群迁移',
-      'selectFunction': '请从左侧菜单选择功能',
-      "Coming Soon": '敬请期待',
     },
     backup: {
       'Backup Type': '备份类型',
@@ -1374,7 +1408,11 @@ const messages = {
       'Sharding key cannot be empty': '分片键不能为空',
       'Error rate cannot be empty': '错误率不能为空',
       'Please fill in the form completely': '请先填写完整表单',
-      "warning": "警告"
+      "warning": "警告",
+      'sectionTarget': '目标表',
+      'sectionStrategy': '均衡策略',
+      'sectionOptions': '选项',
+      'description': '将分区数据在分片间重新分布。操作期间应暂停对所选表的写入。'
     },
     // History Component Translations
     history: {
@@ -1683,23 +1721,10 @@ const messages = {
       'Export Success': '导出请求已发送',
       'Form Reset': '表单已重置'
     },
-
-    // Migration Component Translations
-    migration: {
-      'Coming Soon': '数据迁移功能即将上线',
-      'Feature Description':
-          '我们正在努力开发数据迁移功能，它将帮助您轻松实现：',
-      'Cross-cluster Migration': '跨集群数据迁移',
-      'Heterogeneous Migration': '异构数据库迁移',
-      'Migration Monitoring': '数据迁移监控与管理',
-      'Task Scheduling': '迁移任务调度',
-      'Any Questions': '有任何问题或建议？',
-      'Contact Us': '联系我们'
-    }
   },
 };
 
-const locale = localStorage.getItem('locale') || 'en';
+const locale = localStorage.getItem('locale') || 'zh';
 export const $i18n = new VueI18n({locale, messages});
 const title = $i18n.t('layout.ClickHouse Management Console') + '';
 document.title = title;
