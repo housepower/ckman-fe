@@ -405,8 +405,9 @@
         </el-form>
 
         <span slot="footer">
-            <el-button @click="$emit('input', false)">{{ $t('history.Cancel') }}</el-button>
+            <el-button size="small" @click="$emit('input', false)">{{ $t('history.Cancel') }}</el-button>
             <el-button
+                size="small"
                 type="primary"
                 :loading="submitLoading"
                 :disabled="form.scheduleType === 'scheduled' && form.backupStyle === 'full'"
@@ -1094,264 +1095,266 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import '@/app/variables.scss';
-
 .scrollable-form {
-    max-height: calc(100vh - 220px);
-    overflow-y: auto;
-    padding-right: 6px;
+  max-height: calc(100vh - 220px);
+  overflow-y: auto;
+  padding-right: var(--s-1);
 }
 
 .form-section {
-    border-bottom: 1px solid #ebeef5;
-    padding-bottom: 12px;
-    margin-bottom: 12px;
+  border-bottom: 1px solid var(--c-surface-3);
+  padding-bottom: var(--s-3);
+  margin-bottom: var(--s-3);
 
-    &:last-of-type {
-        border-bottom: none;
-    }
+  &:last-of-type {
+    border-bottom: none;
+  }
 }
 
 .form-section-title {
-    font-size: 14px;
-    font-weight: 500;
-    color: #303133;
-    margin: 0 0 14px 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin: 0 0 var(--s-3);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+  color: var(--c-text-primary);
 }
 
 .section-num {
-    background: $primary-color;
-    color: white;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--c-primary-bg);
+  color: var(--c-primary-fg);
+  border: 1px solid var(--c-primary-border);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  flex-shrink: 0;
 }
 
-/* form-input: 500px wide inputs */
 .form-input {
-    width: 500px !important;
+  width: 500px !important;
 }
 
-/* cron help block */
+// cron 帮助块
 .cron-help {
-    margin-top: 8px;
-    padding: 10px 14px;
-    background-color: #f8f8f8;
-    border-radius: 4px;
-    border: 1px solid #ebeef5;
-    font-size: 13px;
+  margin-top: var(--s-2);
+  padding: var(--s-2) var(--s-3);
+  background: var(--c-surface-1);
+  border: 1px solid var(--c-surface-3);
+  border-radius: var(--r-sm);
+  font-size: var(--fs-sm);
 
-    ul {
-        padding-left: 20px;
-        margin: 6px 0 0;
-    }
+  ul {
+    padding-left: var(--s-5);
+    margin: var(--s-1) 0 0;
+  }
 
-    code {
-        background-color: #f5f7fa;
-        padding: 2px 5px;
-        border-radius: 3px;
-        font-family: monospace;
-    }
+  code {
+    background: var(--c-surface-2);
+    padding: 1px 5px;
+    border-radius: var(--r-sm);
+    font-family: var(--f-mono);
+  }
 }
 
-/* cron preview block: real-time next-run times */
+// cron 预览：成功色
 .cron-preview {
-    margin-top: 6px;
-    font-size: 12px;
-    color: #67c23a;
-    line-height: 1.6;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 4px 10px;
+  margin-top: var(--s-1);
+  font-size: var(--fs-xs);
+  color: var(--c-success-fg);
+  line-height: var(--lh-normal);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
 }
 .cron-preview-label {
-    color: #606266;
+  color: var(--c-text-secondary);
 }
 .cron-preview-item {
-    font-family: monospace;
-    background: #f0f9eb;
-    padding: 1px 6px;
-    border-radius: 3px;
+  font-family: var(--f-mono);
+  background: var(--c-success-bg);
+  border: 1px solid var(--c-success-border);
+  color: var(--c-success-fg);
+  padding: 1px 6px;
+  border-radius: var(--r-sm);
 }
 .cron-preview-invalid {
-    color: #909399;
+  color: var(--c-text-tertiary);
 }
 
-/* table option row in dropdown */
+// dropdown 选项行
 .ms-row-option {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  width: 100%;
 }
 
 .ms-option-name {
-    flex: 1;
-    color: #303133;
-    font-size: 13px;
+  flex: 1;
+  color: var(--c-text-primary);
+  font-size: var(--fs-sm);
 }
 
 .ms-option-size {
-    font-size: 11px;
-    color: #909399;
-    min-width: 60px;
-    text-align: right;
+  font-size: var(--fs-xs);
+  color: var(--c-text-tertiary);
+  min-width: 60px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
-/* conflict tag for already-scheduled tables */
+// 冲突 tag
 .conflict-tag {
-    font-size: 11px;
-    padding: 1px 6px;
-    border-radius: 2px;
-    background: #fef0f0;
-    color: #F56C6C;
-    border: 1px solid #fbc4c4;
-    white-space: nowrap;
+  font-size: var(--fs-xs);
+  padding: 1px 6px;
+  border-radius: var(--r-sm);
+  background: var(--c-danger-bg);
+  color: var(--c-danger-fg);
+  border: 1px solid var(--c-danger-border);
+  white-space: nowrap;
 }
 
-/* partition-tag variants */
+// 分区类型 tag
 .partition-tag {
-    font-size: 11px;
-    padding: 1px 6px;
-    border-radius: 2px;
-    text-align: center;
-    white-space: nowrap;
+  font-size: var(--fs-xs);
+  padding: 1px 6px;
+  border-radius: var(--r-sm);
+  text-align: center;
+  white-space: nowrap;
 
-    &.daily {
-        background: #f0f9eb;
-        color: #67C23A;
-        border: 1px solid #c2e7b0;
-    }
+  &.daily {
+    background: var(--c-success-bg);
+    color: var(--c-success-fg);
+    border: 1px solid var(--c-success-border);
+  }
 
-    &.month {
-        background: #fdf6ec;
-        color: #E6A23C;
-        border: 1px solid #f5dab1;
-    }
+  &.month {
+    background: var(--c-warning-bg);
+    color: var(--c-warning-fg);
+    border: 1px solid var(--c-warning-border);
+  }
 
-    &.none {
-        background: #fef0f0;
-        color: #F56C6C;
-        border: 1px solid #fbc4c4;
-    }
+  &.none {
+    background: var(--c-danger-bg);
+    color: var(--c-danger-fg);
+    border: 1px solid var(--c-danger-border);
+  }
 
-    &.custom {
-        background: #f4f4f5;
-        color: #909399;
-        border: 1px solid #e9e9eb;
-    }
+  &.custom {
+    background: var(--c-surface-2);
+    color: var(--c-text-tertiary);
+    border: 1px solid var(--c-surface-3);
+  }
 }
 
-/* selection counter */
 .selection-counter {
-    margin-top: 5px;
-    font-size: 12px;
-    color: #909399;
+  margin-top: var(--s-1);
+  font-size: var(--fs-xs);
+  color: var(--c-text-tertiary);
 }
 
-/* warn hint (yellow background) */
+// 警告提示块
 .warn-hint {
-    margin-top: 6px;
-    padding: 8px 10px;
-    background: #fdf6ec;
-    border: 1px solid #f5dab1;
-    color: #ad6c00;
-    border-radius: 3px;
-    font-size: 12px;
-    line-height: 1.5;
+  margin-top: var(--s-1);
+  padding: var(--s-2) var(--s-3);
+  background: var(--c-warning-bg);
+  border: 1px solid var(--c-warning-border);
+  color: var(--c-warning-fg);
+  border-radius: var(--r-sm);
+  font-size: var(--fs-xs);
+  line-height: var(--lh-normal);
 
-    code {
-        background: white;
-        padding: 0 3px;
-        border-radius: 2px;
-    }
+  code {
+    background: var(--c-surface-0);
+    padding: 0 3px;
+    border-radius: var(--r-sm);
+  }
 }
 
-/* generic hint text */
 .form-hint-text {
-    margin-top: 4px;
-    font-size: 12px;
-    color: #909399;
+  margin-top: var(--s-1);
+  font-size: var(--fs-xs);
+  color: var(--c-text-tertiary);
 }
 
-/* start-date hint + effective range preview */
 .start-date-hint {
-    margin-top: 4px;
-    font-size: 12px;
-    color: #909399;
-    line-height: 1.5;
+  margin-top: var(--s-1);
+  font-size: var(--fs-xs);
+  color: var(--c-text-tertiary);
+  line-height: var(--lh-normal);
 }
+
 .effective-range {
-    margin-top: 4px;
-    font-size: 12px;
-    color: #67c23a;
-    line-height: 1.5;
+  margin-top: var(--s-1);
+  font-size: var(--fs-xs);
+  color: var(--c-success-fg);
+  line-height: var(--lh-normal);
 }
 .effective-range-skip {
-    color: #e6a23c;
+  color: var(--c-warning-fg);
 }
 
-/* compression-disabled-checksum hint: very muted, do not distract */
 .checksum-hint {
-    display: block;
-    margin-top: 2px;
-    font-size: 11px;
-    line-height: 1.4;
-    color: #c0c4cc;
+  display: block;
+  margin-top: 2px;
+  font-size: var(--fs-xs);
+  line-height: var(--lh-tight);
+  color: var(--c-text-disabled);
 }
 
 .warn-text {
-    color: #ad6c00;
+  color: var(--c-warning-fg);
 }
 
 .disk-loading {
-    color: #909399;
-    font-size: 13px;
-    padding: 6px 0;
+  color: var(--c-text-tertiary);
+  font-size: var(--fs-sm);
+  padding: var(--s-1) 0;
 
-    .el-icon-loading {
-        margin-right: 4px;
-        color: #C9A100;
-    }
+  .el-icon-loading {
+    margin-right: var(--s-1);
+    color: var(--c-primary-solid);
+  }
 }
 
 .disk-option-row {
-    display: grid;
-    grid-template-columns: 120px 1fr auto;
-    gap: 12px;
-    align-items: center;
+  display: grid;
+  grid-template-columns: 120px 1fr auto;
+  gap: var(--s-3);
+  align-items: center;
 
-    .disk-name {
-        font-weight: 500;
-        color: #303133;
-    }
+  .disk-name {
+    font-weight: var(--fw-medium);
+    color: var(--c-text-primary);
+  }
 
-    .disk-path {
-        font-size: 12px;
-        color: #909399;
-        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
+  .disk-path {
+    font-size: var(--fs-xs);
+    color: var(--c-text-tertiary);
+    font-family: var(--f-mono);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 
-    .disk-tag {
-        text-align: right;
-    }
+  .disk-tag {
+    text-align: right;
+  }
 }
 </style>
 
 <style>
-.backup-form-dialog .el-dialog__body { padding: 14px 20px; }
-.backup-form-dialog .el-dialog__header { padding: 14px 20px 10px; }
-.backup-form-dialog .el-dialog__footer { padding: 8px 20px 14px; }
+.backup-form-dialog {
+  .el-dialog__body   { padding: var(--s-3) var(--s-5); }
+  .el-dialog__header { padding: var(--s-3) var(--s-5) var(--s-2); }
+  .el-dialog__footer { padding: var(--s-2) var(--s-5) var(--s-3); }
+  .el-dialog__title  { font-size: var(--fs-md); font-weight: var(--fw-semibold); }
+}
 </style>

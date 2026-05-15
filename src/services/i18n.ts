@@ -167,6 +167,7 @@ const messages = {
       'Metrics unavailable hint': 'Could not load metrics. Verify Prometheus integration is configured for this cluster.',
     },
     manage: {
+      'Action Unavailable In Current State': 'This action is not available in the current cluster state.',
       'statusGreen': 'Healthy',
       'statusRed': 'Offline',
       'statusYellow': 'Warning',
@@ -1026,6 +1027,7 @@ const messages = {
       'Metrics unavailable hint': '无法加载监控指标。请确认本集群的 Prometheus 接入配置已生效。',
     },
     manage: {
+      'Action Unavailable In Current State': '当前集群状态下该操作不可用',
       'statusGreen': '健康',
       'statusRed': '离线',
       'statusYellow': '警告',

@@ -50,6 +50,8 @@ export default {
       if (this.items.length <= 1) return false;
       const r = this.$route;
       if (!r) return true;
+      // 集群内子页面顶部已有 cluster-tabs 的 home 图标，避免重复
+      if (r.params && r.params.id) return false;
       return r.name !== 'Home' && r.path !== '/' && r.path !== '/home';
     },
   },

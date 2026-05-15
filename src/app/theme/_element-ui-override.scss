@@ -5,6 +5,10 @@ $--color-primary:         $tokens-primary-solid;
 $--color-success:         $tokens-success-solid;
 $--color-warning:         $tokens-warning-solid;
 $--color-danger:          $tokens-danger-solid;
+
+// danger 按钮单独压深一档，避免 #EF4444 实色像粉色
+$--button-danger-background-color: #B91C1C;
+$--button-danger-border-color:     #B91C1C;
 $--color-info:            $tokens-info-solid;
 
 $--color-text-primary:    $tokens-text-primary;
@@ -77,6 +81,26 @@ $--font-path: '~element-ui-eoi/lib/theme-chalk/fonts';
   &--medium { padding: var(--s-2) var(--s-3); }
   &--small  { padding: 7px var(--s-3); }
   &--mini   { padding: 6px var(--s-2); font-size: var(--fs-xs); }
+}
+
+// danger 按钮 disabled 状态默认会被 mix 成粉色，统一改为中性灰
+// Element 自身的规则是 .el-button.el-button--danger.is-disabled（3 个 class），需匹配相同特异性
+.el-button.el-button--danger.is-disabled,
+.el-button.el-button--danger.is-disabled:hover,
+.el-button.el-button--danger.is-disabled:focus,
+.el-button.el-button--danger.is-disabled:active {
+  color: var(--c-text-disabled);
+  background-color: var(--c-surface-2);
+  border-color: var(--c-surface-3);
+}
+
+.el-button.el-button--danger.is-plain.is-disabled,
+.el-button.el-button--danger.is-plain.is-disabled:hover,
+.el-button.el-button--danger.is-plain.is-disabled:focus,
+.el-button.el-button--danger.is-plain.is-disabled:active {
+  color: var(--c-text-disabled);
+  background-color: var(--c-surface-1);
+  border-color: var(--c-surface-3);
 }
 
 .el-input__inner {

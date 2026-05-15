@@ -183,8 +183,9 @@
     </el-form>
 
     <span slot="footer">
-      <el-button @click="$emit('input', false)">{{ $t('history.Cancel') }}</el-button>
+      <el-button size="small" @click="$emit('input', false)">{{ $t('history.Cancel') }}</el-button>
       <el-button
+        size="small"
         type="primary"
         :disabled="submitPlan.length === 0"
         :loading="submitLoading"
@@ -699,18 +700,16 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import '@/app/variables.scss';
-
 .scrollable-form {
   max-height: calc(100vh - 220px);
   overflow-y: auto;
-  padding-right: 6px;
+  padding-right: var(--s-1);
 }
 
 .form-section {
-  border-bottom: 1px solid #ebeef5;
-  padding-bottom: 12px;
-  margin-bottom: 12px;
+  border-bottom: 1px solid var(--c-surface-3);
+  padding-bottom: var(--s-3);
+  margin-bottom: var(--s-3);
 
   &:last-of-type {
     border-bottom: none;
@@ -718,37 +717,39 @@ export default {
 }
 
 .form-section-title {
-  font-size: 14px;
-  font-weight: 500;
-  color: #303133;
-  margin: 0 0 14px 0;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--s-2);
+  margin: 0 0 var(--s-3);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+  color: var(--c-text-primary);
 }
 
 .section-num {
-  background: $primary-color;
-  color: white;
   width: 20px;
   height: 20px;
-  border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  border-radius: 50%;
+  background: var(--c-primary-bg);
+  color: var(--c-primary-fg);
+  border: 1px solid var(--c-primary-border);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
   flex-shrink: 0;
 }
 
 .form-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--s-3);
 }
 
 .form-label {
-  font-size: 13px;
-  color: #606266;
+  font-size: var(--fs-sm);
+  color: var(--c-text-secondary);
   width: 100px;
   flex-shrink: 0;
   text-align: right;
@@ -756,44 +757,44 @@ export default {
 
 .cluster-tag {
   display: inline-block;
-  padding: 4px 12px;
-  background: #FDF7DD;
-  border: 1px solid #C9A100;
-  border-radius: 4px;
-  font-size: 13px;
-  font-weight: 500;
-  color: #7a6000;
+  padding: 4px var(--s-3);
+  background: var(--c-primary-bg);
+  border: 1px solid var(--c-primary-border);
+  border-radius: var(--r-sm);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  color: var(--c-primary-fg);
 }
 
 .section-hint {
-  font-size: 13px;
-  color: #909399;
-  padding: 8px 0;
+  font-size: var(--fs-sm);
+  color: var(--c-text-tertiary);
+  padding: var(--s-2) 0;
 }
 
 .muted {
-  color: #909399;
+  color: var(--c-text-tertiary);
 }
 
 .source-summary {
-  padding: 10px 14px;
-  background: #f0f9eb;
-  border: 1px solid #c2e7b0;
-  border-radius: 4px;
-  font-size: 13px;
-  color: #2d6a1c;
-  margin-bottom: 8px;
+  padding: var(--s-2) var(--s-3);
+  background: var(--c-success-bg);
+  border: 1px solid var(--c-success-border);
+  border-radius: var(--r-sm);
+  font-size: var(--fs-sm);
+  color: var(--c-success-fg);
+  margin-bottom: var(--s-2);
 }
 
 .warn-hint {
-  margin-top: 6px;
-  padding: 8px 10px;
-  background: #fdf6ec;
-  border: 1px solid #f5dab1;
-  color: #ad6c00;
-  border-radius: 3px;
-  font-size: 12px;
-  line-height: 1.5;
+  margin-top: var(--s-1);
+  padding: var(--s-2) var(--s-3);
+  background: var(--c-warning-bg);
+  border: 1px solid var(--c-warning-border);
+  color: var(--c-warning-fg);
+  border-radius: var(--r-sm);
+  font-size: var(--fs-xs);
+  line-height: var(--lh-normal);
 }
 
 .partition-filter {
@@ -801,103 +802,105 @@ export default {
   align-items: center;
   flex-wrap: wrap;
   gap: 0;
-  margin-bottom: 10px;
+  margin-bottom: var(--s-2);
 }
 
 .partition-tree {
-  border: 1px solid #ebeef5;
-  border-radius: 4px;
-  padding: 8px;
-  background: #fafafa;
+  border: 1px solid var(--c-surface-3);
+  border-radius: var(--r-sm);
+  padding: var(--s-2);
+  background: var(--c-surface-1);
   max-height: 360px;
   overflow-y: auto;
 }
 
 .tree-node {
-  font-size: 13px;
+  font-size: var(--fs-sm);
 
   &.table {
-    font-weight: 500;
-    color: #303133;
+    font-weight: var(--fw-medium);
+    color: var(--c-text-primary);
   }
 
   &.run {
-    color: #606266;
+    color: var(--c-text-secondary);
   }
 
   &.partition {
-    color: #909399;
-    font-size: 12px;
+    color: var(--c-text-tertiary);
+    font-size: var(--fs-xs);
   }
 }
 
 .submit-summary {
-  padding: 10px 14px;
-  background: #FDF7DD;
-  border: 1px solid #C9A100;
-  border-radius: 4px;
-  font-size: 13px;
-  color: #7a6000;
-  margin-bottom: 8px;
+  padding: var(--s-2) var(--s-3);
+  background: var(--c-primary-bg);
+  border: 1px solid var(--c-primary-border);
+  border-radius: var(--r-sm);
+  font-size: var(--fs-sm);
+  color: var(--c-primary-fg);
+  margin-bottom: var(--s-2);
 }
 
-/* table option row in dropdown */
 .ms-row-option {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--s-2);
   width: 100%;
 }
 
 .ms-option-name {
   flex: 1;
-  color: #303133;
-  font-size: 13px;
+  color: var(--c-text-primary);
+  font-size: var(--fs-sm);
 }
 
 .ms-option-size {
-  font-size: 11px;
-  color: #909399;
+  font-size: var(--fs-xs);
+  color: var(--c-text-tertiary);
   min-width: 60px;
   text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
-/* partition-tag variants */
 .partition-tag {
-  font-size: 11px;
+  font-size: var(--fs-xs);
   padding: 1px 6px;
-  border-radius: 2px;
+  border-radius: var(--r-sm);
   text-align: center;
   white-space: nowrap;
 
   &.daily {
-    background: #f0f9eb;
-    color: #67C23A;
-    border: 1px solid #c2e7b0;
+    background: var(--c-success-bg);
+    color: var(--c-success-fg);
+    border: 1px solid var(--c-success-border);
   }
 
   &.month {
-    background: #fdf6ec;
-    color: #E6A23C;
-    border: 1px solid #f5dab1;
+    background: var(--c-warning-bg);
+    color: var(--c-warning-fg);
+    border: 1px solid var(--c-warning-border);
   }
 
   &.none {
-    background: #fef0f0;
-    color: #F56C6C;
-    border: 1px solid #fbc4c4;
+    background: var(--c-danger-bg);
+    color: var(--c-danger-fg);
+    border: 1px solid var(--c-danger-border);
   }
 
   &.custom {
-    background: #f4f4f5;
-    color: #909399;
-    border: 1px solid #e9e9eb;
+    background: var(--c-surface-2);
+    color: var(--c-text-tertiary);
+    border: 1px solid var(--c-surface-3);
   }
 }
 </style>
 
 <style>
-.restore-form-dialog .el-dialog__body { padding: 14px 20px; }
-.restore-form-dialog .el-dialog__header { padding: 14px 20px 10px; }
-.restore-form-dialog .el-dialog__footer { padding: 8px 20px 14px; }
+.restore-form-dialog {
+  .el-dialog__body   { padding: var(--s-3) var(--s-5); }
+  .el-dialog__header { padding: var(--s-3) var(--s-5) var(--s-2); }
+  .el-dialog__footer { padding: var(--s-2) var(--s-5) var(--s-3); }
+  .el-dialog__title  { font-size: var(--fs-md); font-weight: var(--fw-semibold); }
+}
 </style>

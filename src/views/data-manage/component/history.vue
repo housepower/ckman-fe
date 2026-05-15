@@ -1,6 +1,6 @@
 <template>
   <div class="history pb-20">
-    <el-tabs v-model="activeTab">
+    <el-tabs v-model="activeTab" class="history__tabs">
       <el-tab-pane :label="$t('history.Tasks Tab')" name="tasks">
         <TaskList
           :policies="policies"
@@ -166,6 +166,44 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .history { padding: 20px; }
+
+// 统一字号：el-tabs 标签、el-table 单元格、el-pagination 都向 small 对齐
+.history__tabs {
+  ::v-deep .el-tabs__item {
+    font-size: var(--fs-sm);
+    height: 36px;
+    line-height: 36px;
+  }
+}
+
+::v-deep .el-table {
+  font-size: var(--fs-sm);
+
+  th, td {
+    padding: 6px 0;
+  }
+}
+
+::v-deep .el-pagination {
+  font-size: var(--fs-sm);
+
+  .btn-prev, .btn-next, .el-pager li {
+    min-width: 26px;
+    height: 26px;
+    line-height: 26px;
+    font-size: var(--fs-sm);
+  }
+
+  .el-pagination__total,
+  .el-pagination__jump {
+    font-size: var(--fs-sm);
+  }
+
+  .el-input__inner {
+    height: 26px;
+    line-height: 26px;
+  }
+}
 </style>

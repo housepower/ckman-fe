@@ -21,6 +21,7 @@
       :data="pagedRows"
       v-loading="loading"
       row-key="key"
+      size="small"
       border
       style="width:100%"
       @sort-change="onSortChange"
@@ -99,6 +100,7 @@
 
     <el-pagination
       v-if="filteredRows.length > 0"
+      small
       class="table-pagination"
       :current-page.sync="currentPage"
       :page-size.sync="pageSize"

@@ -2,7 +2,7 @@
   <div class="layout flex flex-column overflow-hidden">
     <header class="flex-between flex-vcenter plr-20">
       <router-link to="/" class="brand-link">
-        <span class="brand-dot"></span>
+        <img class="brand-icon" src="/favicon.ico" alt="" />
         <span class="brand-text">{{title}} <span class="brand-version">{{version}}</span></span>
       </router-link>
       <div class="header-right flex flex-vcenter">
@@ -189,14 +189,12 @@ header {
     text-decoration: none;
   }
 
-  .brand-dot {
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--c-primary-solid);
+  .brand-icon {
+    width: 22px;
+    height: 21px;
     margin-right: var(--s-2);
-    vertical-align: 1px;
+    display: block;
+    flex: 0 0 auto;
   }
 }
 .brand-link {

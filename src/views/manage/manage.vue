@@ -8,10 +8,11 @@
         <el-button
           v-for="item of clusterStatus"
           :key="item"
-          :disabled="isStatusDisable(item)"
           size="medium"
           :type="item === 'Destroy' ? 'danger' : 'default'"
-          @click="clusterOperation(item)"
+          :class="{ 'cluster-op-btn--unavailable': isStatusDisable(item) }"
+          :title="isStatusDisable(item) ? $t('manage.Action Unavailable In Current State') : ''"
+          @click="onClusterOp(item)"
         >
           {{ $t('manage.' + item + ' Cluster') }}
         </el-button>
@@ -489,6 +490,13 @@ export default {
           break;
       }
     },
+    onClusterOp(item) {
+      if (this.isStatusDisable(item)) {
+        this.$message.warning(this.$t('manage.Action Unavailable In Current State'));
+        return;
+      }
+      this.clusterOperation(item);
+    },
     async clusterOperation(type) {
       type = lowerFirst(type);
 
@@ -613,6 +621,15 @@ export default {
 <style lang="scss" scoped>
 .manage-page {
   padding-bottom: var(--s-8);
+}
+
+// 当前状态不可用时：保持原色，仅 hover 显示禁止光标 + 弱化透明度
+.cluster-op-btn--unavailable {
+  cursor: not-allowed;
+
+  &:hover {
+    opacity: 0.6;
+  }
 }
 
 .upgrade-card,

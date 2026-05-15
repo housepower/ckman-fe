@@ -28,6 +28,7 @@
       :data="pagedTasks"
       v-loading="loading"
       row-key="task_id"
+      size="small"
       border
       style="width:100%"
       @sort-change="onSortChange"
@@ -93,6 +94,7 @@
 
     <el-pagination
       v-if="filteredTasks.length > 0"
+      small
       class="task-pagination"
       :current-page.sync="currentPage"
       :page-size.sync="pageSize"
