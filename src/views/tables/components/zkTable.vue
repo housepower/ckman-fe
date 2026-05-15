@@ -1,67 +1,68 @@
 <template>
-  <div class="zkTable">
-    <div class="title flex flex-between flex-vcenter ptb-10">
-      <span class="fs-20 font-bold">{{$t('tables.Zookeeper Status')}}</span>
+  <section class="zk-table">
+    <div class="zk-table__head">
+      <h3 class="zk-table__title">{{ $t('tables.Zookeeper Status') }}</h3>
+      <el-button
+        size="small"
+        plain
+        icon="el-icon-refresh"
+        @click="fetchData"
+      >{{ $t('common.Refresh') }}</el-button>
     </div>
 
-    <vxe-toolbar zoom custom class="pull-right">
-      <template #buttons>
-        <el-button size="mini" @click="fetchData(true)" circle icon="el-icon-refresh" class="fs-16 fc-black" style="border-color: #dcdfe6;"></el-button>
-      </template>
-    </vxe-toolbar>
-
-    <table cellspacing="0" class="el-table width-full reverse-table el-table--border el-table--enable-row-hover el-table--enable-row-transition">
-      <tr>
-        <th></th>
-        <th class="pl-10 pt-10 pb-10 is-center" v-for="item in columns" :key="item.field">{{item.label}}</th>
-      </tr>
-      <tr v-for="field in fields">
-        <td class="pl-10 is-center">{{field}}</td>
-        <template v-for="column in columns">
-         <td class="pl-10 is-center" 
-            :class="{'cell-warning': isAvgLatency(field, data[column.field][field]) === 1, 
-            'cell-danger': isAvgLatency(field, data[column.field][field]) === 2}">
-            {{data[column.field][field]}}
-          </td>
-        </template>
-      </tr>
-    </table>
-  </div>
+    <div class="zk-table__board">
+      <table class="zk-table__grid">
+        <thead>
+          <tr>
+            <th class="zk-table__field-head"></th>
+            <th v-for="item in columns" :key="item.field" class="zk-table__col-head">
+              {{ item.label }}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="field in fields" :key="field">
+            <td class="zk-table__field-cell">{{ field }}</td>
+            <td
+              v-for="column in columns"
+              :key="column.field + field"
+              class="zk-table__cell"
+              :class="{
+                'zk-table__cell--warning': isAvgLatency(field, data[column.field][field]) === 1,
+                'zk-table__cell--danger':  isAvgLatency(field, data[column.field][field]) === 2,
+              }"
+            >
+              {{ data[column.field][field] }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
 </template>
+
 <script>
-import { pull } from "lodash-es";
-import { TablesApi } from "@/apis";
+import { pull } from 'lodash-es';
+import { TablesApi } from '@/apis';
+
 export default {
   data() {
-    return {
-      tableData: [],
-    };
+    return { tableData: [] };
   },
   computed: {
     data() {
-      const { tableData } = this;
       const newData = {};
-      tableData.forEach((item) => {
+      this.tableData.forEach((item) => {
         newData[item.host] = item;
       });
       return newData;
     },
     fields() {
-      const { tableData } = this;
-      if (tableData.length > 0) {
-        return pull(Object.keys(tableData[0]), "host");
-      }
+      if (this.tableData.length === 0) return [];
+      return pull(Object.keys(this.tableData[0]), 'host');
     },
     columns() {
-      const { tableData } = this;
-      const cols = [];
-      tableData.forEach(({ host }) => {
-        cols.push({
-          field: host,
-          label: host
-        })
-      });
-      return cols;
+      return this.tableData.map(({ host }) => ({ field: host, label: host }));
     },
   },
   mounted() {
@@ -69,32 +70,95 @@ export default {
   },
   methods: {
     async fetchData() {
-      const {
-        data: { entity },
-      } = await TablesApi.zkStatus(this.$route.params.id);
-      this.tableData = Object.freeze(entity);
+      const { data: { entity } } = await TablesApi.zkStatus(this.$route.params.id);
+      this.tableData = Object.freeze(entity || []);
     },
     isAvgLatency(field, value) {
-      if (field === 'avg_latency') {
-        const num = Number(value);
-        if (num > 30) return 2;
-        if (num > 10) return 1;
-      }
+      if (field !== 'avg_latency') return 0;
+      const num = Number(value);
+      if (num > 30) return 2;
+      if (num > 10) return 1;
       return 0;
-    }
+    },
   },
 };
 </script>
 
 <style lang="scss" scoped>
- .reverse-table tr td:first-child {
-    background-color: #f8f8f9;
+.zk-table {
+  padding: var(--s-3) 0 var(--s-6);
+
+  &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-3);
+    margin-bottom: var(--s-3);
   }
-  // 添加样式规则
-.cell-warning {
-  background-color: #faecd8 !important;
-}
-.cell-danger {
-  background-color: #fde2e2 !important;
+
+  &__title {
+    font-size: var(--fs-md);
+    font-weight: var(--fw-semibold);
+    color: var(--c-text-primary);
+    margin: 0;
+    line-height: var(--lh-tight);
+  }
+
+  &__board {
+    background: var(--c-surface-0);
+    border: 1px solid var(--c-surface-3);
+    border-radius: var(--r-lg);
+    overflow-x: auto;
+  }
+
+  &__grid {
+    width: 100%;
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__col-head,
+  &__field-head {
+    padding: var(--s-2) var(--s-3);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
+    color: var(--c-text-secondary);
+    text-align: center;
+    background: var(--c-surface-1);
+    border-bottom: 1px solid var(--c-surface-3);
+    white-space: nowrap;
+  }
+
+  &__field-cell {
+    padding: var(--s-2) var(--s-3);
+    font-size: var(--fs-sm);
+    color: var(--c-text-secondary);
+    background: var(--c-surface-1);
+    border-bottom: 1px solid var(--c-surface-3);
+    white-space: nowrap;
+  }
+
+  &__cell {
+    padding: var(--s-2) var(--s-3);
+    font-size: var(--fs-sm);
+    color: var(--c-text-primary);
+    text-align: center;
+    border-bottom: 1px solid var(--c-surface-3);
+
+    &--warning {
+      background-color: var(--c-warning-bg);
+      color: var(--c-warning-fg);
+    }
+
+    &--danger {
+      background-color: var(--c-danger-bg);
+      color: var(--c-danger-fg);
+    }
+  }
+
+  &__grid tr:last-child &__cell,
+  &__grid tr:last-child &__field-cell {
+    border-bottom: 0;
+  }
 }
 </style>

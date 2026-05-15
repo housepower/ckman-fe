@@ -1,26 +1,40 @@
 <template>
-  <div class="table-metric pb-20">
-    <div class="title flex flex-between flex-vcenter ptb-10 pull-left">
-      <span class="fs-20 font-bold mr-10 tab-item" :class="{ active: activeTab === 'table' }" @click="switchTab('table')">
-        {{ $t('tables.Table Metrics') }}
-      </span>
-      <span class="fs-20 font-bold mr-10">|</span>
-      <span class="fs-20 font-bold mr-10 tab-item" :class="{ active: activeTab === 'vm' }" @click="switchTab('vm')">
-        {{ $t('tables.Vm Metrics') }}
-      </span>
-      <time-filter v-model="timeFilter" ref="timeFilter" localKey="tableMetricsTimeFilter"
-        :refreshDuration.sync="refresh" @input="timeFilterChange" @on-refresh="timeFilterRefresh" />
+  <section class="table-metric">
+    <div class="table-metric__head">
+      <div class="table-metric__title-group">
+        <div class="metric-toggle">
+          <button
+            class="metric-toggle__item"
+            :class="{ 'metric-toggle__item--active': activeTab === 'table' }"
+            @click="switchTab('table')"
+          >{{ $t('tables.Table Metrics') }}</button>
+          <button
+            class="metric-toggle__item"
+            :class="{ 'metric-toggle__item--active': activeTab === 'vm' }"
+            @click="switchTab('vm')"
+          >{{ $t('tables.Vm Metrics') }}</button>
+        </div>
+        <time-filter v-model="timeFilter" ref="timeFilter" localKey="tableMetricsTimeFilter"
+          :refreshDuration.sync="refresh" @input="timeFilterChange" @on-refresh="timeFilterRefresh" />
+      </div>
+      <div class="table-metric__controls">
+        <el-input
+          v-model="searchKey"
+          size="small"
+          :placeholder="$t('common.keyword search')"
+          suffix-icon="el-icon-search"
+          class="table-metric__search"
+        />
+        <el-button
+          size="small"
+          plain
+          icon="el-icon-refresh"
+          @click="fetchData(true)"
+        >{{ $t('common.Refresh') }}</el-button>
+      </div>
     </div>
-    <vxe-toolbar zoom custom class="pull-right">
-      <template #buttons>
-        <el-input size="medium" :placeholder="$t('common.keyword search')" v-model="searchKey" class="width-250 mr-10"
-          suffix-icon="el-icon-search"></el-input>
-        <el-button size="mini" @click="fetchData(true)" circle icon="el-icon-refresh" class="fs-16 fc-black"
-          style="border-color: #dcdfe6;"></el-button>
-      </template>
-    </vxe-toolbar>
 
-    <vxe-table style="clear: both;" ref="xTable" v-bind="gridOptions" :columns="columns" :data="currentPageData"
+    <vxe-table ref="xTable" v-bind="gridOptions" :columns="columns" :data="currentPageData"
       @sort-change="sortChangeEvent">
       <vxe-column v-for="{ prop, label, minWidth, fixed, filters } of columns" :key="prop" :fixed="fixed" sortable
         :field="prop" :title="label" :filters="filters || null" :min-width="minWidth || 140">
@@ -56,16 +70,15 @@
       :page-sizes="pagination.pageSizes" :total="pagination.total"
       :layouts="['PrevPage', 'JumpNumber', 'NextPage', 'FullJump', 'Sizes', 'Total']" @page-change="handlePageChange">
     </vxe-pager>
-  </div>
-
+  </section>
 </template>
 <script>
 import { TablesApi } from "@/apis";
 import { $modal } from "@/services";
-import { SqlCodeMirror } from '@/components/';
 import { byteConvert } from '@/helpers/';
 import { percentiles } from '@/helpers/';
 import TablePartitionsComponent from './tablePartitions.vue';
+import ViewSchemaDialog from './viewSchemaDialog.vue';
 import ArchiveModal from './ArchiveModal.vue';
 import TaskDetail from '@/views/task/components/TaskDetail.vue';
 import store from '@/store';
@@ -87,21 +100,15 @@ export default {
         currentPage: 1
       },
       gridOptions: {
-        border: true,
+        border: false,
         resizable: true,
         showHeaderOverflow: true,
         showOverflow: true,
         highlightHoverRow: true,
         height: 550,
         rowId: 'tableName',
-        toolbarConfig: {
-          zoom: true,
-          custom: true
-        },
         sortConfig: {
           trigger: 'cell',
-        },
-        filterConfig: {
         },
       }
     };
@@ -351,16 +358,17 @@ export default {
       });
 
       await $modal({
-        component: SqlCodeMirror,
+        component: ViewSchemaDialog,
         props: {
-          title: this.$t("tables.Schema"),
-          width: 800,
+          title: `${this.$t("tables.Schema")} · ${key}`,
+          width: 880,
           customClass: 'sql-code-mirror-modal',
-          cancelText: this.$t("common.Cancel"),
-          okText: this.$t("common.Confirm"),
+          cancelText: null,
+          okText: this.$t("common.Close"),
         },
         data: {
           sql: create_table_query,
+          tableName: key,
         },
       });
     },
@@ -413,7 +421,7 @@ export default {
       $modal({
         component: TablePartitionsComponent,
         props: {
-          title: this.$t("tables.Partitions"),
+          title: this.$t("tables.Partition Management"),
           width: 800,
           cancelText: null,
           okText: null,
@@ -432,7 +440,32 @@ export default {
 
 <style lang="scss">
 .table-metric {
-  border-bottom: 1px solid var(--color-gray);
+  padding: var(--s-3) 0 var(--s-6);
+
+  &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-3);
+    margin-bottom: var(--s-3);
+    flex-wrap: wrap;
+  }
+
+  &__title-group {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+  }
+
+  &__controls {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+
+  &__search {
+    width: 240px;
+  }
 }
 
 .sql-code-mirror-modal .el-dialog__body {
@@ -443,41 +476,35 @@ export default {
   }
 }
 
-.tab-item {
-  cursor: pointer;
-  color: #000;
-  transition: all 0.3s;
-  position: relative;
+.metric-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-4);
+  margin-right: var(--s-4);
+  border-bottom: 1px solid transparent;
 
-  &.active {
-    color: var(--primary-color);
+  &__item {
+    appearance: none;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    padding: var(--s-2) var(--s-1);
+    font-size: var(--fs-md);
+    color: var(--c-text-secondary);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color var(--du-fast) var(--ease-out),
+                border-color var(--du-fast) var(--ease-out);
 
-    /* 改为金黄色 */
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: -5px;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: var(--primary-color);
-      /* 下划线也改为黄色 */
-      animation: underline 0.3s;
+    &:hover {
+      color: var(--c-text-primary);
     }
-  }
 
-  &:hover {
-    color: var(--c-primary-fg);
-  }
-}
-
-@keyframes underline {
-  from {
-    width: 0
-  }
-
-  to {
-    width: 100%
+    &--active {
+      color: var(--c-text-primary);
+      font-weight: var(--fw-semibold);
+      border-bottom-color: var(--c-primary-solid);
+    }
   }
 }
 </style>

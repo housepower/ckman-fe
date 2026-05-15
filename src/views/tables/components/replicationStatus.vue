@@ -1,51 +1,77 @@
 <template>
-  <div class="table-merges pb-20">
-    <div class="title flex flex-between flex-vcenter ptb-10 pull-left">
-      <span class="fs-20 font-bold mr-10">{{$t('tables.Table Replication Status')}}</span>
-      <time-filter v-model="timeFilter"
+  <section class="replication">
+    <div class="replication__head">
+      <div class="replication__title-group">
+        <h3 class="replication__title">{{ $t('tables.Table Replication Status') }}</h3>
+        <time-filter
+          v-model="timeFilter"
           ref="timeFilter"
           localKey="tableMetricsTimeFilter"
           :refreshDuration.sync="refresh"
-          @input="timeFilterChange"
-          @on-refresh="timeFilterRefresh" />
+          @input="fetchData"
+          @on-refresh="fetchData"
+        />
+      </div>
+      <div class="replication__controls">
+        <el-input
+          v-model="searchKey"
+          size="small"
+          :placeholder="$t('common.keyword search')"
+          suffix-icon="el-icon-search"
+          class="replication__search"
+        />
+        <el-button
+          size="small"
+          plain
+          icon="el-icon-refresh"
+          @click="fetchData"
+        >{{ $t('common.Refresh') }}</el-button>
+      </div>
     </div>
-    <vxe-toolbar zoom custom class="pull-right">
-      <template #buttons>
-        <el-input size="medium" :placeholder="$t('common.keyword search')" v-model="searchKey" class="width-250 mr-10" suffix-icon="el-icon-search"></el-input>
-        <el-button size="mini" @click="fetchData()" circle icon="el-icon-refresh" class="fs-16 fc-black" style="border-color: #dcdfe6;"></el-button>
-      </template>
-    </vxe-toolbar>
 
     <vxe-table
-      style="clear: both;"
       ref="xTable"
-      v-bind="gridOptions"
-      :columns="columns"
+      v-loading="loading"
       :data="currentPageData"
+      :border="false"
+      align="center"
+      resizable
+      show-header-overflow
+      show-overflow
+      highlight-hover-row
+      :sort-config="{ trigger: 'cell' }"
+      height="550"
       @sort-change="sortChangeEvent"
     >
       <vxe-column
-        v-for="{ prop, label, minWidth, fixed, filters } of columns"
+        v-for="{ prop, label, minWidth, fixed, align } of columns"
         :key="prop"
         :fixed="fixed"
-        sortable
         :field="prop"
         :title="label"
-        :filters="filters || null"
-        :min-width="minWidth || 140">
-        
+        :min-width="minWidth || 140"
+        :align="align || 'center'"
+        sortable
+      >
         <template slot-scope="{ row, column }">
-          <span v-if="column.property === 'progress'" :class="getProgressClass(row[column.property])">{{ formatProgress(row[column.property]) }}</span>
-          <span v-else-if="['queue_size', 'merges', 'inserts', 'log_pointer'].includes(column.property)">
-            {{ percentiles(row[column.property]) }}
-            <el-button 
-              v-if="column.property === 'queue_size' && row[column.property] > 0"
-              class="ml-4" 
-              type="text"
-              @click="handleViewQueue(row)">
-              {{$t('tables.View')}}
-            </el-button>
+          <span
+            v-if="column.property === 'progress'"
+            class="replication__progress"
+            :class="progressClass(row[column.property])"
+          >
+            {{ formatProgress(row[column.property]) }}
           </span>
+          <a
+            v-else-if="column.property === 'queue_size' && row[column.property] > 0"
+            href="javascript:void(0)"
+            class="replication__num replication__num--link"
+            :title="$t('tables.View')"
+            @click="handleViewQueue(row)"
+          >{{ percentiles(row[column.property]) }}</a>
+          <span
+            v-else-if="['queue_size', 'merges', 'inserts', 'log_pointer'].includes(column.property)"
+            class="replication__num"
+          >{{ percentiles(row[column.property]) }}</span>
           <span v-else>{{ row[column.property] }}</span>
         </template>
       </vxe-column>
@@ -57,18 +83,16 @@
       :page-sizes="pagination.pageSizes"
       :total="pagination.total"
       :layouts="['PrevPage', 'JumpNumber', 'NextPage', 'FullJump', 'Sizes', 'Total']"
-      @page-change="handlePageChange">
-    </vxe-pager>
-  </div>
-
+      @page-change="handlePageChange"
+    />
+  </section>
 </template>
-<script>
 
-import { $modal } from "@/services";
-import { TablesApi } from "@/apis";
-import { byteConvert } from '@/helpers/';
+<script>
+import { $modal } from '@/services';
+import { TablesApi } from '@/apis';
 import { percentiles } from '@/helpers/';
-import ReplicatedQueueComponent from "./replicatedQueue.vue";
+import ReplicatedQueueComponent from './replicatedQueue.vue';
 
 export default {
   data() {
@@ -79,236 +103,169 @@ export default {
       loading: false,
       searchKey: '',
       sort: {},
-      tableData:[],
+      tableData: [],
       pagination: {
         total: 0,
         pageSize: 10,
-        pageSizes: [10, 15, 20, 50, 100, 200, 500, 1000],
-        currentPage: 1
+        pageSizes: [10, 20, 50, 100, 200, 500, 1000],
+        currentPage: 1,
       },
-      gridOptions: {
-        border: true,
-        resizable: true,
-        showHeaderOverflow: true,
-        showOverflow: true,
-        highlightHoverRow: true,
-        height: 550,
-        toolbarConfig: {
-          zoom: true,
-          custom: true
-        },
-        sortConfig: {
-          trigger: 'cell',
-        },
-        filterConfig: {
-        },
-      }
     };
   },
   watch: {
     'listData.length'(len) {
       this.pagination.currentPage = 1;
       this.pagination.total = len;
-    }
+    },
   },
   computed: {
     columns() {
-      let columns = [
-        {
-          prop: "table",
-          label: this.$t('tables.Table Name'),
-          minWidth: 300,
-          fixed: 'left',
-          sortable: true
-        },
-        {
-          prop: "node",
-          label: this.$t('session.Node Host'),
-          width: 100,
-          sortable: true
-        },
-        {
-          prop: "shard_replica",
-          label: this.$t('tables.Shard Replica'),
-          width: 80,
-          sortable: true
-        },
-        {
-          prop: "queue_size",
-          label: this.$t('tables.QueueSize'),
-          width: 120,
-          sortable: true
-        },
-        {
-          prop: "inserts",
-          label: this.$t('tables.Inserts In Queue'),
-          width: 120,
-          sortable: true
-        },
-        {
-          prop: "merges",
-          label: this.$t('tables.Merges In Queue'),
-          minWidth: 120,
-          sortable: true
-        },
-        {
-          prop: "log_pointer",
-          label: this.$t('tables.Log Pointer'),
-          minWidth: 120,
-          sortable: true
-        },
-        {
-          prop: "progress",
-          label: this.$t('tables.Progress'),
-          minWidth: 80,
-          sortable: true
-        },
+      return [
+        { prop: 'table',         label: this.$t('tables.Table Name'),       minWidth: 280, fixed: 'left' },
+        { prop: 'node',          label: this.$t('session.Node Host'),       minWidth: 120 },
+        { prop: 'shard_replica', label: this.$t('tables.Shard Replica'),    minWidth: 110 },
+        { prop: 'queue_size',    label: this.$t('tables.QueueSize'),        minWidth: 140, align: 'right' },
+        { prop: 'inserts',       label: this.$t('tables.Inserts In Queue'), minWidth: 130, align: 'right' },
+        { prop: 'merges',        label: this.$t('tables.Merges In Queue'),  minWidth: 130, align: 'right' },
+        { prop: 'log_pointer',   label: this.$t('tables.Log Pointer'),      minWidth: 130, align: 'right' },
+        { prop: 'progress',      label: this.$t('tables.Progress'),         minWidth: 100 },
       ];
-      return columns
     },
     listData() {
       const { searchKey, sort: { property, order } } = this;
-      const result = this.tableData
-        ?.filter(x => {
-          let flag = true;
-          if (!x.table?.includes(searchKey)) {
-            flag = false;
-          }
-          return flag;
-        }).sort((prev, next) => {
-          const type = typeof prev[property];
-          if (type === 'number') {
-            const flag = prev[property] - next[property];
-            if (order === 'asc') {
-              return flag;
-            } else if (order === 'desc') {
-              return -flag;
-            }
-          } else if (type === 'string') {
-            let flag;
-            if(prev[property].length === next[property].length){
-              flag = prev[property].localeCompare(next[property]);
-            } else{
-              flag = prev[property].length - next[property].length;
-            }
-            if (order === 'asc') {
-              return flag;
-            } else if (order === 'desc') {
-              return -flag;
-            }
-          }
-        })
-      return result;
+      const filtered = (this.tableData || []).filter((x) =>
+        x.table ? x.table.includes(searchKey) : false,
+      );
+      if (!property || !order) return filtered;
+      const sorted = filtered.slice();
+      sorted.sort((a, b) => {
+        const av = a[property];
+        const bv = b[property];
+        let flag = 0;
+        if (typeof av === 'number' && typeof bv === 'number') {
+          flag = av - bv;
+        } else {
+          const as = String(av ?? '');
+          const bs = String(bv ?? '');
+          flag = as.length === bs.length ? as.localeCompare(bs) : as.length - bs.length;
+        }
+        return order === 'asc' ? flag : -flag;
+      });
+      return sorted;
     },
     currentPageData() {
-      const { pagination: { currentPage, pageSize } } = this;
-      return this.listData?.slice((currentPage - 1)*pageSize, currentPage*pageSize);
+      const { currentPage, pageSize } = this.pagination;
+      return this.listData.slice((currentPage - 1) * pageSize, currentPage * pageSize);
     },
   },
   created() {
-    const { id: clusterName } = this.$route.params;
-    this.clusterName = clusterName;
+    this.clusterName = this.$route.params.id;
     this.fetchData();
   },
   methods: {
-    byteConvert: byteConvert,
-    percentiles: percentiles,
-    handleViewQueue(row){
-      console.log("row", row)
+    percentiles,
+    handleViewQueue(row) {
       const { clusterName } = this;
       const { table, node, last_exception } = row;
-      console.log("lastException", last_exception)
       $modal({
         component: ReplicatedQueueComponent,
         props: {
-          title: this.$t("tables.Replicated Queue"),
+          title: this.$t('tables.Replicated Queue'),
           width: 800,
           cancelText: null,
           okText: null,
         },
-        data: {
-          clusterName, 
-          table, 
-          node,
-          last_exception,
-        },
+        data: { clusterName, table, node, last_exception },
       });
     },
     formatProgress(value) {
-      let valueStr = value.toString();
-      let decimalIndex = valueStr.indexOf('.');
-      if (decimalIndex !== -1) {
-       valueStr = valueStr.substring(0, decimalIndex + 3);
-      }
-      return valueStr + '%';
+      const str = value.toString();
+      const dot = str.indexOf('.');
+      const trimmed = dot !== -1 ? str.substring(0, dot + 3) : str;
+      return trimmed + '%';
     },
-    getProgressClass(value) {
-      if (value < 60) {
-        return 'progress-red';
-      } else if (value >= 60 && value < 90) {
-        return 'progress-yellow';
-      } else {
-        return 'progress-green';
-      }
+    progressClass(value) {
+      if (value < 60) return 'replication__progress--danger';
+      if (value < 90) return 'replication__progress--warning';
+      return 'replication__progress--success';
     },
     async fetchData() {
       this.loading = true;
-      const { clusterName } = this;
-      const {
-        data: { entity },
-      } = await TablesApi.replicationStatus(clusterName).finally(() => this.loading = false);
-      
-      this.tableData = Object.freeze(entity);
-      if (!$.isEmptyObject(this.tableData)) {
-        this.pagination.total = this.tableData.length;
-      }
+      const { data: { entity } } = await TablesApi.replicationStatus(this.clusterName)
+        .finally(() => (this.loading = false));
+      this.tableData = Object.freeze(entity || []);
+      this.pagination.total = this.tableData.length;
     },
-
-    sortChangeEvent(ctx) {
-      const { property, order } = ctx;
-      this.sort = {
-        property,
-        order
-      };
+    sortChangeEvent({ property, order }) {
+      this.sort = { property, order };
     },
-
     handlePageChange(pager) {
       this.pagination.currentPage = pager.currentPage;
-    },
-
-    timeFilterChange() {
-      this.fetchData();
-    },
-    timeFilterRefresh() {
-      this.fetchData();
     },
   },
 };
 </script>
 
-<style lang="scss">
-.table-metric {
-  border-bottom: 1px solid var(--color-gray);
-}
+<style lang="scss" scoped>
+.replication {
+  padding: var(--s-3) 0 var(--s-6);
 
-.sql-code-mirror-modal .el-dialog__body {
-  padding: 0 5px 8px 5px !important;
-
-  .CodeMirror {
-    height: 400px;
+  &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-3);
+    margin-bottom: var(--s-3);
+    flex-wrap: wrap;
   }
-}
 
+  &__title-group {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+  }
 
-.progress-red {
-  color: red;
-}
+  &__title {
+    font-size: var(--fs-md);
+    font-weight: var(--fw-semibold);
+    color: var(--c-text-primary);
+    margin: 0;
+    line-height: var(--lh-tight);
+  }
 
-.progress-yellow {
-  color: #d4b433;
-}
+  &__controls {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
 
-.progress-green {
-  color: green;
+  &__search {
+    width: 240px;
+  }
+
+  &__progress {
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--fw-medium);
+
+    &--success { color: var(--c-success-fg); }
+    &--warning { color: var(--c-warning-fg); }
+    &--danger  { color: var(--c-danger-fg); }
+  }
+
+  &__num {
+    font-variant-numeric: tabular-nums;
+
+    &--link {
+      color: var(--c-primary-solid);
+      text-decoration: none;
+      cursor: pointer;
+      border-bottom: 1px dashed transparent;
+      transition: border-color var(--du-fast) var(--ease-out);
+
+      &:hover {
+        border-bottom-color: var(--c-primary-solid);
+      }
+    }
+  }
 }
 </style>
