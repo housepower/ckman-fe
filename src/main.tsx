@@ -26,7 +26,7 @@ import zhLocale from 'element-ui/lib/locale/lang/zh-CN';
 import ElementLocale from 'element-ui/lib/locale';
 
 // 根据当前语言设置 Element UI locale
-const currentLocale = localStorage.getItem('locale') || 'en';
+const currentLocale = localStorage.getItem('locale') || 'zh';
 ElementLocale.use(currentLocale === 'zh' ? zhLocale : enLocale);
 
 Vue.use(ElementUI);

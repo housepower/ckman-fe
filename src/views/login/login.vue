@@ -1,23 +1,31 @@
 <template>
   <main class="login">
+    <div class="login__lang">
+      <el-select v-model="$i18n.locale" size="mini">
+        <el-option value="en" label="English" />
+        <el-option value="zh" label="中文" />
+      </el-select>
+    </div>
     <section class="container flex-center flex-column">
       <section>
-        <h1 class="fs-24">Click House</h1>
-        <h3 class="fs-20">Management Console</h3>
+        <h1 class="login__brand">
+          <img class="login__brand-icon" src="/favicon.ico" alt="" />
+          <span class="login__brand-text">{{ $t('login.Brand') }}</span>
+        </h1>
         <el-form :model="info"
                  status-icon
                  :rules="rules"
                  ref="Form"
                  label-width="80px"
                  class="pt-15">
-          <el-form-item label="User"
+          <el-form-item :label="$t('login.User')"
                         prop="user">
             <el-input type="text"
                       v-model="info.user"
                       autocomplete="off"
                       class="width-300"></el-input>
           </el-form-item>
-          <el-form-item label="Password"
+          <el-form-item :label="$t('login.Password')"
                         prop="pass">
             <el-input :type="isPasswordType ? 'password' : 'text'"
                       v-model="info.pass"
@@ -29,10 +37,10 @@
           <el-button type="primary"
                      @click.prevent="login"
                      native-type="submit"
-                     class="width-full">Login</el-button>
+                     class="width-full">{{ $t('login.Login') }}</el-button>
         </el-form>
       </section>
-      <p style="position: absolute; bottom: -50px">Copyright © 2016-2020 上海擎创信息技术有限公司</p>
+      <p style="position: absolute; bottom: -50px">{{ $t('login.Copyright', { year: currentYear }) }}</p>
     </section>
   </main>
 </template>
@@ -44,16 +52,17 @@ export default {
   data() {
     return {
       isPasswordType: true,
+      currentYear: new Date().getFullYear(),
       info: {
         pass: "",
         user: "",
       },
       rules: {
         pass: [
-          { required: true, message: "Please input password", trigger: "blur" },
+          { required: true, message: this.$t('login.Password Required'), trigger: "blur" },
         ],
         user: [
-          { required: true, message: "Please input user", trigger: "blur" },
+          { required: true, message: this.$t('login.User Required'), trigger: "blur" },
         ],
       },
       redirect: "/home",
@@ -87,32 +96,79 @@ export default {
   bottom: 0;
   right: 0;
   height: 100vh;
-  background: #cccccc52;
+  background: #f7f8fa;
+  overflow: hidden;
+
+  &__lang {
+    position: absolute;
+    top: 16px;
+    right: 24px;
+    z-index: 2;
+    width: 100px;
+  }
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+  }
+
+  &::before {
+    width: 520px;
+    height: 520px;
+    top: -180px;
+    left: -160px;
+    background: radial-gradient(circle, rgba(201, 161, 0, 0.30) 0%, rgba(201, 161, 0, 0) 70%);
+  }
+
+  &::after {
+    width: 620px;
+    height: 620px;
+    bottom: -220px;
+    right: -200px;
+    background: radial-gradient(circle, rgba(201, 161, 0, 0.20) 0%, rgba(201, 161, 0, 0) 72%);
+  }
+
   .container {
     position: absolute;
     top: 50%;
     left: 50%;
     width: 450px;
     transform: translate3d(-50%, -50%, 0);
-    padding: 20px 10px;
+    padding: 32px 24px 20px;
     background: #fff;
-    border-radius: 3px;
-    box-shadow: 0 0.3em 3em rgba(0, 0, 0, 0.1), 0 0 0 2px rgb(255, 255, 255),
-      0.3em 0.3em 1em rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    box-shadow: 0 16px 40px -16px rgba(15, 23, 42, 0.18),
+                0 4px 12px -4px rgba(15, 23, 42, 0.08);
+  }
 
-    h1,
-    h3 {
-      line-height: 50px;
-      height: 50px;
-      border-bottom: 2px solid #ebeef5;
-      width: 100%;
-      text-align: center;
-    }
-    h3 {
-      height: 40px;
-      line-height: 40px;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.5);
-    }
+  &__brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 0 0 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #ebeef5;
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: #1f2530;
+    letter-spacing: 0.3px;
+  }
+
+  &__brand-icon {
+    width: 32px;
+    height: 30px;
+    flex: 0 0 auto;
+    display: block;
+  }
+
+  &__brand-text {
+    white-space: nowrap;
   }
 }
 </style>
