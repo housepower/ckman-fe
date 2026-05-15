@@ -8,9 +8,8 @@
       <div class="header-right flex flex-vcenter">
 
         <div class="flex flex-vcenter mr-15 pointer" @click="viewTaskList">
-          <i class="el-icon-bell fs-20 mr-5"></i>
-          <span class="fs-16">{{$t('layout.Message Center')}}</span>
-          <el-badge is-dot></el-badge>
+          <i class="fa fa-tasks fs-20 mr-5"></i>
+          <span class="fs-16">{{$t('task.Task List')}}</span>
         </div>
 
         <a href="/docs/ckman" target="_blank" class="flex flex-vcenter mr-15 pointer">
@@ -19,6 +18,13 @@
         </a>
 
         <router-link to="/swagger/index.html" target="_blank" class="fa fa-file-text-o fs-20 mr-15"><span class="fs-16 ml-5">{{$t('layout.API')}}</span></router-link>
+
+        <router-link to="/setting" class="fa fa-briefcase fs-20 pointer mr-15"><span class="fs-16 ml-5">{{$t('common.package')}}</span></router-link>
+
+        <el-select v-model="$i18n.locale" class="mr-15 width-100" size="mini">
+          <el-option value="en" label="English" />
+          <el-option value="zh" label="中文" />
+        </el-select>
 
         <el-dropdown class="pointer">
           <div class="flex flex-vcenter">
@@ -30,13 +36,6 @@
             <el-dropdown-item @click.native="logout">{{$t("common.Logout")}}</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
-  
-        <router-link to="/setting" class="fa fa-briefcase fs-20 pointer ml-15"><span class="fs-16 ml-5">{{$t('common.package')}}</span></router-link>
-
-        <el-select v-model="$i18n.locale" class="ml-10 width-100" size="mini">
-          <el-option value="en" label="English" />
-          <el-option value="zh" label="中文" />
-        </el-select>
       </div>
     </header>
 
