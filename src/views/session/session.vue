@@ -1,113 +1,91 @@
 <template>
-  <main class="settings">
-    <breadcrumb :data="['Clusters', $route.params.id, 'session']"></breadcrumb>
-    <section class="container">
-      <div class="total flex flex-end pb-10 flex-vcenter">
-        <!-- <div class="left flex-column flex-center ml-30">
-          <span class="fs-28 font-bold">36</span>
-          <span class="fs-18 font-bold">Total Open Sessions</span>
-        </div> -->
-      </div>
-      <div class="tables">
-        <h3 class="mb-10">{{$t('session.Open Sessions')}}</h3>
-        <session-table :list="openList" :clusterName="id" type="open" />
-        <div class="mb-10 mt-50" style="overflow: hidden;">
-          <div class="fs-18 font-bold pull-left">{{$t('session.DDL Queue')}}</div>
-        </div>
-        <session-table :list="ddlQueue" :clusterName="id" type="queue" />
-        <div class="mb-10 mt-50" style="overflow: hidden;">
-          <div class="fs-18 font-bold pull-left">{{$t('session.Slow Sessions')}}</div>
-          <div class="pull-right">
-            <time-filter v-model="timeFilter"
-              :refreshDuration.sync="refresh"
-              localKey="sessionTimeFilter"
-              @input="timeFilterChange"
-              @on-refresh="timeFilterRefresh" />
-            <label class="ml-20">{{$t('session.Limit Count')}}</label>
-            <el-input-number class="ml-10" placeholder="查询条数" @change="timeFilterRefresh" v-model="limit" size="small" :min="5" style="width:100px;"/>
-          </div>
-        </div>
-        <session-table :list="closeList" :clusterName="id" type="close" />
-      </div>
-    </section>
+  <main class="session-page">
+    <PageHeader
+      :crumb="[$t('layout.ClickHouse Management Console'), $route.params.id]"
+      :title="$t('home.Session')"
+    />
+    <div class="session-page__tabs">
+      <button
+        v-for="(tab, idx) in tabs"
+        :key="tab.key"
+        class="session-page__tab"
+        :class="{ 'session-page__tab--active': active === idx }"
+        @click="active = idx"
+      >
+        {{ $t(tab.label) }}
+      </button>
+    </div>
+    <div class="session-page__body">
+      <OpenSessions v-show="active === 0" />
+      <DdlQueue v-show="active === 1" />
+      <SlowSessions v-show="active === 2" />
+    </div>
   </main>
 </template>
+
 <script>
-import SessionTable from "./component/sessionTable";
-import { SessionApi } from "@/apis";
-import { convertTimeBounds } from "@/helpers";
-import { parseDurationBySplit } from '@/helpers';
+import OpenSessions from './component/openSessions.vue';
+import DdlQueue from './component/ddlQueue.vue';
+import SlowSessions from './component/slowSessions.vue';
+
 export default {
+  name: 'Session',
+  components: { OpenSessions, DdlQueue, SlowSessions },
   data() {
     return {
-      id: '',
-      refresh: null,
-      openList: [],
-      closeList: [],
-      ddlQueue: [],
-      timeFilter: ["now-7d", "now"],
-      limit: 10,
+      active: 0,
+      tabs: [
+        { key: 'open',  label: 'session.Open Sessions' },
+        { key: 'ddl',   label: 'session.DDL Queue' },
+        { key: 'slow',  label: 'session.Slow Sessions' },
+      ],
     };
   },
-  created() {
-    this.id = this.$route.params.id;
-  },
-  mounted() {
-    this.fetchData();
-  },
-  methods: {
-    async fetchData() {
-      const { id } = this;
-      const {
-        data: { entity: openList },
-      } = await SessionApi.open(id);
-      
-      this.openList = openList;
-
-      this.getDDLQueue();
-
-      this.getSlowSessionList();
-    },
-    async getDDLQueue() {
-      const {id} = this;
-      const {
-        data:{entity: ddlQueue},
-      } = await SessionApi.ddl_queue(id);
-
-      this.ddlQueue = ddlQueue;
-      this.ddlQueue = ddlQueue.map(x => {
-        x.queryDuration = parseDurationBySplit(x.queryDuration);
-        return x;
-      });
-    },
-    async getSlowSessionList() {
-      const { min, max } = convertTimeBounds(this.timeFilter);
-      const { limit, id } = this;
-      const {
-        data: { entity: closeList },
-      } = await SessionApi.close(id, {
-        limit,
-        start: parseInt(min / 1000),
-        end: parseInt(max / 1000),
-      });
-      this.closeList = closeList.map(x => {
-        x.queryDuration = parseDurationBySplit(x.queryDuration);
-        return x;
-      });
-    },
-    timeFilterRefresh() {
-      this.getSlowSessionList();
-    },
-    timeFilterChange() {
-      this.getSlowSessionList();
-    }
-  },
-  components: { SessionTable },
 };
 </script>
 
 <style lang="scss" scoped>
-.total {
-  // border-bottom: 1px solid #eaeef4;
+.session-page {
+  padding-bottom: var(--s-8);
+
+  &__tabs {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    gap: var(--s-5);
+    border-bottom: 1px solid var(--c-surface-3);
+    background: var(--c-surface-1);
+    margin: 0 calc(-1 * var(--s-5));
+    padding: 0 var(--s-5);
+  }
+
+  &__tab {
+    appearance: none;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    padding: var(--s-2) var(--s-1);
+    font-size: var(--fs-md);
+    color: var(--c-text-secondary);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color var(--du-fast) var(--ease-out),
+                border-color var(--du-fast) var(--ease-out);
+
+    &:hover {
+      color: var(--c-text-primary);
+    }
+
+    &--active {
+      color: var(--c-text-primary);
+      font-weight: var(--fw-semibold);
+      border-bottom-color: var(--c-primary-solid);
+    }
+  }
+
+  &__body {
+    margin-top: var(--s-3);
+  }
 }
 </style>
