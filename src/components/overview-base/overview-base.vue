@@ -25,6 +25,14 @@
             class="chart-card"
           >
             <p class="chart-card__title">{{ $t('ClickHouseEcharts.' + item.expect) }}</p>
+            <button
+              v-if="item.option && !item.isEmpty"
+              class="chart-card__expand"
+              :title="$t('home.Fullscreen')"
+              @click="openExpand(gIndex, mIndex)"
+            >
+              <i class="fa fa-expand"></i>
+            </button>
             <div class="chart-card__body">
               <vue-echarts
                 v-if="item.option && !item.isEmpty"
@@ -54,6 +62,31 @@
       :description="$t('home.Metrics unavailable hint')"
       icon-class="el-icon-data-analysis"
     />
+
+    <transition name="chart-expand-fade">
+      <div
+        v-if="expanded"
+        class="chart-expand"
+        @click.self="closeExpand"
+      >
+        <div class="chart-expand__panel">
+          <header class="chart-expand__head">
+            <span class="chart-expand__title">{{ expandedTitle }}</span>
+            <button class="chart-expand__close" :title="$t('common.Close')" @click="closeExpand">
+              <i class="fa fa-times"></i>
+            </button>
+          </header>
+          <div class="chart-expand__body">
+            <vue-echarts
+              v-if="expandedOption"
+              ref="ExpandedChart"
+              :option="expandedOption"
+              theme="ckman"
+            />
+          </div>
+        </div>
+      </div>
+    </transition>
   </section>
 </template>
 <script>
@@ -93,11 +126,25 @@ export default {
         g.metrics.every(m => m.isEmpty === true)
       );
     },
+    expandedMetric() {
+      if (!this.expanded) return null;
+      const { gi, mi } = this.expanded;
+      return this.chartMetrics[gi] && this.chartMetrics[gi].metrics[mi];
+    },
+    expandedOption() {
+      return this.expandedMetric && this.expandedMetric.option;
+    },
+    expandedTitle() {
+      return this.expandedMetric
+        ? this.$t('ClickHouseEcharts.' + this.expandedMetric.expect)
+        : '';
+    },
   },
   data() {
     return {
       chartMetrics: [],
       activeGroupIndex: 0,
+      expanded: null, // { gi, mi } or null
     };
   },
   mounted() {
@@ -108,6 +155,11 @@ export default {
       };
     });
     this.fetchData();
+    document.addEventListener('keydown', this.onKeydown);
+  },
+  beforeDestroy() {
+    document.removeEventListener('keydown', this.onKeydown);
+    document.body.style.overflow = '';
   },
   watch: {
     timeFilter() {
@@ -160,6 +212,21 @@ export default {
       });
     },
     mousemove(params, $event) { },
+    openExpand(gi, mi) {
+      this.expanded = { gi, mi };
+      document.body.style.overflow = 'hidden';
+      this.$nextTick(() => {
+        const c = this.$refs.ExpandedChart;
+        if (c && c.refreshChart) c.refreshChart();
+      });
+    },
+    closeExpand() {
+      this.expanded = null;
+      document.body.style.overflow = '';
+    },
+    onKeydown(e) {
+      if (e.key === 'Escape' && this.expanded) this.closeExpand();
+    },
   },
 };
 </script>
@@ -215,6 +282,7 @@ export default {
 }
 
 .chart-card {
+  position: relative;
   background: var(--c-surface-0);
   border: 1px solid var(--c-surface-3);
   border-radius: var(--r-lg);
@@ -222,6 +290,35 @@ export default {
   display: flex;
   flex-direction: column;
   min-height: 320px;
+
+  &:hover &__expand {
+    opacity: 1;
+  }
+
+  &__expand {
+    position: absolute;
+    top: var(--s-2);
+    right: var(--s-2);
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 0;
+    border-radius: var(--r-sm);
+    color: var(--c-text-tertiary);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity var(--du-fast) var(--ease-out),
+                background-color var(--du-fast) var(--ease-out),
+                color var(--du-fast) var(--ease-out);
+
+    &:hover {
+      background: var(--c-surface-2);
+      color: var(--c-primary-solid);
+    }
+  }
 
   &__title {
     font-size: var(--fs-sm);
@@ -269,5 +366,86 @@ export default {
   .chart-grid {
     grid-template-columns: 1fr;
   }
+}
+
+// 全屏 overlay
+.chart-expand {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--s-5);
+  backdrop-filter: blur(2px);
+
+  &__panel {
+    width: min(1280px, 96vw);
+    height: min(820px, 92vh);
+    background: var(--c-surface-0);
+    border-radius: var(--r-lg);
+    box-shadow: 0 24px 48px -16px rgba(15, 23, 42, 0.32),
+                0 8px 16px -8px rgba(15, 23, 42, 0.16);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  &__head {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--s-3) var(--s-4);
+    border-bottom: 1px solid var(--c-surface-3);
+  }
+
+  &__title {
+    font-size: var(--fs-md);
+    font-weight: var(--fw-semibold);
+    color: var(--c-text-primary);
+  }
+
+  &__close {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 0;
+    border-radius: var(--r-sm);
+    color: var(--c-text-tertiary);
+    cursor: pointer;
+    transition: background-color var(--du-fast) var(--ease-out),
+                color var(--du-fast) var(--ease-out);
+
+    &:hover {
+      background: var(--c-surface-2);
+      color: var(--c-text-primary);
+    }
+  }
+
+  &__body {
+    flex: 1;
+    min-height: 0;
+    padding: var(--s-3) var(--s-4) var(--s-4);
+
+    .vue-echarts {
+      width: 100% !important;
+      height: 100% !important;
+    }
+  }
+}
+
+.chart-expand-fade-enter-active,
+.chart-expand-fade-leave-active {
+  transition: opacity var(--du-base) var(--ease-out);
+}
+
+.chart-expand-fade-enter,
+.chart-expand-fade-leave-to {
+  opacity: 0;
 }
 </style>
