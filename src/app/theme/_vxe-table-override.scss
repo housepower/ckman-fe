@@ -40,14 +40,90 @@
   }
 }
 
+// 空态：icon + 文案，统一品牌灰
+.vxe-table--empty-placeholder {
+  .vxe-table--empty-block {
+    padding: var(--s-8) var(--s-4);
+  }
+
+  .vxe-table--empty-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--s-2);
+    color: var(--c-text-tertiary);
+    font-size: var(--fs-sm);
+
+    &::before {
+      content: "\f01c"; // fa-inbox
+      font-family: FontAwesome;
+      font-size: 32px;
+      color: var(--c-text-disabled);
+      line-height: 1;
+      margin-bottom: var(--s-1);
+      opacity: 0.6;
+      -webkit-font-smoothing: antialiased;
+    }
+  }
+}
+
 // 分页器
 .vxe-pager {
-  font-size: var(--fs-base);
-  color: var(--c-text-secondary);
+  font-size: var(--fs-base) !important;
+  color: var(--c-text-secondary) !important;
+  background-color: transparent !important;
 
+  // 页码按钮 / 上下页 / 跳页按钮 通用样式
+  .vxe-pager--num-btn,
+  .vxe-pager--jump-prev,
+  .vxe-pager--jump-next,
+  .vxe-pager--prev-btn,
+  .vxe-pager--next-btn,
+  .vxe-pager--btn-wrapper .vxe-pager--prev-btn,
+  .vxe-pager--btn-wrapper .vxe-pager--next-btn {
+    color: var(--c-text-secondary) !important;
+    background-color: transparent !important;
+    border-color: transparent !important;
+    transition: color var(--du-fast) var(--ease-out),
+                background-color var(--du-fast) var(--ease-out);
+
+    &:hover:not(.is--disabled) {
+      color: var(--c-primary-solid) !important;
+      background-color: var(--c-surface-1) !important;
+    }
+
+    &.is--disabled {
+      color: var(--c-text-disabled) !important;
+      cursor: not-allowed;
+    }
+  }
+
+  // 选中的页码：白底 + 主色字 + 主色描边（避免黄底+蓝字的视觉冲突）
   .vxe-pager--num-btn.is--active {
-    background-color: var(--c-primary-solid);
-    color: var(--c-surface-0);
-    border-color: var(--c-primary-solid);
+    background-color: var(--c-surface-0) !important;
+    color: var(--c-primary-solid) !important;
+    border: 1px solid var(--c-primary-solid) !important;
+    font-weight: var(--fw-semibold);
+  }
+
+  // 跳页输入框
+  .vxe-pager--goto {
+    color: var(--c-text-primary) !important;
+    border-color: var(--c-surface-3) !important;
+    background-color: var(--c-surface-0) !important;
+
+    &:focus {
+      border-color: var(--c-primary-solid) !important;
+    }
+  }
+
+  // 每页条数下拉
+  .vxe-pager--sizes .vxe-select {
+    color: var(--c-text-primary);
+  }
+
+  // Total 文案
+  .vxe-pager--total {
+    color: var(--c-text-tertiary) !important;
   }
 }
