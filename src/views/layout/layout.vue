@@ -156,7 +156,10 @@ export default {
         this.user = entity.username;
         this.isAdmin = entity.policy === 'admin';
         this.$root.userInfo = entity;
-        localStorage.setItem('user', JSON.stringify(entity));
+        // Merge into existing localStorage record so the JWT token persists
+        // (the /user/me response does not carry a token).
+        const stored = JSON.parse(localStorage.getItem('user') || '{}');
+        localStorage.setItem('user', JSON.stringify({ ...stored, ...entity }));
       } catch (_e) {
         this.$router.push('/login');
       }
