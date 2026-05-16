@@ -55,6 +55,12 @@ export const $router = new Router({
           component: () => import('@/views/task/list.vue'),
         },
         {
+          path: 'users',
+          name: 'Users',
+          component: () => import('@/views/users/users.vue'),
+          meta: { requiresAdmin: true },
+        },
+        {
           path: '/clusters/:id',
           component: ChildViewHolder,
           redirect: '/clusters/:id/overview',
@@ -118,6 +124,21 @@ $router.beforeEach((to, from, next) => {
   } else {
     next();
   }
+});
+
+$router.beforeEach((to, _from, next) => {
+  if (to.matched.some(r => r.meta && r.meta.requiresAdmin)) {
+    let policy = '';
+    try {
+      policy = JSON.parse(localStorage.getItem('user') || '{}').policy || '';
+    } catch (_e) {
+      policy = '';
+    }
+    if (policy !== 'admin') {
+      return next({ path: '/home' });
+    }
+  }
+  next();
 });
 
 $router.afterEach(to => {
