@@ -21,6 +21,13 @@
 
         <router-link to="/setting" class="fa fa-briefcase fs-20 pointer mr-15"><span class="fs-16 ml-5">{{$t('common.package')}}</span></router-link>
 
+        <router-link
+          v-if="isAdmin"
+          to="/users"
+          class="fa fa-users fs-20 pointer mr-15">
+          <span class="fs-16 ml-5">{{ $t('common.users') }}</span>
+        </router-link>
+
         <el-select v-model="$i18n.locale" class="mr-15 width-100" size="mini">
           <el-option value="en" label="English" />
           <el-option value="zh" label="中文" />
@@ -33,7 +40,8 @@
                   class="fs-16 ml-5 user" />
           </div>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item @click.native="logout">{{$t("common.Logout")}}</el-dropdown-item>
+            <el-dropdown-item @click.native="openChangePassword">{{ $t('user.Change Password') }}</el-dropdown-item>
+            <el-dropdown-item @click.native="logout">{{ $t('common.Logout') }}</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
       </div>
@@ -68,8 +76,9 @@
 </template>
 <script>
 import { Menus, LoaderMenus } from "@/constants";
-import { PackageApi, ClusterApi } from "@/apis";
+import { PackageApi, ClusterApi, UserApi } from "@/apis";
 import { ConfigApi } from "@/apis/config";
+import { $modal } from "@/services";
 import ElementLocale from 'element-ui/lib/locale';
 import enLocale from 'element-ui/lib/locale/lang/en';
 import zhLocale from 'element-ui/lib/locale/lang/zh-CN';
@@ -84,11 +93,12 @@ export default {
       mode: '',
       currentMenu: '',
       timerId: null,
-      taskNum: null
+      taskNum: null,
+      isAdmin: false
     };
   },
-  mounted() {
-    this.user = JSON.parse(localStorage.getItem("user") || "{}").username;
+  async mounted() {
+    await this.refreshMe();
     this.fetchVersion();
   },
   methods: {
@@ -134,7 +144,32 @@ export default {
       this.$router.push({
         name: 'TaskList'
       });
-    }
+    },
+
+    async refreshMe() {
+      try {
+        const { data: { entity } } = await UserApi.me();
+        if (!entity || !entity.enabled) {
+          this.$router.push('/login');
+          return;
+        }
+        this.user = entity.username;
+        this.isAdmin = entity.policy === 'admin';
+        this.$root.userInfo = entity;
+        localStorage.setItem('user', JSON.stringify(entity));
+      } catch (_e) {
+        this.$router.push('/login');
+      }
+    },
+    openChangePassword() {
+      $modal({
+        component: () => import('@/views/users/modal/changePassword.vue'),
+        props: {
+          title: this.$t('user.Change Password'),
+          width: 440,
+        },
+      }).catch(() => { /* dialog cancelled */ });
+    },
   },
   created() {
     this.onChangeCluster();
