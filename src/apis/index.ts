@@ -8,3 +8,4 @@ export * from './session';
 export * from './task';
 export * from './dataManage';
 export * from './config';
+export * from './user';
