@@ -75,6 +75,9 @@ const messages = {
       'Force Override': 'Force Override',
       'Force Delete': 'Force Delete',
       'Help': 'Help',
+      'users': 'Users',
+      'Enable': 'Enable',
+      'Disable': 'Disable',
     },
     errors: {
       'Unknown': 'Unexpected error. Please contact the administrator.',
@@ -869,6 +872,30 @@ const messages = {
       'Form Reset': 'Form has been reset'
     },
 
+    user: {
+      'User Management': 'User Management',
+      'Add User': 'Add User',
+      'Edit User': 'Edit User',
+      'Reset Password': 'Reset Password',
+      'Change Password': 'Change Password',
+      'Username': 'Username',
+      'Role': 'Role',
+      'Enabled': 'Enabled',
+      'Created At': 'Created At',
+      'Old Password': 'Old Password',
+      'New Password': 'New Password',
+      'Confirm Password': 'Confirm Password',
+      'Username Rule': 'Username must start with a letter and be 3-32 chars (letters, digits, underscore)',
+      'Reserved Username': 'Reserved username, please choose another',
+      'Password Rule': 'Password ≥ 8 chars, ≥ 3 of: lowercase, uppercase, digit, special',
+      'Password Mismatch': 'Passwords do not match',
+      Policy: {
+        'admin': 'Admin',
+        'guest': 'Guest',
+        'ordinary': 'Ordinary',
+      },
+    },
+
   },
   zh: {
     ...zhCN,
@@ -937,6 +964,9 @@ const messages = {
       'Force Override': '强制覆盖',
       'Force Delete': '强制删除',
       'Help': '帮助',
+      'users': '用户',
+      'Enable': '启用',
+      'Disable': '禁用',
     },
     errors: {
       'Unknown': '未知错误，请联系管理员',
@@ -1722,6 +1752,30 @@ const messages = {
       'Preview Success': '查询预览请求已发送',
       'Export Success': '导出请求已发送',
       'Form Reset': '表单已重置'
+    },
+
+    user: {
+      'User Management': '用户管理',
+      'Add User': '新增用户',
+      'Edit User': '编辑用户',
+      'Reset Password': '重置密码',
+      'Change Password': '修改密码',
+      'Username': '用户名',
+      'Role': '角色',
+      'Enabled': '启用',
+      'Created At': '创建时间',
+      'Old Password': '旧密码',
+      'New Password': '新密码',
+      'Confirm Password': '确认密码',
+      'Username Rule': '用户名以字母开头，3-32 位（字母、数字、下划线）',
+      'Reserved Username': '保留用户名，请选择其他名称',
+      'Password Rule': '密码至少 8 位，包含大写、小写、数字、特殊字符中的至少 3 类',
+      'Password Mismatch': '两次输入的密码不一致',
+      Policy: {
+        'admin': '管理员',
+        'guest': '游客',
+        'ordinary': '普通用户',
+      },
     },
   },
 };
