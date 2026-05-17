@@ -20,6 +20,17 @@
         <span class="task-detail__label">{{ $t('task.Current Action') }}</span>
         <span class="task-detail__value">{{ detail.Option[lang] }}</span>
       </div>
+      <div v-if="hasStep" class="task-detail__field task-detail__field--wide">
+        <span class="task-detail__label">{{ $t('task.Current Step') }}</span>
+        <span class="task-detail__value task-detail__value--step">
+          <i
+            v-if="isLive"
+            class="task-detail__status-dot task-detail__status-dot--spin task-detail__step-dot"
+          ></i>
+          <i v-else class="task-detail__status-dot task-detail__step-dot"></i>
+          {{ detail.Step[lang] }}
+        </span>
+      </div>
     </div>
 
     <div v-if="detail" class="task-detail__progress">
@@ -63,6 +74,7 @@
     </div>
 
     <vxe-table
+      v-if="!hasStep"
       ref="xTable"
       class="task-detail__table"
       :data="currentPageData"
@@ -104,7 +116,7 @@
     </vxe-table>
 
     <vxe-pager
-      v-if="(detail && detail.NodeStatus || []).length > pagination.pageSize"
+      v-if="!hasStep && (detail && detail.NodeStatus || []).length > pagination.pageSize"
       align="right"
       :current-page="pagination.currentPage"
       :page-size.sync="pagination.pageSize"
@@ -142,6 +154,13 @@ export default {
   computed: {
     lang() {
       return this.$i18n.locale.toUpperCase();
+    },
+    // hasStep flags tasks whose progress is driven by a top-level Step (rebalance,
+    // archive) rather than the per-host NodeStatus matrix used by deploy/upgrade.
+    // When set, render the Step prominently and hide the per-host table since for
+    // these task types every host moves in lockstep and the table adds no info.
+    hasStep() {
+      return !!(this.detail?.Step?.EN);
     },
     currentPageData() {
       const { currentPage, pageSize } = this.pagination;
@@ -283,6 +302,18 @@ export default {
       font-family: var(--f-mono);
       font-size: var(--fs-sm);
     }
+
+    &--step {
+      color: var(--c-primary-fg);
+      font-weight: var(--fw-medium);
+      gap: var(--s-2);
+    }
+  }
+
+  &__step-dot {
+    background: var(--c-primary-solid);
+    color: var(--c-primary-solid);
+    flex-shrink: 0;
   }
 
   &__type-badge {
