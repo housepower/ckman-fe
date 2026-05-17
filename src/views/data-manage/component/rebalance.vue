@@ -91,6 +91,7 @@
 
 <script>
 import RebalanceInfoComponent from './rebalanceInfo.vue';
+import TaskDetail from '@/views/task/components/TaskDetail.vue';
 import { $modal } from "@/services";
 import { ClusterApi } from '@/apis';
 
@@ -186,25 +187,44 @@ export default {
     },
 
     onSubmit() {
-      this.$refs.rebalanceForm.validate((valid) => {
+      this.$refs.rebalanceForm.validate(async (valid) => {
         if (!valid) return;
         this.loading = true;
-        ClusterApi.rebalanceCluster({
-          clusterName: this.clusterName,
-          params: {
-            tables: [{
-              database: this.form.database,
-              table: this.form.table,
-              policy: this.form.policy,
-              shardingKey: this.form.policy === 'shardingkey' ? this.form.shardingKey : undefined,
-              allowLossRate: this.form.policy === 'shardingkey' ? this.form.allowLossRate : undefined,
-              saveTemps: this.form.saveTemps,
-            }],
-            except_max_shard: this.form.except_max_shard,
-          },
-          password: this.password,
-        }).finally(() => {
+        let taskId;
+        try {
+          const resp = await ClusterApi.rebalanceCluster({
+            clusterName: this.clusterName,
+            params: {
+              tables: [{
+                database: this.form.database,
+                table: this.form.table,
+                policy: this.form.policy,
+                shardingKey: this.form.policy === 'shardingkey' ? this.form.shardingKey : undefined,
+                allowLossRate: this.form.policy === 'shardingkey' ? this.form.allowLossRate : undefined,
+                saveTemps: this.form.saveTemps,
+              }],
+              except_max_shard: this.form.except_max_shard,
+            },
+            password: this.password,
+          });
+          taskId = resp?.data?.entity;
+        } finally {
           this.loading = false;
+        }
+        // shard == 1 时后端不会建任务，直接返回成功，taskId 为空
+        if (!taskId) return;
+        $modal({
+          component: TaskDetail,
+          props: {
+            title: this.$t('task.View Task'),
+            width: 800,
+            cancelText: this.$t('task.Close'),
+            okText: null,
+          },
+          data: {
+            taskId,
+            refresh: true,
+          },
         });
       });
     },
