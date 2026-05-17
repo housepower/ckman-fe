@@ -838,7 +838,12 @@ const messages = {
       'sectionTarget': 'TARGET',
       'sectionStrategy': 'STRATEGY',
       'sectionOptions': 'OPTIONS',
-      'description': 'Redistribute partitions across shards. Writes to the selected tables should be paused during the operation.'
+      'description': 'Redistribute partitions across shards. Writes to the selected tables should be paused during the operation.',
+      'No tables to display': 'No tables to display',
+      'Imbalance': 'Imbalance',
+      'Compressed': 'Compressed',
+      'Partitions': 'Partitions',
+      'Engine': 'Engine',
     },
 
     // Export Component Translations
@@ -1446,7 +1451,12 @@ const messages = {
       'sectionTarget': '目标表',
       'sectionStrategy': '均衡策略',
       'sectionOptions': '选项',
-      'description': '将分区数据在分片间重新分布。操作期间应暂停对所选表的写入。'
+      'description': '将分区数据在分片间重新分布。操作期间应暂停对所选表的写入。',
+      'No tables to display': '暂无可显示的表',
+      'Imbalance': '不均衡度',
+      'Compressed': '压缩后大小',
+      'Partitions': '分区数',
+      'Engine': '引擎',
     },
     // History Component Translations
     history: {
