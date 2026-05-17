@@ -48,6 +48,9 @@ export const ClusterApi = {
   rebalanceInfo({clusterName, params}){
     return axios.post(`${url}/rebalance_info/${clusterName}`, params);
   },
+  rebalancePlan({clusterName, params}) {
+    return axios.post(`${url}/rebalance_plan/${clusterName}`, params);
+  },
   rebalanceCluster({ clusterName, params, password }) {
     return axios.put(`${url}/rebalance/${clusterName}?password=${ password || '' }`, params);
   },

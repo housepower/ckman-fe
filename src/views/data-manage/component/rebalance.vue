@@ -91,6 +91,7 @@
 
 <script>
 import RebalanceInfoComponent from './rebalanceInfo.vue';
+import RebalancePlanPreview from './rebalancePlanPreview.vue';
 import TaskDetail from '@/views/task/components/TaskDetail.vue';
 import { $modal } from "@/services";
 import { ClusterApi } from '@/apis';
@@ -186,33 +187,82 @@ export default {
       });
     },
 
+    // Build the rebalance payload from the current form state. Shared by
+    // both the plan-preview fetch and the actual execute call so the two
+    // requests are guaranteed to describe the same operation.
+    buildRebalancePayload() {
+      return {
+        tables: [{
+          database: this.form.database,
+          table: this.form.table,
+          policy: this.form.policy,
+          shardingKey: this.form.policy === 'shardingkey' ? this.form.shardingKey : undefined,
+          allowLossRate: this.form.policy === 'shardingkey' ? this.form.allowLossRate : undefined,
+          saveTemps: this.form.saveTemps,
+        }],
+        except_max_shard: this.form.except_max_shard,
+      };
+    },
+
     onSubmit() {
       this.$refs.rebalanceForm.validate(async (valid) => {
         if (!valid) return;
+        const params = this.buildRebalancePayload();
+
+        // Step 1: fetch the plan preview. Failures here are real errors
+        // (network / 4xx / 5xx) and need user feedback — without an
+        // explicit catch they would otherwise be swallowed by validate's
+        // async callback, leaving the UI in an apparently-success state.
+        this.loading = true;
+        let plan;
+        try {
+          const resp = await ClusterApi.rebalancePlan({
+            clusterName: this.clusterName,
+            params,
+          });
+          plan = resp?.data?.entity;
+        } catch (err) {
+          this.$message.error(this.$t('rebalance.Failed to fetch plan'));
+          return;
+        } finally {
+          this.loading = false;
+        }
+        if (!plan) return; // shard == 1 returns empty plan; nothing to confirm
+
+        // Step 2: show the preview modal. The harness rejects with the
+        // string 'cancel' when the user clicks Back; anything else is a
+        // real component error and should be reported.
+        try {
+          await $modal({
+            component: RebalancePlanPreview,
+            props: {
+              title: this.$t('rebalance.Plan Preview'),
+              width: 900,
+              okText: this.$t('rebalance.Execute'),
+              cancelText: this.$t('common.Back'),
+            },
+            data: { plan },
+          });
+        } catch (e) {
+          if (e === 'cancel') return;
+          console.error('[rebalance] plan preview modal error:', e);
+          return;
+        }
+
+        // Step 3: execute the rebalance and open the live task modal.
         this.loading = true;
         let taskId;
         try {
           const resp = await ClusterApi.rebalanceCluster({
             clusterName: this.clusterName,
-            params: {
-              tables: [{
-                database: this.form.database,
-                table: this.form.table,
-                policy: this.form.policy,
-                shardingKey: this.form.policy === 'shardingkey' ? this.form.shardingKey : undefined,
-                allowLossRate: this.form.policy === 'shardingkey' ? this.form.allowLossRate : undefined,
-                saveTemps: this.form.saveTemps,
-              }],
-              except_max_shard: this.form.except_max_shard,
-            },
+            params,
             password: this.password,
           });
           taskId = resp?.data?.entity;
         } finally {
           this.loading = false;
         }
-        // shard == 1 时后端不会建任务，直接返回成功，taskId 为空
-        if (!taskId) return;
+        if (!taskId) return; // shard == 1: backend returned success with no task
         $modal({
           component: TaskDetail,
           props: {
@@ -221,10 +271,7 @@ export default {
             cancelText: this.$t('task.Close'),
             okText: null,
           },
-          data: {
-            taskId,
-            refresh: true,
-          },
+          data: { taskId, refresh: true },
         });
       });
     },
