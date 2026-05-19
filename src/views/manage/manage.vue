@@ -98,6 +98,15 @@
             suffix-icon="el-icon-search"
             class="node-card__search"
           />
+          <el-tooltip :content="$t('common.Refresh')" placement="top">
+            <el-button
+              size="medium"
+              icon="el-icon-refresh"
+              :loading="refreshing"
+              class="node-card__refresh"
+              @click="refreshList"
+            />
+          </el-tooltip>
           <el-button
             v-if="mode === 'deploy'"
             type="primary"
@@ -132,9 +141,15 @@
           align="left">
           <template slot-scope="{ row, column }">
             <div v-if="col.prop === 'status'" class="status-cell">
-              <span class="status-dot" :class="`status-dot--${row.status}`"></span>
-              <span class="status-cell__text">{{ statusLabel(row.status) }}</span>
-              <span class="status-cell__uptime">{{ row.uptime }}</span>
+              <template v-if="row.pendingOp">
+                <i class="el-icon-loading status-cell__spinner"></i>
+                <span class="status-cell__text status-cell__text--pending">{{ pendingLabel(row.pendingOp) }}</span>
+              </template>
+              <template v-else>
+                <span class="status-dot" :class="`status-dot--${row.status}`"></span>
+                <span class="status-cell__text">{{ statusLabel(row.status) }}</span>
+                <span class="status-cell__uptime">{{ row.uptime }}</span>
+              </template>
             </div>
             <div v-else-if="col.prop === 'ip'" class="ip-cell">
               <span class="ip-cell__text">{{ row.ip }}</span>
@@ -173,11 +188,11 @@
             <el-dropdown trigger="click" @command="onNodeCommand($event, row)">
               <i class="fa fa-ellipsis-v node-row-more"></i>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item v-if="row.status === 'green'" command="offline">
+                <el-dropdown-item v-if="row.status === 'green' && !row.pendingOp" command="offline">
                   <i class="el-icon-turn-off"></i>
                   {{ $t('manage.Offline') }}
                 </el-dropdown-item>
-                <el-dropdown-item v-if="row.status === 'red'" command="online">
+                <el-dropdown-item v-if="row.status === 'red' && !row.pendingOp" command="online">
                   <i class="el-icon-open"></i>
                   {{ $t('manage.Online') }}
                 </el-dropdown-item>
@@ -273,6 +288,7 @@ export default {
       },
       numberRange: [],
       deleteIp: '',
+      refreshing: false,
     };
   },
   computed: {
@@ -356,6 +372,17 @@ export default {
       const key = 'manage.status' + upperFirst(status);
       const label = this.$t(key);
       return label === key ? status : label;
+    },
+    pendingLabel(op) {
+      return op === 'online' ? this.$t('manage.Starting') : this.$t('manage.Stopping');
+    },
+    async refreshList() {
+      this.refreshing = true;
+      try {
+        await this.fetchData();
+      } finally {
+        this.refreshing = false;
+      }
     },
     hasDiskData(disk) {
       if (!disk || typeof disk !== 'string') return false;
@@ -557,12 +584,15 @@ export default {
       if (this.needPassword) {
         password = await this.openPasswordDialog();
       }
-      this.$set(row, 'onlineLoading', true);
+      this.$set(row, 'pendingOp', 'online');
       const { id: clusterName } = this.$route.params;
-      await ClusterApi.onlineClusterNode(clusterName, row.ip, password);
-      this.$message.success(`${this.$t('manage.Online')}` + ` ${this.$t('common.' + 'Success')}`);
-      this.fetchData();
-      this.$set(row, 'onlineLoading', false);
+      try {
+        await ClusterApi.onlineClusterNode(clusterName, row.ip, password);
+        this.$message.success(`${this.$t('manage.Online')}` + ` ${this.$t('common.' + 'Success')}`);
+      } finally {
+        this.$set(row, 'pendingOp', null);
+        this.fetchData();
+      }
     },
 
     // 集群node下线
@@ -571,12 +601,15 @@ export default {
       if (this.needPassword) {
         password = await this.openPasswordDialog();
       }
-      this.$set(row, 'offlineLoading', true);
+      this.$set(row, 'pendingOp', 'offline');
       const { id: clusterName } = this.$route.params;
-      await ClusterApi.offlineClusterNode(clusterName, row.ip, password);
-      this.$message.success(`${this.$t('manage.Offline')}` + ` ${this.$t('common.' + 'Success')}`);
-      this.fetchData();
-      this.$set(row, 'offlineLoading', false);
+      try {
+        await ClusterApi.offlineClusterNode(clusterName, row.ip, password);
+        this.$message.success(`${this.$t('manage.Offline')}` + ` ${this.$t('common.' + 'Success')}`);
+      } finally {
+        this.$set(row, 'pendingOp', null);
+        this.fetchData();
+      }
     },
 
     filterHandler(value, row, column) {
@@ -806,6 +839,16 @@ export default {
     color: var(--c-text-tertiary);
     font-size: var(--fs-xs);
     margin-left: var(--s-2);
+  }
+
+  &__spinner {
+    color: var(--c-warning-solid);
+    font-size: var(--fs-base);
+  }
+
+  &__text--pending {
+    color: var(--c-text-secondary);
+    font-style: italic;
   }
 }
 
