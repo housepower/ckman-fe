@@ -69,7 +69,9 @@ export default {
     };
   },
   mounted() {
-    this.redirect = decodeURIComponent(this.$route.query.redirect || "/home");
+    const raw = decodeURIComponent(this.$route.query.redirect || "/home");
+    // Guard against ?redirect=/login looping the user back to the login page.
+    this.redirect = (raw === "/login" || raw.startsWith("/login?")) ? "/home" : raw;
   },
   methods: {
     async login() {
