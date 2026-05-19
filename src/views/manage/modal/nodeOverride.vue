@@ -205,7 +205,29 @@ export default {
 
 <style scoped>
 .override-tip { color: var(--c-text-tertiary); font-size: var(--fs-sm); margin-bottom: 8px; }
-.override-editor { height: 320px; border: 1px solid var(--c-surface-3); border-radius: 4px; overflow: hidden; }
+.override-editor {
+  height: 320px;
+  border: 1px solid var(--c-surface-3);
+  border-radius: 4px;
+  overflow: hidden;
+  background: #282c34; /* One Dark bg, prevents white gap before editor mounts / under short content */
+}
+.override-editor ::v-deep .cm-editor { height: 100%; }
+.override-editor ::v-deep .cm-scroller {
+  background: #282c34;
+  font-family: ui-monospace, SFMono-Regular, 'JetBrains Mono', Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  font-variant-ligatures: contextual;
+}
+.override-editor ::v-deep .cm-content { caret-color: #abb2bf; }
+.override-editor ::v-deep .cm-gutters {
+  background: #21252b;
+  border-right-color: #181a1f;
+  color: #5c6370;
+}
+.override-editor ::v-deep .cm-activeLineGutter { background: #2c313a; }
+.override-editor ::v-deep .cm-activeLine { background: #2c313a; }
 .override-error { color: var(--c-danger-solid); font-size: var(--fs-sm); margin-top: 6px; }
 .override-readonly { color: var(--c-text-tertiary); font-family: monospace; font-size: 12px; }
 .override-empty { text-align: center; color: var(--c-text-tertiary); margin-top: 16px; }
