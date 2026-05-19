@@ -69,6 +69,15 @@ export const ClusterApi = {
   offlineClusterNode(clusterName, ip, password?) {
     return axios.put(`${url}/node/stop/${ clusterName }?ip=${ ip }&password=${ password || ''}`);
   },
+  getNodeOverride(clusterName: string, ip: string) {
+    return axios.get(`${url}/node/override/${clusterName}?ip=${ip}`);
+  },
+  saveNodeOverride(clusterName: string, ip: string, xml: string) {
+    return axios.put(`${url}/node/override/${clusterName}?ip=${ip}`, { xml });
+  },
+  deleteNodeOverride(clusterName: string, ip: string) {
+    return axios.delete(`${url}/node/override/${clusterName}?ip=${ip}`);
+  },
   getNodeLog(clusterName, ip, logType, tail, lines, password? ) {
     return axios.post(`${url}/node/log/${ clusterName }?ip=${ ip }&password=${ password || ''}`, {
       lines,
