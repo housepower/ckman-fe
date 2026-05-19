@@ -1,20 +1,51 @@
+// Table rows use XPath-like path syntax to stay consistent with the cluster
+// Expert config: '/' as separator, '[@k=v]' for attribute predicates.
+// Examples:
+//   merge_tree/parts_to_throw_insert       -> <merge_tree><parts_to_throw_insert>..</></>
+//   disk[@name='hdfs1']/type               -> <disk name="hdfs1"><type>..</type></disk>
+//   title[@lang='en', @size=4]/header      -> <title lang="en" size="4"><header>..</header></title>
 export interface OverrideRow {
   path: string;
   value: string;
   editable: boolean;
-  raw?: string; // original XML segment when not editable, for display
+  raw?: string; // original XML segment when row could not be expressed in XPath form
+}
+
+interface ParsedSegment {
+  tag: string;
+  attrs: Array<{ name: string; value: string }>;
+  canonical: string; // canonical "tag[@k='v', @j='w']" used as merge key
+}
+
+function parseSegment(s: string): ParsedSegment | null {
+  const m = /^([^/[\s]+)\s*(?:\[(.+)\])?$/.exec(s.trim());
+  if (!m) return null;
+  const tag = m[1];
+  const attrs: Array<{ name: string; value: string }> = [];
+  if (m[2]) {
+    m[2].split(',').forEach(pair => {
+      const am = /^\s*@([^=]+)\s*=\s*['"]?([^'"]*)['"]?\s*$/.exec(pair);
+      if (am) attrs.push({ name: am[1].trim(), value: am[2] });
+    });
+  }
+  return { tag, attrs, canonical: canonicalSegment(tag, attrs) };
+}
+
+function canonicalSegment(tag: string, attrs: Array<{ name: string; value: string }>): string {
+  if (attrs.length === 0) return tag;
+  const pred = attrs.map(a => `@${a.name}='${a.value}'`).join(', ');
+  return `${tag}[${pred}]`;
 }
 
 /**
- * Parse a node_override.xml string into a flat list of dotted-path rows.
- * Nodes that cannot be flattened (attributes / repeated siblings / mixed
- * content) are returned with editable=false and the raw XML segment kept.
+ * Parse a node_override.xml string into a flat list of XPath-style rows.
+ * Repeated same-tag siblings (without distinguishing attrs) and mixed
+ * content fall back to editable=false with the raw XML segment preserved.
  */
 export function parseXmlToRows(xml: string): OverrideRow[] {
   if (!xml || !xml.trim()) return [];
   const doc = new DOMParser().parseFromString(xml, 'application/xml');
-  const parseErr = doc.getElementsByTagName('parsererror')[0];
-  if (parseErr) {
+  if (doc.getElementsByTagName('parsererror').length) {
     throw new Error('invalid xml');
   }
   const root = doc.documentElement;
@@ -27,30 +58,30 @@ export function parseXmlToRows(xml: string): OverrideRow[] {
 function walk(el: Element, pathSoFar: string[], out: OverrideRow[]): void {
   const children = Array.from(el.children);
 
-  // case 1: leaf — emit a row
+  // Leaf: emit a row regardless of attributes (attrs go into the path segment).
   if (children.length === 0) {
     if (pathSoFar.length === 0) return; // root with no body
-    const hasAttrs = el.attributes.length > 0;
     out.push({
-      path: pathSoFar.join('.'),
+      path: pathSoFar.join('/'),
       value: (el.textContent || '').trim(),
-      editable: !hasAttrs,
-      raw: hasAttrs ? el.outerHTML : undefined,
+      editable: true,
     });
     return;
   }
 
-  // case 2: container — check editability of THIS level
-  const tagCounts: Record<string, number> = {};
-  children.forEach(ch => {
-    tagCounts[ch.tagName] = (tagCounts[ch.tagName] || 0) + 1;
-  });
-  const hasRepeated = Object.values(tagCounts).some(n => n > 1);
-  const hasAttrs = el.attributes.length > 0;
+  // Container: detect tagname collisions where siblings would canonicalize the
+  // same — e.g. two <volume> with no distinguishing attrs. We can't express
+  // those in XPath without an index/predicate, so we punt the whole subtree.
+  const canonCounts: Record<string, number> = {};
+  for (const ch of children) {
+    const seg = canonicalSegment(ch.tagName, Array.from(ch.attributes).map(a => ({ name: a.name, value: a.value })));
+    canonCounts[seg] = (canonCounts[seg] || 0) + 1;
+  }
+  const hasRepeated = Object.values(canonCounts).some(n => n > 1);
 
-  if ((hasRepeated || hasAttrs) && pathSoFar.length > 0) {
+  if (hasRepeated && pathSoFar.length > 0) {
     out.push({
-      path: pathSoFar.join('.'),
+      path: pathSoFar.join('/'),
       value: '',
       editable: false,
       raw: el.outerHTML,
@@ -58,43 +89,68 @@ function walk(el: Element, pathSoFar: string[], out: OverrideRow[]): void {
     return;
   }
 
-  children.forEach(ch => walk(ch, [...pathSoFar, ch.tagName], out));
+  for (const ch of children) {
+    const seg = canonicalSegment(ch.tagName, Array.from(ch.attributes).map(a => ({ name: a.name, value: a.value })));
+    walk(ch, [...pathSoFar, seg], out);
+  }
 }
 
 /**
  * Build XML from rows. Readonly rows contribute their raw XML segment;
- * editable rows are merged into a nested tree.
+ * editable rows are merged into a nested tree keyed by canonical segment
+ * (so 'disk[@name=x]/a' and 'disk[@name=x]/b' share one <disk name="x">).
  */
 export function rowsToXml(rows: OverrideRow[], rootTag = 'clickhouse'): string {
   if (rows.length === 0) return '';
-  type Node = { [k: string]: Node | string };
-  const tree: Node = {};
+  interface TreeNode {
+    parsed?: ParsedSegment;
+    children: Map<string, TreeNode>;
+    leafValue?: string;
+  }
+  const root: TreeNode = { children: new Map() };
   const rawSegments: string[] = [];
-  rows.forEach(r => {
+
+  for (const r of rows) {
     if (!r.editable && r.raw) {
       rawSegments.push(r.raw);
-      return;
+      continue;
     }
-    const segs = r.path.split('.');
-    let cur: Node = tree;
+    const segs = r.path.split('/').map(s => s.trim()).filter(Boolean);
+    if (segs.length === 0) continue;
+    let cur = root;
     segs.forEach((s, i) => {
-      if (i === segs.length - 1) {
-        cur[s] = r.value;
-      } else {
-        if (typeof cur[s] !== 'object') cur[s] = {};
-        cur = cur[s] as Node;
+      const parsed = parseSegment(s);
+      if (!parsed) return;
+      const key = parsed.canonical;
+      let next = cur.children.get(key);
+      if (!next) {
+        next = { parsed, children: new Map() };
+        cur.children.set(key, next);
       }
+      if (i === segs.length - 1) next.leafValue = r.value;
+      cur = next;
     });
-  });
-  const inner = renderNode(tree);
-  return `<${rootTag}>${inner}${rawSegments.join('')}</${rootTag}>`;
+  }
+
+  const parts: string[] = [];
+  for (const child of root.children.values()) parts.push(renderNode(child));
+  return `<${rootTag}>${parts.join('')}${rawSegments.join('')}</${rootTag}>`;
 }
 
-function renderNode(n: any): string {
-  if (typeof n === 'string') return escape(n);
-  return Object.entries(n)
-    .map(([k, v]) => `<${k}>${renderNode(v)}</${k}>`)
+function renderNode(n: { parsed?: ParsedSegment; children: Map<string, any>; leafValue?: string }): string {
+  if (!n.parsed) return '';
+  const tag = n.parsed.tag;
+  const attrStr = n.parsed.attrs
+    .map(a => ` ${a.name}="${escapeAttr(a.value)}"`)
     .join('');
+  if (n.children.size === 0) {
+    const v = n.leafValue ?? '';
+    if (v === '') return `<${tag}${attrStr}/>`;
+    return `<${tag}${attrStr}>${escape(v)}</${tag}>`;
+  }
+  let inner = '';
+  for (const child of n.children.values()) inner += renderNode(child);
+  return `<${tag}${attrStr}>${inner}</${tag}>`;
 }
 
 function escape(s: string): string {

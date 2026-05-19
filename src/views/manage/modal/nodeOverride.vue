@@ -18,7 +18,7 @@
           <el-table :data="rows" border style="margin-top: 8px;" size="mini">
             <el-table-column prop="path" :label="$t('common.Key')">
               <template slot-scope="{ row }">
-                <el-input v-if="row.editable" v-model="row.path" placeholder="a.b.c" size="mini" />
+                <el-input v-if="row.editable" v-model="row.path" placeholder="a/b/c 或 disk[@name='x']/type" size="mini" />
                 <el-tooltip v-else :content="$t('manage.Override Readonly Row Tip')" placement="top">
                   <span class="override-readonly">{{ row.raw || row.path }}</span>
                 </el-tooltip>
