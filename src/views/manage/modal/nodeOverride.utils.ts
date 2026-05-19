@@ -105,6 +105,6 @@ function escape(s: string): string {
 
 export function detectRootTag(xml: string): 'clickhouse' | 'yandex' {
   if (!xml) return 'clickhouse';
-  const m = xml.match(/<\s*(clickhouse|yandex)[\s>]/i);
+  const m = /<\s*(clickhouse|yandex)[\s>]/i.exec(xml);
   return (m ? m[1].toLowerCase() : 'clickhouse') as 'clickhouse' | 'yandex';
 }
