@@ -8,7 +8,10 @@
     </header>
     <el-table :data="rows" stripe v-loading="loading">
       <el-table-column prop="username" :label="$t('user.Username')" />
-      <el-table-column :label="$t('user.Role')">
+      <el-table-column>
+        <template slot="header">
+          {{ $t('user.Role') }}<role-help />
+        </template>
         <template slot-scope="{ row }">
           {{ $t('user.Policy.' + row.policy) }}
         </template>
@@ -52,11 +55,13 @@
 <script>
 import { UserApi } from '@/apis';
 import { $modal } from '@/services';
+import RoleHelp from '@/views/users/role-help.vue';
 
 const BUILTIN = new Set(['ckman', 'ordinary']);
 
 export default {
   name: 'Users',
+  components: { RoleHelp },
   data() {
     return { rows: [], loading: false };
   },

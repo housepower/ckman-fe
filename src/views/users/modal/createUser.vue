@@ -4,7 +4,8 @@
       <el-form-item :label="$t('user.Username')" prop="username">
         <el-input v-model="form.username" autocomplete="off" />
       </el-form-item>
-      <el-form-item :label="$t('user.Role')" prop="policy">
+      <el-form-item prop="policy">
+        <template slot="label">{{ $t('user.Role') }}<role-help /></template>
         <el-select v-model="form.policy" style="width: 100%">
           <el-option value="ordinary" :label="$t('user.Policy.ordinary')" />
           <el-option value="guest" :label="$t('user.Policy.guest')" />
@@ -25,6 +26,7 @@
 
 <script>
 import { UserApi } from '@/apis';
+import RoleHelp from '@/views/users/role-help.vue';
 
 const USERNAME_RE = /^[A-Za-z][A-Za-z0-9_]{2,31}$/;
 const RESERVED = new Set(['ckman', 'ordinary']);
@@ -40,6 +42,7 @@ function passwordPolicy(pwd) {
 }
 
 export default {
+  components: { RoleHelp },
   data() {
     return {
       form: { username: '', policy: 'ordinary', enabled: true, password: '', confirm: '' },

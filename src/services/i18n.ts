@@ -108,8 +108,7 @@ const messages = {
       'Settings': 'Settings',
       'Logout Success': 'Logout Success',
       'Message Center': 'Message Center',
-      'Document': 'Document',
-      'API': 'Swagger'
+      'Document': 'Document'
     },
     home: {
       'Create or import a ClickHouse Cluster':
@@ -930,6 +929,12 @@ const messages = {
         'guest': 'Guest',
         'ordinary': 'Ordinary',
       },
+      RoleHelp: {
+        'Title': 'Role permissions',
+        'admin': 'Full control: cluster deploy/upgrade/destroy, node ops, user management; can execute every change and query.',
+        'ordinary': 'Operates on existing clusters: table/partition/backup/DML actions; inherits guest. Cannot alter cluster topology or manage users.',
+        'guest': 'Read-only: view clusters, table schemas, run queries, view metrics, and browse task/backup records.',
+      },
     },
 
   },
@@ -1034,7 +1039,6 @@ const messages = {
       'Logout Success': '成功登出',
       'Message Center': '消息中心',
       'Document': '文档',
-      'API': '接口说明',
     },
     home: {
       'Create or import a ClickHouse Cluster': '创建或导入集群',
@@ -1847,6 +1851,12 @@ const messages = {
         'admin': '管理员',
         'guest': '游客',
         'ordinary': '普通用户',
+      },
+      RoleHelp: {
+        'Title': '角色权限说明',
+        'admin': '管理员权限：集群部署/升级/销毁、节点增删启停、用户管理，可执行全部变更与查询操作。',
+        'ordinary': '在已有集群上做表/分区/备份/DML 等运维操作，包含游客权限；不可修改集群拓扑、不能管理用户。',
+        'guest': '只读权限：查看集群、表结构、执行查询、查看监控以及任务/备份记录。',
       },
     },
   },

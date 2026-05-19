@@ -4,7 +4,8 @@
       <el-form-item :label="$t('user.Username')">
         <el-input :value="user.username" disabled />
       </el-form-item>
-      <el-form-item :label="$t('user.Role')">
+      <el-form-item>
+        <template slot="label">{{ $t('user.Role') }}<role-help /></template>
         <el-select v-model="form.policy" style="width: 100%">
           <el-option value="ordinary" :label="$t('user.Policy.ordinary')" />
           <el-option value="guest" :label="$t('user.Policy.guest')" />
@@ -19,8 +20,10 @@
 
 <script>
 import { UserApi } from '@/apis';
+import RoleHelp from '@/views/users/role-help.vue';
 
 export default {
+  components: { RoleHelp },
   props: {
     user: { type: Object, required: true },
   },

@@ -12,12 +12,10 @@
           <span class="fs-16">{{$t('task.Task List')}}</span>
         </div>
 
-        <a href="/docs/ckman" target="_blank" class="flex flex-vcenter mr-15 pointer">
+        <a href="/docs/" target="_blank" class="flex flex-vcenter mr-15 pointer">
           <i class="fa fa-book fs-20 mr-5" aria-hidden="true"></i>
           <span class="fs-16">{{$t('layout.Document')}}</span>
         </a>
-
-        <router-link to="/swagger/index.html" target="_blank" class="fa fa-file-text-o fs-20 mr-15"><span class="fs-16 ml-5">{{$t('layout.API')}}</span></router-link>
 
         <router-link to="/setting" class="fa fa-briefcase fs-20 pointer mr-15"><span class="fs-16 ml-5">{{$t('common.package')}}</span></router-link>
 
