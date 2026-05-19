@@ -108,6 +108,15 @@ $--font-path: '~element-ui-eoi/lib/theme-chalk/fonts';
   font-size: var(--fs-sm);
 }
 
+// Dialog 右上角的关闭 X：恢复理性色（默认 element-ui-eoi 编译产物里仍是蓝色）
+.el-dialog__headerbtn .el-dialog__close {
+  color: var(--c-text-tertiary);
+}
+.el-dialog__headerbtn:focus .el-dialog__close,
+.el-dialog__headerbtn:hover .el-dialog__close {
+  color: var(--c-primary-solid);
+}
+
 .el-tag {
   border-radius: var(--r-sm);
   font-size: var(--fs-xs);
