@@ -10,13 +10,16 @@
     "lint:style": "stylelint --allow-empty-input --max-warnings=99999 \"src/**/*.{scss,vue}\""
   },
   "dependencies": {
+    "@codemirror/lang-xml": "^6.1.0",
+    "@codemirror/state": "^6.6.0",
+    "@codemirror/view": "^6.43.0",
     "@fontsource/inter": "5",
     "@fontsource/jetbrains-mono": "5",
     "@json-editor/json-editor": "^2.5.3",
     "ace-builds": "^1.4.12",
     "axios": "^0.21.1",
     "blueimp-md5": "^2.18.0",
-    "codemirror": "^5.62.0",
+    "codemirror": "^5.65.21",
     "core-js": "^3.11.0",
     "cron-parser": "3.5.0",
     "date-fns": "^2.21.1",
@@ -45,6 +48,7 @@
   },
   "devDependencies": {
     "@types/blueimp-md5": "^2.18.0",
+    "@types/lodash": "^4.14.202",
     "@types/lodash-es": "^4.17.4",
     "@types/platform": "^1.3.3",
     "@typescript-eslint/eslint-plugin": "^4.22.0",

@@ -196,6 +196,10 @@
                   <i class="el-icon-open"></i>
                   {{ $t('manage.Online') }}
                 </el-dropdown-item>
+                <el-dropdown-item command="override">
+                  <i class="el-icon-setting"></i>
+                  {{ $t('manage.Node Override') }}
+                </el-dropdown-item>
                 <el-dropdown-item command="log">
                   <i class="el-icon-document"></i>
                   {{ $t('manage.View Log') }}
@@ -221,6 +225,13 @@
       />
     </div>
     <DeleteNodeComponent :visible.sync="deleteNodeDialogVisible" :password="password" :ip="deleteIp" @onOk="onAddNodeSuccess" @close="deleteNodeDialogVisible = false" />
+    <NodeOverrideDialog
+      v-if="overrideDialogVisible"
+      :visible="overrideDialogVisible"
+      :cluster-name="$route.params.id"
+      :ip="overrideTargetIp"
+      @close="overrideDialogVisible = false"
+    />
   </main>
 </template>
 <script>
@@ -233,10 +244,12 @@ import { ClusterApi, PackageApi } from "@/apis";
 import TaskDetail from '@/views/task/components/TaskDetail.vue';
 import ViewLogComponent from './modal/viewLog.vue';
 import DeleteNodeComponent from './modal/deleteNode.vue';
+import NodeOverrideDialog from './modal/nodeOverride.vue';
 export default {
   components: {
     AddNodeDialog,
     DeleteNodeComponent,
+    NodeOverrideDialog,
   },
   data() {
     return {
@@ -289,6 +302,8 @@ export default {
       numberRange: [],
       deleteIp: '',
       refreshing: false,
+      overrideDialogVisible: false,
+      overrideTargetIp: '',
     };
   },
   computed: {
@@ -514,6 +529,10 @@ export default {
           break;
         case 'delete':
           this.remove(row);
+          break;
+        case 'override':
+          this.overrideTargetIp = row.ip;
+          this.overrideDialogVisible = true;
           break;
       }
     },

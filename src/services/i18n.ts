@@ -79,6 +79,11 @@ const messages = {
       'users': 'Users',
       'Enable': 'Enable',
       'Disable': 'Disable',
+      'Add': 'Add',
+      'Key': 'Key',
+      'Value': 'Value',
+      'Clear': 'Clear',
+      'Warning': 'Warning',
     },
     errors: {
       'Unknown': 'Unexpected error. Please contact the administrator.',
@@ -999,6 +1004,11 @@ const messages = {
       'users': '用户',
       'Enable': '启用',
       'Disable': '禁用',
+      'Add': '添加',
+      'Key': '键',
+      'Value': '值',
+      'Clear': '清除',
+      'Warning': '警告',
     },
     errors: {
       'Unknown': '未知错误，请联系管理员',
