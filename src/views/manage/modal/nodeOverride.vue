@@ -12,7 +12,7 @@
     <el-tabs v-model="activeTab" type="card" class="override-tabs">
       <el-tab-pane :label="$t('manage.Node Override Table Mode')" name="table">
         <div class="override-table">
-          <el-button size="mini" type="primary" plain icon="el-icon-plus" @click="addRow">
+          <el-button size="mini" type="primary" icon="el-icon-plus" @click="addRow">
             {{ $t('common.Add') }}
           </el-button>
           <el-table :data="rows" border style="margin-top: 8px;" size="mini">
@@ -57,10 +57,11 @@
 
 <script>
 import { ClusterApi } from '@/apis';
-import { parseXmlToRows, rowsToXml, detectRootTag } from './nodeOverride.utils';
+import { parseXmlToRows, rowsToXml, detectRootTag, prettyXml } from './nodeOverride.utils';
 import { EditorState } from '@codemirror/state';
 import { EditorView, lineNumbers } from '@codemirror/view';
 import { xml } from '@codemirror/lang-xml';
+import { defaultHighlightStyle, syntaxHighlighting, bracketMatching } from '@codemirror/language';
 
 export default {
   name: 'NodeOverrideDialog',
@@ -89,7 +90,7 @@ export default {
     },
     activeTab(v) {
       if (v === 'xml') {
-        this.currentXml = rowsToXml(this.rows, this.rootTag);
+        this.currentXml = prettyXml(rowsToXml(this.rows, this.rootTag));
         this.$nextTick(() => this.mountEditor());
       } else {
         this.disposeEditor();
@@ -122,13 +123,20 @@ export default {
       if (this.editor) return;
       this.editor = new EditorView({
         state: EditorState.create({
-          doc: this.currentXml,
-          extensions: [lineNumbers(), xml(), EditorView.updateListener.of(u => {
-            if (u.docChanged) {
-              this.currentXml = u.state.doc.toString();
-              this.validateXml();
-            }
-          })],
+          doc: prettyXml(this.currentXml) || this.currentXml,
+          extensions: [
+            lineNumbers(),
+            xml(),
+            syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+            bracketMatching(),
+            EditorView.lineWrapping,
+            EditorView.updateListener.of(u => {
+              if (u.docChanged) {
+                this.currentXml = u.state.doc.toString();
+                this.validateXml();
+              }
+            }),
+          ],
         }),
         parent: this.$refs.editorMount,
       });

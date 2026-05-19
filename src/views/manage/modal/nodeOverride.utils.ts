@@ -108,3 +108,38 @@ export function detectRootTag(xml: string): 'clickhouse' | 'yandex' {
   const m = /<\s*(clickhouse|yandex)[\s>]/i.exec(xml);
   return (m ? m[1].toLowerCase() : 'clickhouse') as 'clickhouse' | 'yandex';
 }
+
+/**
+ * Pretty-print an XML string with the given indent. Returns the input
+ * unchanged when it cannot be parsed (so we never lose user content).
+ */
+export function prettyXml(xml: string, indent = '    '): string {
+  if (!xml || !xml.trim()) return '';
+  const doc = new DOMParser().parseFromString(xml, 'application/xml');
+  if (doc.getElementsByTagName('parsererror').length || !doc.documentElement) {
+    return xml;
+  }
+  return formatNode(doc.documentElement, '', indent);
+}
+
+function formatNode(el: Element, prefix: string, indent: string): string {
+  const attrs = Array.from(el.attributes)
+    .map(a => ` ${a.name}="${escapeAttr(a.value)}"`)
+    .join('');
+  const children = Array.from(el.children);
+  if (children.length === 0) {
+    const text = (el.textContent || '').trim();
+    if (!text) return `${prefix}<${el.tagName}${attrs}/>`;
+    return `${prefix}<${el.tagName}${attrs}>${escape(text)}</${el.tagName}>`;
+  }
+  const inner = children
+    .map(c => formatNode(c, prefix + indent, indent))
+    .join('\n');
+  return `${prefix}<${el.tagName}${attrs}>\n${inner}\n${prefix}</${el.tagName}>`;
+}
+
+function escapeAttr(s: string): string {
+  return s.replace(/[<>&"]/g, c =>
+    ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[c] || c)
+  );
+}
