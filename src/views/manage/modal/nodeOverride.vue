@@ -61,7 +61,8 @@ import { parseXmlToRows, rowsToXml, detectRootTag, prettyXml } from './nodeOverr
 import { EditorState } from '@codemirror/state';
 import { EditorView, lineNumbers } from '@codemirror/view';
 import { xml } from '@codemirror/lang-xml';
-import { defaultHighlightStyle, syntaxHighlighting, bracketMatching } from '@codemirror/language';
+import { bracketMatching } from '@codemirror/language';
+import { oneDark } from '@codemirror/theme-one-dark';
 
 export default {
   name: 'NodeOverrideDialog',
@@ -127,7 +128,7 @@ export default {
           extensions: [
             lineNumbers(),
             xml(),
-            syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+            oneDark,
             bracketMatching(),
             EditorView.lineWrapping,
             EditorView.updateListener.of(u => {
