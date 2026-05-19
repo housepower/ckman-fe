@@ -84,10 +84,12 @@ export default {
       rootTag: 'clickhouse',
     };
   },
+  mounted() {
+    this.fetch();
+  },
   watch: {
     visible(v) {
       this.dialogVisible = v;
-      if (v) this.fetch();
     },
     activeTab(v) {
       if (v === 'xml') {
