@@ -22,9 +22,6 @@ export const ClusterApi = {
   getClusterUpdateFormSchema() {
     return axios.get(`/api/v1/ui/schema?type=config`);
   },
-  getReBalanceFormSchema() {
-    return axios.get(`/api/v1/ui/schema?type=rebalance`);
-  },
   importCluster(params) {
     return axios.post(`${url}/cluster`, params);
   },
