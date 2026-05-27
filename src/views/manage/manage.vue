@@ -403,12 +403,17 @@ export default {
       if (!disk || typeof disk !== 'string') return false;
       return /([\d.]+)\s*\w*\s*\/\s*([\d.]+)/.test(disk);
     },
+    diskUnitMultiplier(unit) {
+      const map = { B: 1, K: 1024, M: 1024 ** 2, G: 1024 ** 3, T: 1024 ** 4, P: 1024 ** 5, E: 1024 ** 6 };
+      const key = (unit || 'B').trim().charAt(0).toUpperCase();
+      return map[key] || 1;
+    },
     diskPercent(disk) {
       if (!disk || typeof disk !== 'string') return 0;
-      const match = disk.match(/([\d.]+)\s*\w*\s*\/\s*([\d.]+)/);
+      const match = disk.match(/([\d.]+)\s*([A-Za-z]*)\s*\/\s*([\d.]+)\s*([A-Za-z]*)/);
       if (!match) return 0;
-      const used = parseFloat(match[1]);
-      const total = parseFloat(match[2]);
+      const used = parseFloat(match[1]) * this.diskUnitMultiplier(match[2]);
+      const total = parseFloat(match[3]) * this.diskUnitMultiplier(match[4]);
       if (!total || isNaN(used)) return 0;
       return Math.min(100, Math.round((used / total) * 100));
     },
