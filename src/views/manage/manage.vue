@@ -175,6 +175,32 @@
               </template>
               <span v-else class="disk-cell__empty">—</span>
             </div>
+            <div v-else-if="col.prop === 'cpu'" class="disk-cell">
+              <template v-if="hasDiskData(row.cpu)">
+                <el-progress
+                  :percentage="diskPercent(row.cpu)"
+                  :color="diskColor"
+                  :stroke-width="6"
+                  :show-text="false"
+                  class="disk-cell__bar"
+                />
+                <span class="disk-cell__text">{{ row.cpu }}</span>
+              </template>
+              <span v-else class="disk-cell__text">{{ row.cpu || '—' }}</span>
+            </div>
+            <div v-else-if="col.prop === 'memory'" class="disk-cell">
+              <template v-if="hasDiskData(row.memory)">
+                <el-progress
+                  :percentage="diskPercent(row.memory)"
+                  :color="diskColor"
+                  :stroke-width="6"
+                  :show-text="false"
+                  class="disk-cell__bar"
+                />
+                <span class="disk-cell__text">{{ row.memory }}</span>
+              </template>
+              <span v-else class="disk-cell__text">{{ row.memory || '—' }}</span>
+            </div>
             <span v-else>{{ row[column.property] }}</span>
           </template>
         </vxe-column>
@@ -344,6 +370,18 @@ export default {
           prop: "replicaNumber",
           label: this.$t('manage.replica number'),
           minWidth: 250,
+          sortable: true
+        },
+        {
+          prop: "cpu",
+          label: this.$t('manage.CPU Cores'),
+          minWidth: 180,
+          sortable: true
+        },
+        {
+          prop: "memory",
+          label: this.$t('manage.Memory'),
+          minWidth: 200,
           sortable: true
         },
         {

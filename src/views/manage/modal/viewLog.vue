@@ -1,5 +1,5 @@
 <template>
-  <div class="view-log">
+  <div class="view-log" :class="{ 'view-log--fullscreen': fullscreen }">
     <div class="view-log__toolbar">
       <div class="view-log__filters">
         <el-radio-group v-model="logType" size="small" @change="getLogs">
@@ -53,6 +53,13 @@
           :loading="loading"
           @click="getLogs"
         >{{ $t('common.Refresh') }}</el-button>
+        <el-button
+          size="small"
+          plain
+          :icon="fullscreen ? 'el-icon-close' : 'el-icon-full-screen'"
+          :title="fullscreen ? $t('common.Exit Fullscreen') : $t('common.Fullscreen')"
+          @click="toggleFullscreen"
+        />
       </div>
     </div>
 
@@ -96,13 +103,18 @@ export default {
       searchOverlay: null,
       matchTotal: 0,
       matchIndex: 0,
+      fullscreen: false,
     };
   },
   watch: {
     logs(newLogs) {
       if (newLogs == null) return;
       this.codeMirror?.setValue(newLogs);
-      if (this.searchKey) this.applySearch();
+      if (this.searchKey) {
+        this.applySearch();
+      } else {
+        this.scrollToBottom();
+      }
     },
     searchKey() {
       this.applySearch();
@@ -131,8 +143,33 @@ export default {
     if (this.codeMirror && this.searchOverlay) {
       this.codeMirror.removeOverlay(this.searchOverlay);
     }
+    document.removeEventListener('keydown', this.onKeydown, true);
   },
   methods: {
+    toggleFullscreen() {
+      this.fullscreen = !this.fullscreen;
+      if (this.fullscreen) {
+        document.addEventListener('keydown', this.onKeydown, true);
+      } else {
+        document.removeEventListener('keydown', this.onKeydown, true);
+      }
+      this.$nextTick(() => this.codeMirror?.refresh());
+    },
+    onKeydown(e) {
+      if (e.key === 'Escape' && this.fullscreen) {
+        e.stopPropagation();
+        this.toggleFullscreen();
+      }
+    },
+    scrollToBottom() {
+      const cm = this.codeMirror;
+      if (!cm) return;
+      this.$nextTick(() => {
+        const last = cm.lastLine();
+        cm.setCursor({ line: last, ch: cm.getLine(last).length });
+        cm.scrollIntoView({ line: last, ch: 0 });
+      });
+    },
     async getLogs() {
       if (this.loading) return;
       this.loading = true;
@@ -249,6 +286,25 @@ export default {
   display: flex;
   flex-direction: column;
   gap: var(--s-3);
+
+  &--fullscreen {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    margin: 0;
+    padding: var(--s-4);
+    background: var(--c-surface-1);
+    box-sizing: border-box;
+
+    .view-log__editor-wrap {
+      flex: 1;
+      min-height: 0;
+    }
+
+    ::v-deep .CodeMirror {
+      height: 100%;
+    }
+  }
 
   &__toolbar {
     display: flex;
