@@ -74,12 +74,22 @@
           disabled
         />
       </el-form-item>
-      <el-form-item v-if="form.backup_type === 'daily' && form.backup_style === 'incremental'" :label="$t('backup.Time Range')">
+      <el-form-item
+        v-if="isDailyIncremental && form.schedule_type === 'immediate'"
+        :label="$t('backup.Range Mode')"
+      >
+        <el-radio-group v-model="form.range_mode">
+          <el-radio label="rolling">{{ $t('backup.Range Mode Rolling') }}</el-radio>
+          <el-radio label="fixed">{{ $t('backup.Range Mode Fixed') }}</el-radio>
+        </el-radio-group>
+        <div v-if="form.range_mode === 'fixed'" class="form-hint">{{ $t('backup.Range Mode Fixed Hint') }}</div>
+      </el-form-item>
+      <el-form-item v-if="isDailyIncremental && rangeModeEffective === 'rolling'" :label="$t('backup.Time Range')">
         <el-input v-model.number="form.days_before" type="number">
           <template #append>{{ $t('backup.Days Ago Text') }}</template>
         </el-input>
       </el-form-item>
-      <el-form-item v-if="form.backup_type === 'daily' && form.backup_style === 'incremental'" :label="$t('backup.Start Date')">
+      <el-form-item v-if="isDailyIncremental && rangeModeEffective === 'rolling'" :label="$t('backup.Start Date')">
         <el-date-picker
           v-model="form.start_date"
           type="date"
@@ -90,6 +100,27 @@
         />
         <div class="form-hint">{{ $t('backup.Start Date Hint') }}</div>
         <div v-if="effectiveRangeText" class="effective-range" :class="{ 'effective-range-skip': effectiveRangeSkip }">
+          {{ $t('backup.Effective Range') }}: {{ effectiveRangeText }}
+        </div>
+      </el-form-item>
+      <el-form-item
+        v-if="isDailyIncremental && rangeModeEffective === 'fixed'"
+        :label="$t('backup.Fixed Range')"
+        prop="fixed_range"
+      >
+        <el-date-picker
+          v-model="form.fixed_range"
+          type="daterange"
+          :start-placeholder="$t('backup.Range Start Placeholder')"
+          :end-placeholder="$t('backup.Range End Placeholder')"
+          format="yyyy-MM-dd"
+          value-format="yyyyMMdd"
+          style="width: 320px;"
+        />
+        <div v-if="fixedRangeInvalid" class="effective-range effective-range-skip">
+          {{ $t('backup.Range Invalid') }}
+        </div>
+        <div v-else-if="effectiveRangeText" class="effective-range">
           {{ $t('backup.Effective Range') }}: {{ effectiveRangeText }}
         </div>
       </el-form-item>
@@ -183,6 +214,18 @@ export default {
       cronPreview: { valid: false, runs: [] },
       cronPreviewTimer: null,
       rules: {
+        fixed_range: [{
+          validator: (_, val, cb) => {
+            if (this.rangeModeEffective !== 'fixed') { cb(); return; }
+            if (!Array.isArray(val) || val.length !== 2 || !val[0] || !val[1]) {
+              cb(new Error(this.$t('backup.Range Start Placeholder') + ' / ' + this.$t('backup.Range End Placeholder')));
+              return;
+            }
+            if (val[0] > val[1]) { cb(new Error(this.$t('backup.Range Invalid'))); return; }
+            cb();
+          },
+          trigger: 'change',
+        }],
         crontab: [{
           validator: (_, val, cb) => {
             if (this.form.schedule_type !== 'scheduled') { cb(); return; }
@@ -247,6 +290,20 @@ export default {
       const v = (this.form.crontab || '').trim();
       return v.length > 0 && !this.cronPreview.valid;
     },
+    isDailyIncremental() {
+      return this.form.backup_style === 'incremental' && this.form.backup_type === 'daily';
+    },
+    // scheduled 强制为 rolling，与创建表单/后端校验保持一致
+    rangeModeEffective() {
+      if (this.form.schedule_type !== 'immediate') return 'rolling';
+      return this.form.range_mode || 'rolling';
+    },
+    fixedRangeInvalid() {
+      if (this.rangeModeEffective !== 'fixed') return false;
+      const r = this.form.fixed_range;
+      if (!Array.isArray(r) || r.length !== 2 || !r[0] || !r[1]) return false;
+      return r[0] > r[1];
+    },
     windowEndDate() {
       const d = new Date();
       d.setDate(d.getDate() - (this.form.days_before || 0));
@@ -265,7 +322,13 @@ export default {
       return this.startDateFormatted > this.windowEndDate;
     },
     effectiveRangeText() {
-      if (this.form.backup_style !== 'incremental' || this.form.backup_type !== 'daily') return '';
+      if (!this.isDailyIncremental) return '';
+      if (this.rangeModeEffective === 'fixed') {
+        const r = this.form.fixed_range || [];
+        const fmt = s => (s && s.length === 8 ? `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}` : '');
+        if (!fmt(r[0]) || !fmt(r[1])) return '';
+        return `${fmt(r[0])} ~ ${fmt(r[1])}`;
+      }
       const end = this.windowEndDate;
       if (!this.startDateFormatted) {
         return `${this.$t('backup.No Lower Bound')} ~ ${end}`;
@@ -320,6 +383,7 @@ export default {
         task_name: '', schedule_type: 'immediate', crontab: '', instance: '', enabled: true,
         database: '', tables: [],
         backup_style: 'incremental', backup_type: 'partition', days_before: 7, start_date: '',
+        range_mode: 'rolling', fixed_range: [],
         target_type: 's3',
         s3Endpoint: '', s3Bucket: '', s3AccessKeyId: '', s3SecretAccessKey: '', s3Region: '',
         localPath: '',
@@ -329,6 +393,9 @@ export default {
     loadFromTask() {
       const t = this.task;
       const p = t.policies[0] || {};
+      const rangeStart = p.range_start_date || '';
+      const rangeEnd = p.range_end_date || '';
+      const hasFixedRange = !!(rangeStart || rangeEnd);
       this.form = {
         task_name: t.task_name || '',
         schedule_type: t.schedule_type,
@@ -341,6 +408,8 @@ export default {
         backup_type: p.backup_type || 'partition',
         days_before: p.days_before || 7,
         start_date: p.start_date || '',
+        range_mode: hasFixedRange ? 'fixed' : 'rolling',
+        fixed_range: hasFixedRange ? [rangeStart, rangeEnd] : [],
         target_type: p.target_type || 's3',
         s3Endpoint: (p.s3 && (p.s3.Endpoint || p.s3.endpoint)) || '',
         s3Bucket: (p.s3 && (p.s3.Bucket || p.s3.bucket)) || '',
@@ -411,6 +480,9 @@ export default {
         backup_type: f.backup_type,
         days_before: f.days_before,
         start_date: f.start_date || '',
+        // 显式覆盖区间字段：fixed 提交固定区间，rolling 清空，避免 {...p} 残留旧值
+        range_start_date: '',
+        range_end_date: '',
         target_type: f.target_type,
         compression: f.compression,
         checksum: f.checksum,
@@ -428,6 +500,11 @@ export default {
         }
       } else if (f.target_type === 'local') {
         body.local = { path: f.localPath };
+      }
+      if (this.isDailyIncremental && this.rangeModeEffective === 'fixed') {
+        const r = f.fixed_range || [];
+        body.range_start_date = r[0] || '';
+        body.range_end_date = r[1] || '';
       }
       return body;
     },
