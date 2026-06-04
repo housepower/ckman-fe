@@ -7,6 +7,14 @@
         <el-option :label="$t('history.Disabled')" value="disabled" />
       </el-select>
       <el-input v-model="searchKey" size="small" style="width:240px" :placeholder="$t('history.Search Task Or Table')" suffix-icon="el-icon-search" clearable />
+      <span v-if="queueStats && (queueStats.running > 0 || queueStats.queued > 0)" class="queue-stats">
+        <el-tooltip :content="$t('history.Queue Stats Tip')" placement="top">
+          <span>
+            <span class="qs-running">● {{ $t('history.Status Running') }} {{ queueStats.running }}</span>
+            <span class="qs-queued" :class="{ 'qs-queued-deep': queueStats.queued > 30 }">● {{ $t('history.Status Queued') }} {{ queueStats.queued }}</span>
+          </span>
+        </el-tooltip>
+      </span>
       <div style="flex:1" />
       <el-button type="primary" size="small" icon="el-icon-plus" @click="$emit('go-backup')">{{ $t('history.New Backup') }}</el-button>
       <el-button size="small" icon="el-icon-refresh-left" @click="$emit('go-restore')">{{ $t('history.New Restore') }}</el-button>
@@ -115,6 +123,7 @@ export default {
     policies: { type: Array, default: () => [] },
     loading: { type: Boolean, default: false },
     autoRefresh: { type: Boolean, default: false },
+    queueStats: { type: Object, default: null },
   },
   data() {
     return {
@@ -306,6 +315,10 @@ export default {
 
 <style scoped>
 .toolbar { display:flex; gap:10px; align-items:center; margin-bottom:14px; flex-wrap:wrap; }
+.queue-stats { font-size:12px; display:inline-flex; gap:10px; align-items:center; }
+.qs-running { color:#67c23a; }
+.qs-queued { color:#909399; margin-left:8px; }
+.qs-queued-deep { color:#e6a23c; font-weight:600; }
 .auto-refresh { display:inline-flex; align-items:center; gap:6px; }
 .ar-label { font-size: 12px; color: #606266; }
 .task-name { font-weight: 500; }

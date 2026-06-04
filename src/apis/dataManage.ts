@@ -26,6 +26,10 @@ export const DataManageApi = {
   listPolicies(clusterName: string) {
     return axios.get(`${url}/backup/${clusterName}`);
   },
+  // cluster 下执行中/排队中 run 统计
+  getBackupQueue(clusterName: string) {
+    return axios.get(`${url}/backup/${clusterName}/queue`);
+  },
   getPolicy(policyId: string) {
     return axios.get(`${url}/backup/policy/${policyId}`);
   },

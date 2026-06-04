@@ -6,6 +6,7 @@
           :policies="policies"
           :loading="loading"
           :auto-refresh="autoRefresh"
+          :queue-stats="queueStats"
           @refresh="fetchPolicies"
           @update:auto-refresh="autoRefresh = $event"
           @view-task="onViewTask"
@@ -70,6 +71,7 @@ export default {
     return {
       activeTab: 'tasks',
       policies: [],
+      queueStats: { running: 0, queued: 0 },
       loading: false,
       autoRefresh: false,
       refreshTimer: null,
@@ -109,6 +111,7 @@ export default {
     },
     async fetchPolicies() {
       this.loading = true;
+      this.fetchQueueStats();
       try {
         const res = await DataManageApi.listPolicies(this.cluster);
         if (res.data.retCode === '0000') {
@@ -121,6 +124,17 @@ export default {
       } finally {
         this.loading = false;
       }
+    },
+    async fetchQueueStats() {
+      try {
+        const res = await DataManageApi.getBackupQueue(this.cluster);
+        if (res.data.retCode === '0000' && res.data.entity) {
+          this.queueStats = {
+            running: res.data.entity.running || 0,
+            queued: res.data.entity.queued || 0,
+          };
+        }
+      } catch { /* 统计失败不打扰主流程 */ }
     },
     onViewTask(task) {
       this.currentTask = task;
