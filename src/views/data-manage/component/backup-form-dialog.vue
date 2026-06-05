@@ -243,6 +243,7 @@
                     key="start-date-input"
                     v-if="form.backupStyle === 'incremental' && form.backupType === 'daily' && rangeModeEffective === 'rolling'"
                     :label="$t('backup.Start Date')"
+                    prop="startDate"
                 >
                     <el-date-picker
                         v-model="form.startDate"
@@ -518,6 +519,25 @@ export default {
                             }
                             if (value[0] > value[1]) {
                                 callback(new Error(this.$t('backup.Range Invalid')));
+                                return;
+                            }
+                            callback();
+                        }
+                    }
+                ],
+                startDate: [
+                    {
+                        required: false,
+                        trigger: 'change',
+                        validator: (rule, value, callback) => {
+                            // 立即备份 + 滚动窗口反转(起始日期晚于窗口终点)时本次必然空跑,阻断提交;
+                            // 定时备份不拦(空窗期后端会标 skipped),保留下方红字提示即可
+                            if (this.form.scheduleType === 'immediate'
+                                && this.form.backupStyle === 'incremental'
+                                && this.form.backupType === 'daily'
+                                && this.rangeModeEffective === 'rolling'
+                                && this.effectiveRangeSkip) {
+                                callback(new Error(this.$t('backup.Effective Range Skip')));
                                 return;
                             }
                             callback();
