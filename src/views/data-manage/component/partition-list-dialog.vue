@@ -91,8 +91,8 @@
                   type="text"
                   size="mini"
                   style="color:#F56C6C"
-                  @click.stop="onDeleteRun(op)"
-                >{{ $t('history.Delete') }}</el-button>
+                  @click.stop="openDeleteRecords([row.partition])"
+                >{{ $t('history.Delete Partition Records') }}</el-button>
               </span>
             </div>
           </div>
@@ -153,10 +153,33 @@
 
     <span slot="footer">
       <el-button @click="$emit('input', false)">{{ $t('history.Close') }}</el-button>
+      <el-button type="danger" plain :disabled="selectedPartitions.length === 0" @click="openDeleteRecords(selectedPartitions)">
+        {{ $t('history.Delete Selected Partition Records', { count: selectedPartitions.length }) }}
+      </el-button>
       <el-button type="primary" :disabled="selectedPartitions.length === 0" @click="onRestoreSelected">
         {{ $t('history.Restore Selected Partitions Count', { count: selectedPartitions.length }) }}
       </el-button>
     </span>
+
+    <!-- 删除分区备份记录确认 -->
+    <el-dialog
+      :visible.sync="deleteDialogVisible"
+      :title="$t('history.Delete Partition Records')"
+      width="480px"
+      append-to-body
+    >
+      <p style="color:#F56C6C;margin:0 0 8px">{{ $t('history.Confirm Delete Partition Records') }}</p>
+      <div class="mono" style="max-height:160px;overflow:auto;margin-bottom:12px;word-break:break-all">
+        {{ deleteTargets.join(', ') }}
+      </div>
+      <el-checkbox v-model="deleteCleanRemote">{{ $t('history.Also Clean Remote Data') }}</el-checkbox>
+      <span slot="footer">
+        <el-button @click="deleteDialogVisible = false">{{ $t('common.Cancel') }}</el-button>
+        <el-button type="danger" :loading="deleting" @click="confirmDeleteRecords">
+          {{ $t('history.Confirm Delete Btn') }}
+        </el-button>
+      </span>
+    </el-dialog>
   </el-dialog>
 </template>
 
@@ -181,6 +204,10 @@ export default {
       currentPage: 1,
       pageSize: 10,
       viewportHeight: typeof window !== 'undefined' ? window.innerHeight : 800,
+      deleteDialogVisible: false,
+      deleteTargets: [],
+      deleteCleanRemote: true,
+      deleting: false,
     };
   },
   computed: {
@@ -399,29 +426,35 @@ export default {
       const m = Math.floor((sec % 3600) / 60);
       return m ? `${h}h ${m}m` : `${h}h`;
     },
-    async onDeleteRun(op) {
+    openDeleteRecords(partitions) {
+      if (!partitions || !partitions.length) return;
+      this.deleteTargets = [...partitions];
+      this.deleteCleanRemote = true; // 每次打开重置为默认勾选
+      this.deleteDialogVisible = true;
+    },
+    async confirmDeleteRecords() {
+      this.deleting = true;
       try {
-        await this.$confirm(
-          this.$t('history.Confirm Delete Run', { op: op.op === 'backup' ? this.$t('history.Op Backup') : this.$t('history.Op Restore'), time: this.formatDate(op.time) }),
-          this.$t('common.Confirm'),
-          {
-            confirmButtonText: this.$t('history.Confirm Delete Btn'),
-            cancelButtonText: this.$t('common.Cancel'),
-            type: 'warning',
-            dangerouslyUseHTMLString: true,
-          }
+        const res = await DataManageApi.deletePartitionRecords(
+          this.policy.cluster_name, this.policy.database, this.policy.table,
+          { partitions: this.deleteTargets, clean_remote: this.deleteCleanRemote }
         );
-      } catch { return; }
-      try {
-        const res = await DataManageApi.deleteRun(op.run_id);
         if (res.data.retCode === '0000') {
-          this.$message.success(this.$t('history.Run Deleted'));
+          const warnings = (res.data.entity && res.data.entity.warnings) || [];
+          if (warnings.length) {
+            this.$message.warning(this.$t('history.Partition Records Deleted With Warnings', { count: warnings.length }));
+          } else {
+            this.$message.success(this.$t('history.Partition Records Deleted'));
+          }
+          this.deleteDialogVisible = false;
           this.fetchRuns();
         } else {
           this.$message.error(res.data.retMsg || this.$t('history.Delete Failed'));
         }
       } catch (e) {
         this.$message.error(this.$t('history.Delete Failed') + ': ' + (e.message || ''));
+      } finally {
+        this.deleting = false;
       }
     },
     targetOfPolicy(p) {
