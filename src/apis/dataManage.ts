@@ -70,7 +70,7 @@ export const DataManageApi = {
     clusterName: string,
     database: string,
     table: string,
-    data: { partitions: string[]; clean_remote: boolean }
+    data: { partitions: string[]; clean_remote: boolean },
   ) {
     return axios.post(`${url}/backup/table/${clusterName}/${database}/${table}/partitions/delete`, data);
   },
