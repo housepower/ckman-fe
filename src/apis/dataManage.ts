@@ -65,6 +65,15 @@ export const DataManageApi = {
       params: { days: days ?? 30 },
     });
   },
+  // 删除分区备份记录(按分区名作用于全部历史 run);clean_remote 同时清理远端数据
+  deletePartitionRecords(
+    clusterName: string,
+    database: string,
+    table: string,
+    data: { partitions: string[]; clean_remote: boolean }
+  ) {
+    return axios.post(`${url}/backup/table/${clusterName}/${database}/${table}/partitions/delete`, data);
+  },
 
   // ============ 表分区信息（前端选表用，缓存几分钟）============
   getTableSummary(clusterName: string, database: string) {
