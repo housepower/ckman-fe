@@ -86,14 +86,7 @@
                 <span v-else class="muted">—</span>
               </span>
               <span class="ops-col-msg muted ellipsis" :title="op.msg || ''">{{ op.msg || '—' }}</span>
-              <span class="ops-col-action">
-                <el-button
-                  type="text"
-                  size="mini"
-                  style="color:#F56C6C"
-                  @click.stop="openDeleteRecords([row.partition])"
-                >{{ $t('history.Delete Partition Records') }}</el-button>
-              </span>
+              <span class="ops-col-action"></span>
             </div>
           </div>
         </template>
@@ -131,6 +124,16 @@
         <template #default="{ row }">
           <span class="muted" v-if="row.latestRestore">{{ formatDate(row.latestRestore.time) }}</span>
           <span class="muted" v-else>—</span>
+        </template>
+      </el-table-column>
+      <el-table-column :label="$t('history.Operation')" width="100" fixed="right" class-name="col-no-click">
+        <template #default="{ row }">
+          <el-button
+            type="text"
+            size="mini"
+            style="color:#F56C6C"
+            @click.stop="openDeleteRecords([row.partition])"
+          >{{ $t('history.Delete Partition Records') }}</el-button>
         </template>
       </el-table-column>
     </el-table>
