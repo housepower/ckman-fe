@@ -133,7 +133,7 @@
             size="mini"
             style="color:#F56C6C"
             @click.stop="openDeleteRecords([row.partition])"
-          >{{ $t('history.Delete Partition Records') }}</el-button>
+          >{{ $t('history.Delete') }}</el-button>
         </template>
       </el-table-column>
     </el-table>
