@@ -62,7 +62,7 @@ export const DataManageApi = {
   // 表维度：cluster.database.table 过去 days 天的 run
   listRunsByTable(clusterName: string, database: string, table: string, days?: number) {
     return axios.get(`${url}/backup/table/${clusterName}/${database}/${table}/runs`, {
-      params: { days: days ?? 30 },
+      params: { days: days ?? 0 },
     });
   },
   // 删除分区备份记录(按分区名作用于全部历史 run);clean_remote 同时清理远端数据

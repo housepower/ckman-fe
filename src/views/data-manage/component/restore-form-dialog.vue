@@ -392,18 +392,12 @@ export default {
       const startDate = new Date(startStr + 'T00:00:00');
       const endDate = new Date(endStr + 'T23:59:59');
 
-      // Calculate days to cover from today back to startDate
-      const today = new Date();
-      const diffMs = today.getTime() - startDate.getTime();
-      const days = Math.max(30, Math.ceil(diffMs / (1000 * 60 * 60 * 24)) + 1);
-
       const promises = this.selectedTables.map(async (table) => {
         try {
           const res = await DataManageApi.listRunsByTable(
             this.cluster,
             this.selectedDatabase,
-            table,
-            days
+            table
           );
           if (res.data.retCode === '0000') {
             const allRuns = res.data.entity || [];

@@ -322,7 +322,7 @@ export default {
     async fetchRuns() {
       this.loading = true;
       try {
-        const res = await DataManageApi.listRunsByTable(this.policy.cluster_name, this.policy.database, this.policy.table, 365);
+        const res = await DataManageApi.listRunsByTable(this.policy.cluster_name, this.policy.database, this.policy.table);
         if (res.data.retCode === '0000') {
           this.runs = res.data.entity || [];
         }

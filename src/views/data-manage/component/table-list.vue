@@ -205,7 +205,7 @@ export default {
   methods: {
     async fetchTableMeta(row) {
       try {
-        const res = await DataManageApi.listRunsByTable(row.cluster_name, row.database, row.table, 365);
+        const res = await DataManageApi.listRunsByTable(row.cluster_name, row.database, row.table);
         if (res.data.retCode === '0000') {
           const runs = res.data.entity || [];
           // 真实最近一次（任意状态），各自维度独立比较
