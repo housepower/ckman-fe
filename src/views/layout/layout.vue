@@ -59,7 +59,7 @@
           :key="item.name"
           href="javascript:void(0)"
           class="ctab"
-          :class="{ 'ctab--active': currentMenu === item.path, 'ctab--hidden': item.name === 'Settings' && mode !== 'deploy' }"
+          :class="{ 'ctab--active': currentMenu === item.path, 'ctab--hidden': item.name === 'Settings' && mode === 'import' }"
           @click="handleMenuClick(item, $event)"
         >
           {{ $t('home.' + item.name) }}
@@ -90,6 +90,7 @@ export default {
       version: "",
       mode: '',
       currentMenu: '',
+      loadedCluster: '',
       timerId: null,
       taskNum: null,
       isAdmin: false
@@ -104,10 +105,13 @@ export default {
       const { path } = this.$route;
       const currentMenu = path.split('/').pop();
       const clusterName = this.$route.params.id;
-      if (!clusterName || this.currentMenu === currentMenu) return false;
+      if (!clusterName) return false;
       this.currentMenu = currentMenu;
+      // 仅在切换到不同集群时刷新 mode；按 tab 名早退会导致跨集群同名 tab 时 mode 不更新。
+      if (this.loadedCluster === clusterName) return false;
+      this.loadedCluster = clusterName;
       const { data: { entity } } = await ClusterApi.getCluster();
-      const { mode } = entity[clusterName];
+      const { mode } = entity[clusterName] || {};
 
       this.mode = mode;
     },

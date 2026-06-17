@@ -178,6 +178,7 @@ const messages = {
     },
     manage: {
       'Action Unavailable In Current State': 'This action is not available in the current cluster state.',
+      'Action Unavailable For Imported Cluster': 'This action is not supported for imported clusters.',
       'statusGreen': 'Healthy',
       'statusRed': 'Offline',
       'statusYellow': 'Warning',
@@ -1118,6 +1119,7 @@ const messages = {
     },
     manage: {
       'Action Unavailable In Current State': '当前集群状态下该操作不可用',
+      'Action Unavailable For Imported Cluster': '导入的集群不支持该操作',
       'statusGreen': '健康',
       'statusRed': '离线',
       'statusYellow': '警告',

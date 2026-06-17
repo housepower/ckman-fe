@@ -5,17 +5,26 @@
       :title="$t('home.Manage')"
     >
       <template #actions>
-        <el-button
+        <el-tooltip
           v-for="item of clusterStatus"
           :key="item"
-          size="medium"
-          :type="item === 'Destroy' ? 'danger' : 'default'"
-          :class="{ 'cluster-op-btn--unavailable': isStatusDisable(item) }"
-          :title="isStatusDisable(item) ? $t('manage.Action Unavailable In Current State') : ''"
-          @click="onClusterOp(item)"
+          placement="bottom"
+          :disabled="mode !== 'import'"
+          :content="$t('manage.Action Unavailable For Imported Cluster')"
         >
-          {{ $t('manage.' + item + ' Cluster') }}
-        </el-button>
+          <span class="cluster-op-btn-wrap">
+            <el-button
+              size="medium"
+              :type="item === 'Destroy' ? 'danger' : 'default'"
+              :disabled="mode === 'import'"
+              :class="{ 'cluster-op-btn--unavailable': isStatusDisable(item) }"
+              :title="mode !== 'import' && isStatusDisable(item) ? $t('manage.Action Unavailable In Current State') : ''"
+              @click="onClusterOp(item)"
+            >
+              {{ $t('manage.' + item + ' Cluster') }}
+            </el-button>
+          </span>
+        </el-tooltip>
       </template>
     </PageHeader>
     <div class="upgrade-card" :class="{ 'upgrade-card--collapsed': !upgradeExpanded }">
@@ -725,6 +734,11 @@ export default {
   &:hover {
     opacity: 0.6;
   }
+}
+
+// 包裹层：禁用的 el-button 不触发鼠标事件，外层 wrapper 才能让 tooltip 生效
+.cluster-op-btn-wrap {
+  display: inline-flex;
 }
 
 .upgrade-card,
