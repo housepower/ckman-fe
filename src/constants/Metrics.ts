@@ -36,6 +36,8 @@ export const Metrics = Object.freeze([
     }, {
       expect: "Memory (tracked)"
     }, {
+      expect: "Memory (RSS)"
+    }, {
       expect: "Network Recive"
     }, {
       expect: "Network Send"

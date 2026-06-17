@@ -118,8 +118,6 @@ export default {
         httpPort: 8123,
         secure: false,
         zkPort: 2181,
-        prom_host: '127.0.0.1',
-        prom_port: '9090',
       },
     };
   },
@@ -136,7 +134,7 @@ export default {
       this.loading = true;
       const {
         cluster, logic_cluster, hosts, zkNodes, user, password,
-        protocol, port, httpPort, secure, zkPort, prom_host, prom_port,
+        protocol, port, httpPort, secure, zkPort,
       } = this.formModel;
       try {
         await ClusterApi.importCluster({
@@ -151,8 +149,6 @@ export default {
           password,
           zkNodes: getCirdOrRangeIps(lineFeed(zkNodes)),
           zkPort: +zkPort,
-          prom_host,
-          prom_port,
         });
         this.$message.success(`${this.$t('common.Import')}${this.$t('common.Success')}`);
         this.$router.push({ name: 'Home' });
