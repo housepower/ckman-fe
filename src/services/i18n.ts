@@ -323,6 +323,7 @@ const messages = {
       'Batch Delete': 'Batch Delete',
       'Selected': 'Selected',
       'Confirm Batch Operation': 'Confirm to {op} {count} selected partitions?',
+      'Confirm Delete Partition': 'Deleting partition <b>{partition}</b>: its data will be permanently lost. Please make sure it has been backed up or is no longer needed. Confirm deletion?',
     },
     session: {
       'Open Sessions': 'Open Sessions',
@@ -1263,6 +1264,7 @@ const messages = {
       'Batch Delete': '批量删除',
       'Selected': '已选择',
       'Confirm Batch Operation': '确认对 {count} 个分区执行{op}操作？',
+      'Confirm Delete Partition': '删除分区 <b>{partition}</b> 后该分区数据将彻底丢失，请确认数据已备份或不再需要。确认删除？',
     },
     session: {
       'Open Sessions': '正在执行的SQL会话',

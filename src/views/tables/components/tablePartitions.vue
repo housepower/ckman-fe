@@ -266,6 +266,24 @@ export default {
       const { clusterName } = this;
       const { table, database, partition_id } = row;
 
+      // 删除分区为破坏性操作,需二次确认(与删除表/批量删除分区保持一致)
+      if (op === 3) {
+        try {
+          await this.$confirm(
+            this.$t('tables.Confirm Delete Partition', { partition: partition_id }),
+            this.$t('common.tips'),
+            {
+              confirmButtonText: this.$t('common.Delete'),
+              cancelButtonText: this.$t('common.Cancel'),
+              type: 'warning',
+              dangerouslyUseHTMLString: true,
+            },
+          );
+        } catch (e) {
+          return; // 用户取消
+        }
+      }
+
       try {
         await TablesApi.operatePartition(clusterName, {
           op,
