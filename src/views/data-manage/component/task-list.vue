@@ -421,6 +421,9 @@ export default {
     async confirmDeleteTask() {
       const t = this.deleteTaskTarget;
       if (!t) return;
+      // 防御:进行中(排队/运行中)时禁止删除,与确认按钮的 disabled 状态一致,
+      // 避免按钮 disabled 渲染前的回车等触发竞态删除
+      if (this.deleteHasInflight) return;
       this.deleting = true;
       try {
         const warnings = [];
