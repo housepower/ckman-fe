@@ -111,6 +111,71 @@
       layout="total, sizes, prev, pager, next, jumper"
       @size-change="currentPage = 1"
     />
+
+    <el-dialog
+      :visible.sync="deleteDialogVisible"
+      :title="$t('history.Delete Task Title')"
+      width="560px"
+      @closed="onDeleteDialogClosed"
+    >
+      <div v-loading="deleteLoading">
+        <p
+          style="margin:0 0 10px"
+          v-html="$t('history.Delete Task Tip', {
+            name: deleteTaskTarget ? displayName(deleteTaskTarget) : '',
+            count: deleteTaskTarget ? deleteTaskTarget.policies.length : 0,
+          })"
+        ></p>
+
+        <el-alert
+          v-if="deleteHasInflight"
+          :title="$t('history.Delete Task Inflight Warning')"
+          type="error"
+          :closable="false"
+          show-icon
+          style="margin-bottom:10px"
+        />
+        <el-alert
+          v-else-if="deleteFetchError"
+          :title="$t('history.Delete Task Fetch Error')"
+          type="warning"
+          :closable="false"
+          show-icon
+          style="margin-bottom:10px"
+        />
+
+        <el-table :data="deleteTableSummaries" size="small" border max-height="260" style="width:100%">
+          <el-table-column :label="$t('history.Delete Task Col Table')" min-width="220" show-overflow-tooltip>
+            <template #default="{ row }">{{ row.database }}.{{ row.table }}</template>
+          </el-table-column>
+          <el-table-column :label="$t('history.Delete Task Col Backed Partitions')" width="140" align="right">
+            <template #default="{ row }">
+              <span v-if="row.error" class="muted">-</span>
+              <span v-else>{{ row.count }}</span>
+            </template>
+          </el-table-column>
+        </el-table>
+
+        <div class="muted" style="margin:10px 0">
+          {{ $t('history.Delete Task Total', { tables: deleteTableSummaries.length, partitions: deleteTotalPartitions }) }}
+        </div>
+
+        <el-checkbox
+          v-model="deleteCleanRemote"
+          :disabled="deleteHasInflight || deleteFetchError"
+        >{{ $t('history.Delete Task Clean Checkbox') }}</el-checkbox>
+      </div>
+
+      <span slot="footer">
+        <el-button @click="deleteDialogVisible = false">{{ $t('common.Cancel') }}</el-button>
+        <el-button
+          type="danger"
+          :loading="deleting"
+          :disabled="deleteLoading || deleteHasInflight"
+          @click="confirmDeleteTask"
+        >{{ $t('history.Confirm Delete Btn') }}</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -134,6 +199,15 @@ export default {
       latestRunMap: {},
       sortField: '',
       sortOrder: '',
+      // 删除任务弹窗
+      deleteDialogVisible: false,
+      deleteTaskTarget: null,
+      deleteTableSummaries: [],
+      deleteCleanRemote: false,
+      deleteLoading: false,
+      deleting: false,
+      deleteHasInflight: false,
+      deleteFetchError: false,
     };
   },
   computed: {
@@ -194,6 +268,9 @@ export default {
     pagedTasks() {
       const s = (this.currentPage - 1) * this.pageSize;
       return this.sortedTasks.slice(s, s + this.pageSize);
+    },
+    deleteTotalPartitions() {
+      return this.deleteTableSummaries.reduce((sum, s) => sum + (s.error ? 0 : s.count), 0);
     },
   },
   watch: {
@@ -284,30 +361,110 @@ export default {
         this.$set(t, 'toggling', false);
       }
     },
-    async deleteTask(t) {
+    deleteTask(t) {
+      this.deleteTaskTarget = t;
+      this.deleteCleanRemote = false;
+      this.deleteTableSummaries = [];
+      this.deleteHasInflight = false;
+      this.deleteFetchError = false;
+      this.deleteDialogVisible = true;
+      this.loadDeleteSummary(t);
+    },
+    async loadDeleteSummary(t) {
+      this.deleteLoading = true;
+      this.deleteHasInflight = false;
+      this.deleteFetchError = false;
       try {
-        await this.$confirm(
-          this.$t('history.Confirm Delete Task', { name: this.displayName(t), count: t.policies.length }),
-          this.$t('common.Confirm'),
-          {
-            confirmButtonText: this.$t('history.Confirm Delete Btn'),
-            cancelButtonText: this.$t('common.Cancel'),
-            type: 'warning',
-            dangerouslyUseHTMLString: true,
+        const summaries = await Promise.all(t.policies.map(async (p) => {
+          const entry = {
+            policy_id: p.policy_id,
+            cluster_name: p.cluster_name,
+            database: p.database,
+            table: p.table,
+            partitions: [],
+            count: 0,
+            error: false,
+          };
+          try {
+            const res = await DataManageApi.listRunsByTable(p.cluster_name, p.database, p.table);
+            if (res.data.retCode === '0000') {
+              const runs = res.data.entity || [];
+              const succ = new Set();
+              for (const run of runs) {
+                if (run.status === 'queued' || run.status === 'running') this.deleteHasInflight = true;
+                if (run.operation === 'backup') {
+                  for (const part of (run.partitions || [])) {
+                    if (part.status === 'success') succ.add(part.partition);
+                  }
+                }
+              }
+              entry.partitions = [...succ];
+              entry.count = succ.size;
+            } else {
+              entry.error = true;
+              this.deleteFetchError = true;
+            }
+          } catch {
+            entry.error = true;
+            this.deleteFetchError = true;
           }
-        );
-      } catch { return; }
-      const results = await Promise.allSettled(
-        t.policies.map(p => DataManageApi.deletePolicy(p.policy_id))
-      );
-      const success = results.filter(r => r.status === 'fulfilled' && r.value.data.retCode === '0000').length;
-      const failed = results.length - success;
-      if (failed === 0) {
-        this.$message.success(this.$t('history.Task Delete Result OK', { success }));
-      } else {
-        this.$message.warning(this.$t('history.Task Delete Result Partial', { success, failed }));
+          return entry;
+        }));
+        // 防止用户在加载期间切换到另一任务时把结果错配
+        if (this.deleteTaskTarget === t) {
+          this.deleteTableSummaries = summaries;
+        }
+      } finally {
+        this.deleteLoading = false;
       }
-      this.$emit('refresh');
+    },
+    async confirmDeleteTask() {
+      const t = this.deleteTaskTarget;
+      if (!t) return;
+      this.deleting = true;
+      try {
+        const warnings = [];
+        if (this.deleteCleanRemote) {
+          for (const s of this.deleteTableSummaries) {
+            if (s.error || s.count === 0) continue;
+            try {
+              const res = await DataManageApi.deletePartitionRecords(
+                s.cluster_name, s.database, s.table,
+                { partitions: s.partitions, clean_remote: true }
+              );
+              if (res.data.retCode !== '0000') {
+                warnings.push(`${s.database}.${s.table}: ${res.data.retMsg || 'failed'}`);
+              } else {
+                const w = (res.data.entity && res.data.entity.warnings) || [];
+                warnings.push(...w);
+              }
+            } catch (e) {
+              warnings.push(`${s.database}.${s.table}: ${e.message || 'error'}`);
+            }
+          }
+        }
+        const results = await Promise.allSettled(
+          t.policies.map(p => DataManageApi.deletePolicy(p.policy_id))
+        );
+        const success = results.filter(r => r.status === 'fulfilled' && r.value.data.retCode === '0000').length;
+        const failed = results.length - success;
+        if (failed > 0) {
+          this.$message.warning(this.$t('history.Task Delete Result Partial', { success, failed }));
+        } else if (warnings.length > 0) {
+          this.$message.warning(this.$t('history.Task Delete Clean Warnings', { count: warnings.length }));
+        } else {
+          this.$message.success(this.$t('history.Task Delete Result OK', { success }));
+        }
+        this.deleteDialogVisible = false;
+        this.$emit('refresh');
+      } finally {
+        this.deleting = false;
+      }
+    },
+    onDeleteDialogClosed() {
+      this.deleteTaskTarget = null;
+      this.deleteTableSummaries = [];
+      this.deleteCleanRemote = false;
     },
   },
 };
