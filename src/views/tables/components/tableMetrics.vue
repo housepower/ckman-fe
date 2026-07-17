@@ -170,6 +170,18 @@ export default {
             sortable: true
           },
           {
+            prop: "index_uncompressed",
+            label: this.$t('tables.IndexUnCompressed'),
+            minWidth: 200,
+            sortable: true
+          },
+          {
+            prop: "index_compressed",
+            label: this.$t('tables.IndexCompressed'),
+            minWidth: 200,
+            sortable: true
+          },
+          {
             prop: "readwrite_status",
             label: this.$t('tables.RWStatus'),
             filters: [
@@ -288,6 +300,8 @@ export default {
             parts: values.parts,
             uncompressed: values.uncompressed,
             compressed: values.compressed,
+            index_uncompressed: values.index_uncompressed,
+            index_compressed: values.index_compressed,
             readwrite_status: values.readwrite_status.toString().toUpperCase(),
           } :{
             tableName: key,
