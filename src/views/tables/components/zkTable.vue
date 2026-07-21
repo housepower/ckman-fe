@@ -32,7 +32,7 @@
                 'zk-table__cell--danger':  isAvgLatency(field, data[column.field][field]) === 2,
               }"
             >
-              {{ data[column.field][field] }}
+              {{ formatValue(field, data[column.field][field]) }}
             </td>
           </tr>
         </tbody>
@@ -44,6 +44,8 @@
 <script>
 import { pull } from 'lodash-es';
 import { TablesApi } from '@/apis';
+
+const COUNT_FIELDS = ['znode_count', 'watch_count', 'outstanding_requests'];
 
 export default {
   data() {
@@ -73,12 +75,30 @@ export default {
       const { data: { entity } } = await TablesApi.zkStatus(this.$route.params.id);
       this.tableData = Object.freeze(entity || []);
     },
+    // avg_latency 单位为毫秒(ZK 与 clickhouse-keeper 一致)，是自上次重启以来的累计均值。
+    // 健康集群基线在 0.1~3ms —— ZK 的读请求由本地内存直接返回，不走 quorum 和 fsync，
+    // 而 CK 对 ZK 的访问读多写少，故均值极低。阈值按基线的十倍量级取，留出抖动余量。
     isAvgLatency(field, value) {
       if (field !== 'avg_latency') return 0;
       const num = Number(value);
-      if (num > 30) return 2;
-      if (num > 10) return 1;
+      if (num > 200) return 2;
+      if (num > 50) return 1;
       return 0;
+    },
+    formatValue(field, value) {
+      if (value === undefined || value === null) return '—';
+      if (field === 'avg_latency') return `${value} ms`;
+      if (field === 'approximate_data_size') return this.formatBytes(Number(value));
+      if (COUNT_FIELDS.includes(field)) return Number(value).toLocaleString();
+      return value;
+    },
+    formatBytes(b) {
+      if (!b || b === 0) return '—';
+      if (b < 1024) return `${b} B`;
+      if (b < 1024 ** 2) return `${(b / 1024).toFixed(2)} KiB`;
+      if (b < 1024 ** 3) return `${(b / 1024 ** 2).toFixed(2)} MiB`;
+      if (b < 1024 ** 4) return `${(b / 1024 ** 3).toFixed(2)} GiB`;
+      return `${(b / 1024 ** 4).toFixed(2)} TiB`;
     },
   },
 };
