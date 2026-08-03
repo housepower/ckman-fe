@@ -13,6 +13,7 @@
       :schema="schema"
       :form-model="formModel"
       :is-show-cancel="false"
+      :show-policy="true"
       :submit-text="$t('common.Save')"
       @submit="onSubmit"
     />
@@ -85,14 +86,14 @@ export default {
 
       return password;
     },
-    async onSubmit({ data, force }) {
+    async onSubmit({ data, force, policy }) {
       let password = "";
       if (data["AuthenticateType"] === 1) {
         password = await this.openPasswordDialog();
       }
       this.loading = true;
       const clusterName = this.$route.params.id;
-      const { data: { entity: taskId } } = await ClusterApi.saveClusterConfig(clusterName, data, force, password).finally(() => this.loading = false);
+      const { data: { entity: taskId } } = await ClusterApi.saveClusterConfig(clusterName, data, force, password, policy).finally(() => this.loading = false);
       await $modal({
         component: TaskDetail,
         props: {
