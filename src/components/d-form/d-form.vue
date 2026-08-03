@@ -10,10 +10,10 @@
     </DFormItem>
     <el-form-item class="sticky-bottom" v-if="!noFooter">
       <div v-if="showPolicy" class="d-form-restart-policy">
-        <label class="d-form-restart-policy__label">{{ $t('manage.Policy') }}</label>
+        <label class="d-form-restart-policy__label">{{ $t('common.Restart Policy') }}</label>
         <el-select v-model="policy" size="small" class="d-form-restart-policy__select">
-          <el-option :label="$t('manage.Full')" value="Full"></el-option>
-          <el-option :label="$t('manage.Rolling')" value="Rolling"></el-option>
+          <el-option :label="$t('common.Full Restart')" value="Full"></el-option>
+          <el-option :label="$t('common.Rolling Restart')" value="Rolling"></el-option>
         </el-select>
         <span v-if="tlsChanged" class="d-form-restart-policy__hint">
           <i class="el-icon-warning"></i>

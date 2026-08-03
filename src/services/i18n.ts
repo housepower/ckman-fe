@@ -94,6 +94,9 @@ const messages = {
       'Read File Failed': 'Failed to read file',
       'Certificate Valid Until': 'Certificate valid until {date}',
       'TLS Restart Hint': 'Switching TLS requires restarting all nodes; the cluster will be unavailable during this time.',
+      'Restart Policy': 'Restart Policy',
+      'Full Restart': 'Full Restart',
+      'Rolling Restart': 'Rolling Restart',
     },
     errors: {
       'Unknown': 'Unexpected error. Please contact the administrator.',
@@ -1057,6 +1060,9 @@ const messages = {
       'Read File Failed': '读取文件失败',
       'Certificate Valid Until': '证书有效期至 {date}',
       'TLS Restart Hint': '切换 TLS 需要重启全部节点，期间集群不可用',
+      'Restart Policy': '重启策略',
+      'Full Restart': '全量重启',
+      'Rolling Restart': '滚动重启',
     },
     errors: {
       'Unknown': '未知错误，请联系管理员',
