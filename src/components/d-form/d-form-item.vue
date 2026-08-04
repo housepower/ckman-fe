@@ -42,29 +42,6 @@
           <el-input class="width-350" size="medium" :disabled="schema.editable === 'false'" type="textarea" v-model="formModel[originName]" :placeholder="$t('common.Please fill out')" v-if="schema.input_type === 'textarea'"></el-input>
           <!-- 密码 -->
           <el-input class="width-350" size="medium" :disabled="schema.editable === 'false'" autocomplete="new-password" v-model="formModel[originName]" :placeholder="$t('common.Please fill out')" v-if="schema.input_type === 'password'" show-password></el-input>
-          <!-- 证书/私钥辅助操作：从本地文件导入 + 生成自签名证书 -->
-          <div v-if="isCertField" class="tls-cert-actions">
-            <input
-              :ref="'certFileInput_' + originName"
-              type="file"
-              accept=".crt,.pem,.key"
-              style="display: none"
-              @change="onCertFileChange"
-            />
-            <el-button size="mini" @click="$refs['certFileInput_' + originName].click()">
-              {{ $t('common.Import From File') }}
-            </el-button>
-            <el-tooltip v-if="originName === 'Key' && !isAdmin" effect="dark" :content="$t('common.Generate Self Signed Cert No Permission')" placement="top">
-              <span>
-                <el-button size="mini" type="primary" disabled>
-                  {{ $t('common.Generate Self Signed Cert') }}
-                </el-button>
-              </span>
-            </el-tooltip>
-            <el-button v-else-if="originName === 'Key'" size="mini" type="primary" :loading="genCertLoading" @click="genSelfSignedCert">
-              {{ $t('common.Generate Self Signed Cert') }}
-            </el-button>
-          </div>
         </template>
       </template>
 
@@ -133,8 +110,6 @@
 <script>
 import { isEqual, cloneDeep } from 'lodash-es';
 import { catWith, getPostData } from './util';
-import { ClusterApi } from '@/apis';
-import { readFile } from '@/helpers';
 export default {
   name: 'dFormItem',
   components: {
@@ -147,13 +122,6 @@ export default {
   model: {
     prop: 'formModel',
     event: 'change',
-  },
-
-  inject: {
-    // 由 d-form.vue 提供，用于访问表单根数据（跨嵌套层级，比如从 TlsConf.Key 读取顶层的节点 IP 列表）
-    dFormRoot: {
-      default: null,
-    },
   },
 
   props: {
@@ -188,7 +156,6 @@ export default {
       label: '',
       isSlideUp: true,
       errorMessage: '',
-      genCertLoading: false,
     }
   },
 
@@ -199,14 +166,6 @@ export default {
     // 证书到期时间：只读展示，非表单输入框
     isNotAfterField() {
       return this.originName === 'NotAfter';
-    },
-    // Cert / Key 两个字段需要额外的"从文件导入"、"生成自签名证书"辅助操作
-    isCertField() {
-      return (this.originName === 'Cert' || this.originName === 'Key') && this.schema.input_type === 'textarea';
-    },
-    isAdmin() {
-      const root = this.$root;
-      return !!(root && root.userInfo && root.userInfo.policy === 'admin');
     },
     isShowAddIcon() {
       return ['list-struct', 'list-string', 'map'].includes(this.schema.type);
@@ -411,58 +370,6 @@ export default {
         if (Number(formModel.HttpPort) === SECURE_HTTP_PORT) this.$set(formModel, 'HttpPort', PLAIN_HTTP_PORT);
       }
     },
-
-    // 收集表单里已填写的全部 ClickHouse 节点 IP，用作自签名证书的 SAN
-    collectHosts() {
-      const root = this.dFormRoot && this.dFormRoot.formData;
-      const shards = root && root.Shards;
-      if (!Array.isArray(shards)) return [];
-      const ips = [];
-      shards.forEach((shard) => {
-        (shard.Replicas || []).forEach((replica) => {
-          if (replica && replica.Ip) ips.push(replica.Ip);
-        });
-      });
-      return [...new Set(ips)];
-    },
-
-    async genSelfSignedCert() {
-      const hosts = this.collectHosts();
-      if (hosts.length === 0) {
-        this.$message.warning(this.$t('common.No Host For Self Signed Cert'));
-        return;
-      }
-      this.genCertLoading = true;
-      try {
-        const { data: { entity } } = await ClusterApi.genSelfSignedCert(hosts);
-        this.$set(this.formModel, 'Cert', entity.cert);
-        this.$set(this.formModel, 'Key', entity.key);
-        this.$set(this.formModel, 'SelfSigned', true);
-        this.$message.success(this.$t('common.Generate Self Signed Cert Success'));
-      } catch (e) {
-        if (e && e.response && e.response.data && e.response.data.retCode === '5030') {
-          this.$message.error(this.$t('common.Generate Self Signed Cert No Permission'));
-        } else {
-          this.$message.error((e && e.message) || this.$t('errors.Unknown'));
-        }
-      } finally {
-        this.genCertLoading = false;
-      }
-    },
-
-    async onCertFileChange(event) {
-      const file = event.target.files && event.target.files[0];
-      event.target.value = '';
-      if (!file) return;
-      try {
-        const content = await readFile(file);
-        this.$set(this.formModel, this.originName, content);
-        // 手动导入的证书不再视为 ckman 自签名
-        this.$set(this.formModel, 'SelfSigned', false);
-      } catch (e) {
-        this.$message.error(this.$t('common.Read File Failed'));
-      }
-    },
   }
 }
 </script>
@@ -544,13 +451,6 @@ export default {
       left: 300px !important;
     }
   }
-}
-
-.tls-cert-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 8px;
 }
 
 .tls-not-after {
