@@ -67,10 +67,21 @@ $--font-path: '~element-ui-eoi/lib/theme-chalk/fonts';
 .el-tooltip__popper {
   font-size: var(--fs-xs);
   border-radius: var(--r-sm);
+  // Element 只在 .is-dark / .is-light 上设背景，裸 popper 是透明的：
+  // 表格 show-overflow-tooltip 的浮层一旦少了这个 class，就会把底下的
+  // 单元格内容透出来，看着像表格"穿帮"。这里给个不透明兜底。
+  background: var(--c-gray-700);
+  color: var(--c-surface-0);
 
   &.is-dark {
     background: var(--c-gray-700);
     color: var(--c-surface-0);
+  }
+
+  // 兜底是深色的，浅色变体要把前景色一并还原，否则会白底白字
+  &.is-light {
+    background: var(--c-surface-0);
+    color: var(--c-text-primary);
   }
 }
 
