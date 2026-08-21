@@ -90,7 +90,6 @@
   </section>
 </template>
 <script>
-import echarts from "echarts";
 import { chartOption } from "./chartOption";
 import { MetricApi } from "@/apis";
 import { convertTimeBounds } from "@/helpers";
@@ -206,8 +205,6 @@ export default {
       this.$nextTick(() => {
         if (this.$refs.Charts && this.$refs.Charts[index]) {
           this.$refs.Charts[index].refreshChart();
-          const chartInstances = (this.$refs.Charts || []).map((item) => item.chart);
-          echarts.connect(chartInstances);
         }
       });
     },
