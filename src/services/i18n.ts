@@ -123,7 +123,9 @@ const messages = {
       'Settings': 'Settings',
       'Logout Success': 'Logout Success',
       'Message Center': 'Message Center',
-      'Document': 'Document'
+      'Document': 'Document',
+      'Collapse Sidebar': 'Collapse',
+      'Expand Sidebar': 'Expand',
     },
     home: {
       'Create or import a ClickHouse Cluster':
@@ -1092,6 +1094,8 @@ const messages = {
       'Logout Success': '成功登出',
       'Message Center': '消息中心',
       'Document': '文档',
+      'Collapse Sidebar': '收起',
+      'Expand Sidebar': '展开',
     },
     home: {
       'Create or import a ClickHouse Cluster': '创建或导入集群',
@@ -1125,11 +1129,11 @@ const messages = {
       'ClickHouse Version': 'ClickHouse版本',
       'Overview': '监控集群',
       'Manage': '管理集群',
-      'Tables': '表管理',
+      'Tables': '库表管理',
       'data-manage': '数据管理',
       'Session': '会话管理',
       'Query Execution': '查询管理',
-      'Settings': '设置',
+      'Settings': '配置管理',
       'The imported cluster does not support editing': '导入的集群不支持编辑',
       'Address': '地址',
       'Port': '端口',
@@ -1306,8 +1310,8 @@ const messages = {
       'Confirm Delete Partition': '删除分区 <b>{partition}</b> 后该分区数据将彻底丢失，请确认数据已备份或不再需要。确认删除？',
     },
     session: {
-      'Open Sessions': '正在执行的SQL会话',
-      'DDL Queue': '分布式DDL查询',
+      'Open Sessions': '执行中SQL',
+      'DDL Queue': '分布式DDL',
       'Slow Sessions': '慢SQL查询',
       'Limit Count': '查询条数',
       'Query Start Time': 'SQL开始时间',
@@ -1345,7 +1349,7 @@ const messages = {
       'ClickHouse Packages': 'ClickHouse 安装包管理',
     },
     ClickHouseEcharts: {
-      'ClickHouse Table KPIs': 'ClickHouse 数据库性能指标',
+      'ClickHouse Table KPIs': '数据库指标',
       'Queries/second': '每秒查询次数',
       'Selected Bytes/second': '每秒查询字节数(MB)',
       'Selected Rows/second': '每秒查询行数',
@@ -1360,7 +1364,7 @@ const messages = {
       'Replicated Part Mutations': '副本突变指标',
       'Total MergeTree Parts': 'Part总数',
       'Max Parts For Partition': '分区内最大Part数',
-      'ClickHouse Node KPIs': 'ClickHouse 节点指标',
+      'ClickHouse Node KPIs': '节点指标',
       'Load Average (15 minutes)': '平均负载(15分钟)',
       'CPU Usage (cores)': 'CPU指标(核数)',
       'Memory (tracked)': '跟踪内存(ClickHouse统计/MB)',

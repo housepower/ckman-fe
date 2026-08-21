@@ -1,17 +1,6 @@
 <template>
   <section class="overview-base">
     <template v-if="!allEmpty">
-      <div class="metric-tabs" v-if="chartMetrics.length > 1">
-        <button
-          v-for="(group, gIndex) of chartMetrics"
-          :key="group.title"
-          class="metric-tab"
-          :class="{ 'metric-tab--active': gIndex === activeGroupIndex }"
-          @click="activeGroupIndex = gIndex"
-        >
-          {{ $t('ClickHouseEcharts.' + group.title) }}
-        </button>
-      </div>
       <div
         v-for="(group, gIndex) of chartMetrics"
         :key="group.title"
@@ -92,6 +81,7 @@
 <script>
 import { chartOption } from "./chartOption";
 import { MetricApi } from "@/apis";
+import { tabIndexOf } from "@/constants";
 import { convertTimeBounds } from "@/helpers";
 
 export default {
@@ -138,17 +128,21 @@ export default {
         ? this.$t('ClickHouseEcharts.' + this.expandedMetric.expect)
         : '';
     },
+    // 指标分组的切换入口在侧边栏二级菜单，选中项由 URL 的 ?tab= 决定
+    activeGroupIndex() {
+      return tabIndexOf(this.chartMetrics, this.$route.query.tab);
+    },
   },
   data() {
     return {
       chartMetrics: [],
-      activeGroupIndex: 0,
       expanded: null, // { gi, mi } or null
     };
   },
   mounted() {
-    this.chartMetrics = (this.metrics || []).map(({ title, metrics }) => {
+    this.chartMetrics = (this.metrics || []).map(({ key, title, metrics }) => {
       return {
+        key,
         title,
         metrics: (metrics || []).map(m => ({ ...m, option: null, isEmpty: false })),
       };
@@ -232,44 +226,6 @@ export default {
   display: flex;
   flex-direction: column;
   gap: var(--s-4);
-}
-
-.metric-tabs {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  display: flex;
-  gap: var(--s-5);
-  border-bottom: 1px solid var(--c-surface-3);
-  padding: 0 var(--s-2);
-  background: var(--c-surface-1);
-  margin: 0 calc(-1 * var(--s-5));
-  padding-left: var(--s-7, 28px);
-  padding-right: var(--s-5);
-}
-
-.metric-tab {
-  appearance: none;
-  background: none;
-  border: 0;
-  cursor: pointer;
-  padding: var(--s-2) var(--s-1);
-  font-size: var(--fs-md);
-  color: var(--c-text-secondary);
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
-  transition: color var(--du-fast) var(--ease-out),
-              border-color var(--du-fast) var(--ease-out);
-
-  &:hover {
-    color: var(--c-text-primary);
-  }
-
-  &--active {
-    color: var(--c-text-primary);
-    font-weight: var(--fw-semibold);
-    border-bottom-color: var(--c-primary-solid);
-  }
 }
 
 .chart-grid {

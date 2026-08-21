@@ -1,5 +1,6 @@
 export const Metrics = Object.freeze([
   {
+    key: 'ch-table',
     title: 'ClickHouse Table KPIs',
     metrics: [{
       expect: "Inserted/second"
@@ -28,6 +29,7 @@ export const Metrics = Object.freeze([
 
     }],
   }, {
+    key: 'ch-node',
     title: 'ClickHouse Node KPIs',
     metrics: [{
       expect: "Load Average (15 minutes)"
@@ -51,6 +53,7 @@ export const Metrics = Object.freeze([
       expect: "DiskUsed(default)"
     }],
   }, {
+    key: 'zookeeper',
     title: 'ZooKeeper KPIs',
     metrics: [{
       expect: "Zookeeper Create"

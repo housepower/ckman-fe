@@ -279,15 +279,16 @@ export default {
   height: 100%;
 
   &--fullscreen {
-    // 留出顶栏(52px) + 集群导航条(40px) = 92px，保持导航可用
+    // 让开顶栏和左侧导航栏，保持导航可用；两个尺寸变量由 layout 维护，
+    // 侧边栏折叠时 --layout-sidebar-w 会自动变成折叠宽度。
     position: fixed !important;
-    top: 92px !important;
+    top: var(--layout-header-h) !important;
     right: 0 !important;
     bottom: 0 !important;
-    left: 0 !important;
-    width: 100vw !important;
-    height: calc(100vh - 92px) !important;
-    z-index: 98; // 顶栏 z=100、集群导航 z=99 之下，确保不被遮挡的同时不盖住导航
+    left: var(--layout-sidebar-w) !important;
+    width: auto !important;
+    height: auto !important;
+    z-index: 98;
     background: var(--c-surface-0);
     display: flex;
     flex-direction: column;

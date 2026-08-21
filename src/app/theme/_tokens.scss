@@ -206,4 +206,13 @@ $tokens-fs-base: 13px;
 
   --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  // ─────────────────────────────────────────────────
+  // Layout · 框架尺寸
+  // layout.vue 会在折叠时把 --layout-sidebar-w 覆写为折叠宽度，
+  // 需要贴合框架定位的组件（如查询结果全屏面板）读这两个变量即可自适应。
+  // ─────────────────────────────────────────────────
+  --layout-sidebar-w:           208px;
+  --layout-sidebar-w-collapsed:  56px;
+  --layout-header-h:             40px;
 }

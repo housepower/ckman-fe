@@ -1,75 +1,116 @@
 <template>
-  <div class="layout flex flex-column overflow-hidden">
-    <header class="flex-between flex-vcenter plr-20">
-      <router-link to="/" class="brand-link">
-        <img class="brand-icon" src="/favicon.ico" alt="" />
-        <span class="brand-text">{{title}} <span class="brand-version">{{version}}</span></span>
+  <div class="layout" :class="{ 'layout--collapsed': collapsed }">
+    <aside class="sidebar">
+      <router-link to="/" class="brand" v-tooltip="tip(title)">
+        <img class="brand__icon" src="/favicon.ico" alt="" />
+        <span class="brand__text">
+          {{ title }}
+          <span class="brand__version">{{ version }}</span>
+        </span>
       </router-link>
-      <div class="header-right flex flex-vcenter">
 
-        <div class="flex flex-vcenter mr-15 pointer" @click="viewTaskList">
-          <i class="fa fa-tasks fs-20 mr-5"></i>
-          <span class="fs-16">{{$t('task.Task List')}}</span>
+      <nav class="side-nav">
+        <router-link
+          to="/home"
+          class="side-item"
+          active-class="side-item--active"
+          v-tooltip="tip($t('home.All ClickHouse Clusters'))"
+        >
+          <i class="fa fa-home side-item__icon"></i>
+          <span class="side-item__text">{{ $t('home.All ClickHouse Clusters') }}</span>
+        </router-link>
+
+        <template v-if="$route.params.id">
+          <p class="side-group" v-if="!collapsed">{{ $route.params.id }}</p>
+          <div class="side-divider" v-else></div>
+          <template v-for="item of clusterMenus">
+            <a
+              :key="item.name"
+              href="javascript:void(0)"
+              class="side-item"
+              :class="{ 'side-item--active': currentMenu === item.path }"
+              v-tooltip="tip($t('home.' + item.name))"
+              @click="handleMenuClick(item, $event)"
+            >
+              <i class="fa side-item__icon" :class="item.icon"></i>
+              <span class="side-item__text">{{ $t('home.' + item.name) }}</span>
+            </a>
+            <div
+              v-if="!collapsed && item.children && currentMenu === item.path"
+              :key="item.name + '-tabs'"
+              class="side-sub"
+            >
+              <a
+                v-for="tab of item.children"
+                :key="tab.key"
+                href="javascript:void(0)"
+                class="side-subitem"
+                :class="{ 'side-subitem--active': currentTab(item) === tab.key }"
+                @click="goTab(tab.key)"
+              >
+                {{ $t(tab.label) }}
+              </a>
+            </div>
+          </template>
+        </template>
+      </nav>
+
+      <button
+        type="button"
+        class="side-toggle"
+        v-tooltip="tip(collapsedLabel)"
+        @click="toggleCollapse"
+      >
+        <i class="fa side-item__icon" :class="collapsed ? 'fa-angle-double-right' : 'fa-angle-double-left'"></i>
+        <span class="side-item__text">{{ collapsedLabel }}</span>
+      </button>
+    </aside>
+
+    <div class="main-column">
+      <header class="flex flex-vcenter">
+        <div class="header-right flex flex-vcenter">
+          <router-link to="/task" class="header-link">
+            <i class="fa fa-tasks"></i>
+            <span>{{ $t('task.Task List') }}</span>
+          </router-link>
+
+          <a href="/docs/" target="_blank" class="header-link">
+            <i class="fa fa-book" aria-hidden="true"></i>
+            <span>{{ $t('layout.Document') }}</span>
+          </a>
+
+          <router-link to="/setting" class="header-link">
+            <i class="fa fa-briefcase"></i>
+            <span>{{ $t('common.package') }}</span>
+          </router-link>
+
+          <router-link v-if="isAdmin" to="/users" class="header-link">
+            <i class="fa fa-users"></i>
+            <span>{{ $t('common.users') }}</span>
+          </router-link>
+
+          <el-select v-model="$i18n.locale" class="width-100" size="mini">
+            <el-option value="en" label="English" />
+            <el-option value="zh" label="中文" />
+          </el-select>
+
+          <el-dropdown class="pointer">
+            <div class="flex flex-vcenter">
+              <i class="fa fa-user-o"></i>
+              <span v-text="user" class="ml-5 user" />
+            </div>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item @click.native="openChangePassword">{{ $t('user.Change Password') }}</el-dropdown-item>
+              <el-dropdown-item @click.native="logout">{{ $t('common.Logout') }}</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
         </div>
+      </header>
 
-        <a href="/docs/" target="_blank" class="flex flex-vcenter mr-15 pointer">
-          <i class="fa fa-book fs-20 mr-5" aria-hidden="true"></i>
-          <span class="fs-16">{{$t('layout.Document')}}</span>
-        </a>
-
-        <router-link to="/setting" class="fa fa-briefcase fs-20 pointer mr-15"><span class="fs-16 ml-5">{{$t('common.package')}}</span></router-link>
-
-        <router-link
-          v-if="isAdmin"
-          to="/users"
-          class="fa fa-users fs-20 pointer mr-15">
-          <span class="fs-16 ml-5">{{ $t('common.users') }}</span>
-        </router-link>
-
-        <el-select v-model="$i18n.locale" class="mr-15 width-100" size="mini">
-          <el-option value="en" label="English" />
-          <el-option value="zh" label="中文" />
-        </el-select>
-
-        <el-dropdown class="pointer">
-          <div class="flex flex-vcenter">
-            <i class="fa fa-user-o fs-20"></i>
-            <span v-text="user"
-                  class="fs-16 ml-5 user" />
-          </div>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item @click.native="openChangePassword">{{ $t('user.Change Password') }}</el-dropdown-item>
-            <el-dropdown-item @click.native="logout">{{ $t('common.Logout') }}</el-dropdown-item>
-          </el-dropdown-menu>
-        </el-dropdown>
-      </div>
-    </header>
-
-    <nav class="cluster-tabs" v-if="$route.params.id">
-      <div class="cluster-tabs__inner">
-        <router-link
-          to="/"
-          class="ctab-home"
-          v-tooltip="$t('home.All ClickHouse Clusters')"
-        >
-          <i class="fa fa-home"></i>
-        </router-link>
-        <a
-          v-for="item of menus"
-          :key="item.name"
-          href="javascript:void(0)"
-          class="ctab"
-          :class="{ 'ctab--active': currentMenu === item.path, 'ctab--hidden': item.name === 'Settings' && mode === 'import' }"
-          @click="handleMenuClick(item, $event)"
-        >
-          {{ $t('home.' + item.name) }}
-        </a>
-      </div>
-    </nav>
-
-    <main class="flex-1" style="overflow: auto;">
-      <router-view />
-    </main>
+      <main class="flex-1" style="overflow: auto;">
+        <router-view />
+      </main>
+    </div>
   </div>
 </template>
 <script>
@@ -80,6 +121,8 @@ import { $modal } from "@/services";
 import ElementLocale from 'element-ui/lib/locale';
 import enLocale from 'element-ui/lib/locale/lang/en';
 import zhLocale from 'element-ui/lib/locale/lang/zh-CN';
+
+const COLLAPSE_KEY = 'ckman-sidebar-collapsed';
 
 export default {
   name: "Layout",
@@ -93,7 +136,8 @@ export default {
       loadedCluster: '',
       timerId: null,
       taskNum: null,
-      isAdmin: false
+      isAdmin: false,
+      collapsed: localStorage.getItem(COLLAPSE_KEY) === '1',
     };
   },
   async mounted() {
@@ -129,6 +173,26 @@ export default {
       }
     },
 
+    toggleCollapse() {
+      this.collapsed = !this.collapsed;
+    },
+
+    // 二级菜单当前项：URL 上没写就是第一项，与页面的回落规则一致。
+    currentTab(item) {
+      const tab = this.$route.query.tab;
+      return item.children.some(x => x.key === tab) ? tab : item.children[0].key;
+    },
+
+    goTab(key) {
+      if (this.$route.query.tab === key) return;
+      this.$router.push({ query: { ...this.$route.query, tab: key } });
+    },
+
+    // 折叠态才给出 tooltip：展开时文字已经可见，content 为 null 时组件自身隐藏。
+    tip(content) {
+      return this.collapsed ? { content, placement: 'right' } : { content: null };
+    },
+
     logout() {
       localStorage.removeItem("user");
       this.$message.success(this.$t('layout.Logout Success'));
@@ -140,12 +204,6 @@ export default {
         data: { entity },
       } = await ConfigApi.getVersion();
       this.version = entity;
-    },
-
-    viewTaskList() {
-      this.$router.push({
-        name: 'TaskList'
-      });
     },
 
     async refreshMe() {
@@ -187,6 +245,9 @@ export default {
       },
       immediate: true,
     },
+    collapsed(value) {
+      localStorage.setItem(COLLAPSE_KEY, value ? '1' : '0');
+    },
     '$i18n.locale'(value) {
       localStorage.setItem('locale', value);
       document.title = this.title;
@@ -199,6 +260,13 @@ export default {
     title() {
       return this.$t('layout.ClickHouse Management Console');
     },
+    collapsedLabel() {
+      return this.collapsed ? this.$t('layout.Expand Sidebar') : this.$t('layout.Collapse Sidebar');
+    },
+    // 导入的集群不支持编辑配置，直接从菜单里去掉而不是渲染成不可点的项。
+    clusterMenus() {
+      return this.menus.filter(x => !(x.name === 'Settings' && this.mode === 'import'));
+    },
   },
 };
 </script>
@@ -207,149 +275,294 @@ export default {
 .layout {
   position: relative;
   height: 100%;
+  display: flex;
+  overflow: hidden;
 }
-header {
-  position: sticky;
-  width: 100%;
-  top: 0;
-  z-index: 100;
-  height: 52px;
-  color: var(--c-surface-0);
+
+// ── 侧边栏 ───────────────────────────────────────
+.sidebar {
+  flex: 0 0 auto;
+  width: var(--layout-sidebar-w);
+  display: flex;
+  flex-direction: column;
   background: var(--c-gray-700);
-  border-bottom: 2px solid var(--c-primary-solid);
+  color: var(--c-surface-0);
+  overflow: hidden;
+  transition: width var(--du-base) var(--ease-out);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  height: var(--layout-header-h);
+  padding: 0 var(--s-4);
+  color: var(--c-surface-0);
+  text-decoration: none;
   font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 
-  .user,
-  i {
-    color: var(--c-surface-0);
-  }
-
-  a, .router-link-active {
-    color: var(--c-surface-0);
-    text-decoration: none;
-  }
-
-  .brand-icon {
+  &__icon {
     width: 22px;
     height: 21px;
-    margin-right: var(--s-2);
     display: block;
     flex: 0 0 auto;
   }
-}
-.brand-link {
-  display: inline-flex;
-  align-items: center;
-  font-size: var(--fs-lg);
-  font-weight: var(--fw-semibold);
-  letter-spacing: 0.3px;
+
+  &__text {
+    margin-left: var(--s-3);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__version {
+    font-weight: var(--fw-regular);
+    opacity: 0.5;
+    margin-left: var(--s-1);
+    font-size: var(--fs-sm);
+  }
 }
 
-.brand-version {
-  font-weight: var(--fw-regular);
-  opacity: 0.5;
-  margin-left: var(--s-1);
+.side-nav {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--s-3) 0;
+}
+
+.side-group {
+  margin: var(--s-3) 0 var(--s-1);
+  padding: 0 var(--s-4);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.side-divider {
+  height: 1px;
+  margin: var(--s-3) var(--s-4);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.side-item {
+  display: flex;
+  align-items: center;
+  height: 38px;
+  padding: 0 var(--s-4);
+  color: rgba(255, 255, 255, 0.72);
+  font-size: var(--fs-md);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: background var(--du-fast) var(--ease-out),
+              color var(--du-fast) var(--ease-out);
+
+  &__icon {
+    width: 18px;
+    flex: 0 0 auto;
+    text-align: center;
+    font-size: var(--fs-lg);
+  }
+
+  &__text {
+    margin-left: var(--s-3);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &:hover {
+    color: var(--c-surface-0);
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  &--active {
+    color: var(--c-surface-0);
+    font-weight: var(--fw-semibold);
+    background: rgba(255, 255, 255, 0.1);
+    border-left-color: var(--c-primary-solid);
+
+    .side-item__icon {
+      color: var(--c-primary-solid);
+    }
+  }
+}
+
+// 二级菜单：只在所属一级项选中时展开，折叠态不渲染
+.side-sub {
+  padding: var(--s-1) 0;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.side-subitem {
+  display: block;
+  padding: var(--s-2) var(--s-4) var(--s-2) var(--s-10);
+  color: rgba(255, 255, 255, 0.6);
   font-size: var(--fs-sm);
+  line-height: var(--lh-tight);
+  text-decoration: none;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: background var(--du-fast) var(--ease-out),
+              color var(--du-fast) var(--ease-out);
+
+  &:hover {
+    color: var(--c-surface-0);
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  &--active {
+    color: var(--c-surface-0);
+    font-weight: var(--fw-medium);
+    border-left-color: var(--c-primary-solid);
+    background: rgba(255, 255, 255, 0.06);
+  }
+}
+
+.side-toggle {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 38px;
+  padding: 0 var(--s-4);
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 3px solid transparent;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: var(--fs-md);
+  font-family: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--du-fast) var(--ease-out),
+              color var(--du-fast) var(--ease-out);
+
+  &:hover {
+    color: var(--c-surface-0);
+    background: rgba(255, 255, 255, 0.08);
+  }
+}
+
+// 折叠态：只留图标，文字与分组标题不再占位。
+// 同时把 --layout-sidebar-w 覆写在 .layout 上，后代组件（查询结果全屏面板）
+// 直接继承到折叠后的宽度，无需感知折叠状态。
+.layout--collapsed {
+  --layout-sidebar-w: var(--layout-sidebar-w-collapsed);
+
+  .brand {
+    padding: 0;
+    justify-content: center;
+  }
+
+  .brand__text,
+  .side-item__text,
+  .side-toggle .side-item__text {
+    display: none;
+  }
+
+  .side-item,
+  .side-toggle {
+    padding: 0;
+    justify-content: center;
+    border-left-width: 0;
+    border-right: 3px solid transparent;
+  }
+
+  .side-item--active {
+    border-right-color: var(--c-primary-solid);
+  }
+
+  .side-divider {
+    margin: var(--s-3) var(--s-2);
+  }
+}
+
+// ── 右侧主列 ─────────────────────────────────────
+.main-column {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+header {
+  flex: 0 0 auto;
+  justify-content: flex-end;
+  height: var(--layout-header-h);
+  padding: 0 var(--s-5);
+  background: var(--c-gray-700);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: var(--fs-md);
 }
 
 .header-right {
-  font-size: var(--fs-md);
+  .user,
+  i {
+    color: rgba(255, 255, 255, 0.72);
+  }
 
   > * {
-    margin-left: var(--s-4);
+    margin-left: var(--s-3);
     padding: var(--s-1) var(--s-2);
     border-radius: var(--r-sm);
     transition: background var(--du-fast) var(--ease-out);
+  }
 
-    &:hover {
-      background: rgba(255, 255, 255, 0.08);
+  > .el-dropdown:hover,
+  > .header-link:hover {
+    background: rgba(255, 255, 255, 0.08);
+
+    .user,
+    i {
+      color: var(--c-surface-0);
     }
   }
 
   i {
-    font-size: var(--fs-xl);
-    margin-right: var(--s-2);
+    font-size: var(--fs-lg);
   }
 
-  .fs-16, .fs-20 {
-    font-size: inherit !important;
-  }
-
-  .mr-15 { margin-right: 0 !important; }
-  .mr-5 { margin-right: var(--s-1) !important; }
   .ml-5 { margin-left: var(--s-1) !important; }
-  .ml-10 { margin-left: var(--s-2) !important; }
-  .ml-15 { margin-left: var(--s-3) !important; }
+}
+
+.header-link {
+  display: inline-flex;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.72);
+  text-decoration: none;
+  white-space: nowrap;
+
+  i {
+    margin-right: var(--s-1);
+  }
+
+  &:hover,
+  &.router-link-active {
+    color: var(--c-surface-0);
+
+    i {
+      color: var(--c-surface-0);
+    }
+  }
+
+  &.router-link-active {
+    font-weight: var(--fw-semibold);
+  }
 }
 
 main {
   background: var(--c-surface-1);
   padding: 0 var(--s-5);
-}
-
-.cluster-tabs {
-  position: sticky;
-  top: 52px;
-  z-index: 99;
-  background: var(--c-surface-0);
-  border-bottom: 1px solid var(--c-surface-3);
-  height: 40px;
-
-  &__inner {
-    display: flex;
-    gap: var(--s-4);
-    padding: 0 var(--s-5);
-    height: 100%;
-    align-items: stretch;
-  }
-
-  .ctab-home {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--c-text-tertiary);
-    text-decoration: none;
-    padding: 0 var(--s-1);
-    margin-right: var(--s-2);
-    border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
-    transition: color var(--du-fast) var(--ease-out);
-
-    i {
-      font-size: var(--fs-lg);
-    }
-
-    &:hover {
-      color: var(--c-primary-solid);
-    }
-  }
-
-  .ctab {
-    display: inline-flex;
-    align-items: center;
-    padding: 0 var(--s-1);
-    font-size: var(--fs-sm);
-    color: var(--c-text-secondary);
-    text-decoration: none;
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
-    transition: color var(--du-fast) var(--ease-out),
-                border-color var(--du-fast) var(--ease-out);
-
-    &:hover {
-      color: var(--c-text-primary);
-    }
-
-    &--active {
-      color: var(--c-text-primary);
-      font-weight: var(--fw-semibold);
-      border-bottom-color: var(--c-primary-solid);
-    }
-
-    &--hidden {
-      display: none;
-    }
-  }
 }
 </style>
