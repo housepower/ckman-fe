@@ -44,12 +44,13 @@
       @sort-change="sortChangeEvent"
     >
       <vxe-column
-        v-for="{ prop, label, minWidth, fixed } of columns"
+        v-for="{ prop, label, minWidth, fixed, align } of columns"
         :key="prop"
         :fixed="fixed"
         :field="prop"
         :title="label"
         :min-width="minWidth || 140"
+        :align="align || 'center'"
         sortable
       >
         <template slot-scope="{ row, column }">
@@ -109,7 +110,7 @@ export default {
   computed: {
     columns() {
       return [
-        { prop: 'table',             label: this.$t('tables.Table Name'),     minWidth: 250, fixed: 'left' },
+        { prop: 'table',             label: this.$t('tables.Table Name'),     minWidth: 250, fixed: 'left', align: 'left' },
         { prop: 'host',              label: this.$t('session.Node Host'),     minWidth: 100 },
         { prop: 'elapsed',           label: this.$t('tables.Elapsed'),        minWidth: 100 },
         { prop: 'merge_start',       label: this.$t('tables.MergeStart'),     minWidth: 160 },

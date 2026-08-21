@@ -121,7 +121,7 @@ export default {
   computed: {
     columns() {
       return [
-        { prop: 'table',         label: this.$t('tables.Table Name'),       minWidth: 280, fixed: 'left' },
+        { prop: 'table',         label: this.$t('tables.Table Name'),       minWidth: 280, fixed: 'left', align: 'left' },
         { prop: 'node',          label: this.$t('session.Node Host'),       minWidth: 120 },
         { prop: 'shard_replica', label: this.$t('tables.Shard Replica'),    minWidth: 110 },
         { prop: 'queue_size',    label: this.$t('tables.QueueSize'),        minWidth: 140, align: 'right' },
