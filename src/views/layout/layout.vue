@@ -1,7 +1,10 @@
 <template>
-  <div class="layout" :class="{ 'layout--collapsed': collapsed }">
-    <aside class="sidebar">
-      <router-link to="/" class="brand" v-tooltip="tip(title)">
+  <div
+    class="layout"
+    :class="{ 'layout--collapsed': collapsed, 'layout--no-sidebar': !inCluster }"
+  >
+    <header class="flex flex-vcenter">
+      <router-link to="/" class="brand">
         <img class="brand__icon" src="/favicon.ico" alt="" />
         <span class="brand__text">
           {{ title }}
@@ -9,18 +12,59 @@
         </span>
       </router-link>
 
-      <nav class="side-nav">
-        <router-link
-          to="/home"
-          class="side-item"
-          active-class="side-item--active"
-          v-tooltip="tip($t('home.All ClickHouse Clusters'))"
-        >
-          <i class="fa fa-home side-item__icon"></i>
-          <span class="side-item__text">{{ $t('home.All ClickHouse Clusters') }}</span>
+      <div class="header-right flex flex-vcenter">
+        <router-link to="/task" class="header-link">
+          <i class="fa fa-tasks"></i>
+          <span>{{ $t('task.Task List') }}</span>
         </router-link>
 
-        <template v-if="$route.params.id">
+        <a href="/docs/" target="_blank" class="header-link">
+          <i class="fa fa-book" aria-hidden="true"></i>
+          <span>{{ $t('layout.Document') }}</span>
+        </a>
+
+        <router-link to="/setting" class="header-link">
+          <i class="fa fa-briefcase"></i>
+          <span>{{ $t('common.package') }}</span>
+        </router-link>
+
+        <router-link v-if="isAdmin" to="/users" class="header-link">
+          <i class="fa fa-users"></i>
+          <span>{{ $t('common.users') }}</span>
+        </router-link>
+
+        <el-select v-model="$i18n.locale" class="width-100" size="mini">
+          <el-option value="en" label="English" />
+          <el-option value="zh" label="中文" />
+        </el-select>
+
+        <el-dropdown class="pointer">
+          <div class="flex flex-vcenter">
+            <i class="fa fa-user-o"></i>
+            <span v-text="user" class="ml-5 user" />
+          </div>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item @click.native="openChangePassword">{{ $t('user.Change Password') }}</el-dropdown-item>
+            <el-dropdown-item @click.native="logout">{{ $t('common.Logout') }}</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+      </div>
+    </header>
+
+    <div class="layout__body">
+      <!-- 侧边栏承载集群内导航，集群外（集群列表、任务、安装包、用户）不出现 -->
+      <aside class="sidebar" v-if="inCluster">
+        <nav class="side-nav">
+          <router-link
+            to="/home"
+            class="side-item"
+            active-class="side-item--active"
+            v-tooltip="tip($t('home.All ClickHouse Clusters'))"
+          >
+            <i class="fa fa-home side-item__icon"></i>
+            <span class="side-item__text">{{ $t('home.All ClickHouse Clusters') }}</span>
+          </router-link>
+
           <p class="side-group" v-if="!collapsed">{{ $route.params.id }}</p>
           <div class="side-divider" v-else></div>
           <template v-for="item of clusterMenus">
@@ -52,60 +96,18 @@
               </a>
             </div>
           </template>
-        </template>
-      </nav>
+        </nav>
 
-      <button
-        type="button"
-        class="side-toggle"
-        v-tooltip="tip(collapsedLabel)"
-        @click="toggleCollapse"
-      >
-        <i class="fa side-item__icon" :class="collapsed ? 'fa-angle-double-right' : 'fa-angle-double-left'"></i>
-        <span class="side-item__text">{{ collapsedLabel }}</span>
-      </button>
-    </aside>
-
-    <div class="main-column">
-      <header class="flex flex-vcenter">
-        <div class="header-right flex flex-vcenter">
-          <router-link to="/task" class="header-link">
-            <i class="fa fa-tasks"></i>
-            <span>{{ $t('task.Task List') }}</span>
-          </router-link>
-
-          <a href="/docs/" target="_blank" class="header-link">
-            <i class="fa fa-book" aria-hidden="true"></i>
-            <span>{{ $t('layout.Document') }}</span>
-          </a>
-
-          <router-link to="/setting" class="header-link">
-            <i class="fa fa-briefcase"></i>
-            <span>{{ $t('common.package') }}</span>
-          </router-link>
-
-          <router-link v-if="isAdmin" to="/users" class="header-link">
-            <i class="fa fa-users"></i>
-            <span>{{ $t('common.users') }}</span>
-          </router-link>
-
-          <el-select v-model="$i18n.locale" class="width-100" size="mini">
-            <el-option value="en" label="English" />
-            <el-option value="zh" label="中文" />
-          </el-select>
-
-          <el-dropdown class="pointer">
-            <div class="flex flex-vcenter">
-              <i class="fa fa-user-o"></i>
-              <span v-text="user" class="ml-5 user" />
-            </div>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item @click.native="openChangePassword">{{ $t('user.Change Password') }}</el-dropdown-item>
-              <el-dropdown-item @click.native="logout">{{ $t('common.Logout') }}</el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
-        </div>
-      </header>
+        <button
+          type="button"
+          class="side-toggle"
+          v-tooltip="tip(collapsedLabel)"
+          @click="toggleCollapse"
+        >
+          <i class="fa side-item__icon" :class="collapsed ? 'fa-angle-double-right' : 'fa-angle-double-left'"></i>
+          <span class="side-item__text">{{ collapsedLabel }}</span>
+        </button>
+      </aside>
 
       <main class="flex-1" style="overflow: auto;">
         <router-view />
@@ -260,6 +262,10 @@ export default {
     title() {
       return this.$t('layout.ClickHouse Management Console');
     },
+    // 侧边栏只服务集群内的导航，集群外的页面（集群列表、任务、安装包、用户）不渲染它
+    inCluster() {
+      return !!this.$route.params.id;
+    },
     collapsedLabel() {
       return this.collapsed ? this.$t('layout.Expand Sidebar') : this.$t('layout.Collapse Sidebar');
     },
@@ -276,7 +282,20 @@ export default {
   position: relative;
   height: 100%;
   display: flex;
+  flex-direction: column;
   overflow: hidden;
+
+  // 没有侧边栏时，贴合框架定位的组件（查询结果全屏面板）应从最左侧算起
+  &--no-sidebar {
+    --layout-sidebar-w: 0px;
+  }
+
+  &__body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    overflow: hidden;
+  }
 }
 
 // ── 侧边栏 ───────────────────────────────────────
@@ -295,15 +314,13 @@ export default {
   display: flex;
   align-items: center;
   flex: 0 0 auto;
-  height: var(--layout-header-h);
-  padding: 0 var(--s-4);
+  margin-right: var(--s-6);
   color: var(--c-surface-0);
   text-decoration: none;
   font-size: var(--fs-md);
   font-weight: var(--fw-semibold);
   letter-spacing: 0.3px;
   white-space: nowrap;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 
   &__icon {
     width: 22px;
@@ -459,12 +476,6 @@ export default {
 .layout--collapsed {
   --layout-sidebar-w: var(--layout-sidebar-w-collapsed);
 
-  .brand {
-    padding: 0;
-    justify-content: center;
-  }
-
-  .brand__text,
   .side-item__text,
   .side-toggle .side-item__text {
     display: none;
@@ -487,18 +498,10 @@ export default {
   }
 }
 
-// ── 右侧主列 ─────────────────────────────────────
-.main-column {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
+// ── 顶栏 ─────────────────────────────────────────
 header {
   flex: 0 0 auto;
-  justify-content: flex-end;
+  justify-content: space-between;
   height: var(--layout-header-h);
   padding: 0 var(--s-5);
   background: var(--c-gray-700);
@@ -562,6 +565,7 @@ header {
 }
 
 main {
+  min-width: 0; // 内容过宽时收缩自己而不是撑破布局
   background: var(--c-surface-1);
   padding: 0 var(--s-5);
 }
