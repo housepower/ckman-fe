@@ -401,6 +401,25 @@
                         {{ $t('backup.Checksum Disabled By Compression') }}
                     </span>
                 </el-form-item>
+
+                <el-form-item v-if="form.target === 's3'" :label="$t('backup.Upload Bandwidth')" prop="maxBandwidthMB">
+                    <el-switch v-model="form.bandwidthLimited" />
+                    <span v-if="!form.bandwidthLimited" class="bandwidth-off">
+                        {{ $t('backup.Bandwidth Unlimited') }}
+                    </span>
+                    <span v-if="form.bandwidthLimited" class="bandwidth-input">
+                        <el-input-number
+                            v-model="form.maxBandwidthMB"
+                            :min="MIN_BANDWIDTH_MB"
+                            :step="10"
+                            :precision="0"
+                            controls-position="right"
+                            style="width:140px"
+                        />
+                        MB/s
+                    </span>
+                    <div class="form-hint-text">{{ $t('backup.Bandwidth Hint') }}</div>
+                </el-form-item>
             </div>
 
         </el-form>
@@ -424,6 +443,9 @@
 import { DataManageApi, ConfigApi } from '@/apis';
 import { parseCronNextRuns } from '@/helpers';
 
+// 上传限速下限（MB/s）：前端强制，避免设得过小导致备份慢到不可用
+const MIN_BANDWIDTH_MB = 1;
+
 export default {
     name: 'BackupFormDialog',
     model: { prop: 'value', event: 'input' },
@@ -435,6 +457,7 @@ export default {
     },
     data() {
         return {
+            MIN_BANDWIDTH_MB,
             cronHelpVisible: false,
             cronPreview: { valid: false, runs: [] },
             cronPreviewTimer: null,
@@ -645,6 +668,19 @@ export default {
                 ],
                 compression: [
                     { required: true, message: this.$t('backup.Please select compression format'), trigger: 'change' }
+                ],
+                maxBandwidthMB: [
+                    {
+                        validator: (rule, value, callback) => {
+                            if (this.form.target !== 's3' || !this.form.bandwidthLimited) { callback(); return; }
+                            if (!Number.isInteger(value) || value < MIN_BANDWIDTH_MB) {
+                                callback(new Error(this.$t('backup.Bandwidth Min')));
+                                return;
+                            }
+                            callback();
+                        },
+                        trigger: 'change'
+                    }
                 ]
             }
         };
@@ -853,7 +889,9 @@ export default {
                 partitions: [],
                 backupStyle: 'full',
                 clean: false,
-                checksum: true
+                checksum: true,
+                bandwidthLimited: false,
+                maxBandwidthMB: 100
             };
         },
 
@@ -1027,6 +1065,11 @@ export default {
                 clean: this.form.clean,
                 checksum: this.form.checksum,
             };
+
+            // 上传限速只对 S3 生效；0 表示不限
+            if (this.form.target === 's3' && this.form.bandwidthLimited) {
+                params.max_bandwidth_mb = Math.max(MIN_BANDWIDTH_MB, Math.round(this.form.maxBandwidthMB || 0));
+            }
 
             // task_name: include only if non-empty (backend auto-generates when absent)
             if (this.form.task_name && this.form.task_name.trim()) {
@@ -1319,6 +1362,14 @@ export default {
 }
 .effective-range-skip {
   color: var(--c-warning-fg);
+}
+
+.bandwidth-input {
+  margin-left: 12px;
+}
+
+.bandwidth-off {
+  margin-left: 8px;
 }
 
 .checksum-hint {

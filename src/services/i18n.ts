@@ -521,6 +521,10 @@ const messages = {
       'Form Reset': 'Form has been reset',
       'Checksum': 'Checksum',
       'Checksum Disabled By Compression': 'Disabled because compression is enabled. md5 byte comparison is invalid against gzip/zstd archives; ClickHouse BACKUP has its own metadata integrity check.',
+      'Upload Bandwidth': 'Upload Bandwidth',
+      'Bandwidth Unlimited': 'Unlimited',
+      'Bandwidth Hint': 'Upload bandwidth cap for the whole cluster per task, split evenly across shards; network peak stays within it. ClickHouse reads each file locally several times during backup (checksum, request signing), so the average upload speed is about 1/3 of the cap over HTTP and 1/2 over HTTPS. Minimum 1 MB/s; requires ClickHouse >= 23.4. Concurrent tasks add up.',
+      'Bandwidth Min': 'Upload bandwidth must be at least 1 MB/s',
       'Instance': 'Instance',
       // New keys for Task 11 redesign
       'Schedule': 'Schedule',
@@ -1487,6 +1491,10 @@ const messages = {
       'Form Reset': '表单已重置',
       'Checksum': '是否校验MD5',
       'Checksum Disabled By Compression': '开启压缩后不再做 md5 比对——本地 raw 文件 md5 与 S3 上 gzip/zstd 字节流必然不等。ClickHouse BACKUP 自身有 metadata 完整性校验。',
+      'Upload Bandwidth': '上传限速',
+      'Bandwidth Unlimited': '不限速',
+      'Bandwidth Hint': '单个任务对整个集群的上传带宽上限，按 shard 数均分，网络峰值不超过该值。ClickHouse 备份时会在本地多次读取文件（计算校验和、签名），实际平均上传速度约为上限的 1/3（HTTP）或 1/2（HTTPS）。最小 1 MB/s，需要 ClickHouse ≥ 23.4；多个任务同时运行会叠加。',
+      'Bandwidth Min': '上传限速不能小于 1 MB/s',
       'Instance': '指定执行实例',
       // New keys for Task 11 redesign
       'Schedule': '调度',

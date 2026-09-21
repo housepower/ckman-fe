@@ -178,6 +178,28 @@
           {{ $t('backup.Checksum Disabled By Compression') }}
         </div>
       </el-form-item>
+      <el-form-item v-if="form.target_type === 's3'" :label="$t('backup.Upload Bandwidth')" prop="max_bandwidth_mb">
+        <el-switch
+          v-model="form.bandwidth_limited"
+          active-color="#C9A100"
+          inactive-color="#c0c4cc"
+        />
+        <span v-if="!form.bandwidth_limited" class="bandwidth-off">
+          {{ $t('backup.Bandwidth Unlimited') }}
+        </span>
+        <span v-if="form.bandwidth_limited" class="bandwidth-input">
+          <el-input-number
+            v-model="form.max_bandwidth_mb"
+            :min="MIN_BANDWIDTH_MB"
+            :step="10"
+            :precision="0"
+            controls-position="right"
+            style="width:140px"
+          />
+          MB/s
+        </span>
+        <div class="form-hint">{{ $t('backup.Bandwidth Hint') }}</div>
+      </el-form-item>
       <el-form-item :label="$t('backup.Clean Successful Partitions')">
         <el-switch v-model="form.clean" active-color="#C9A100" inactive-color="#c0c4cc" />
         <div v-if="form.clean" class="danger-hint">⚠ {{ $t('history.Clean Partition Danger') }}</div>
@@ -198,6 +220,9 @@
 import { DataManageApi, ConfigApi } from '@/apis';
 import { parseCronNextRuns } from '@/helpers';
 
+// 上传限速下限（MB/s）：前端强制，避免设得过小导致备份慢到不可用
+const MIN_BANDWIDTH_MB = 1;
+
 export default {
   name: 'TaskEditDialog',
   model: { prop: 'value', event: 'input' },
@@ -207,6 +232,7 @@ export default {
   },
   data() {
     return {
+      MIN_BANDWIDTH_MB,
       form: this.emptyForm(),
       originalInstance: '',
       instanceList: [],
@@ -258,6 +284,14 @@ export default {
             else cb();
           },
           trigger: 'blur',
+        }],
+        max_bandwidth_mb: [{
+          validator: (_, val, cb) => {
+            if (this.form.target_type !== 's3' || !this.form.bandwidth_limited) { cb(); return; }
+            if (!Number.isInteger(val) || val < MIN_BANDWIDTH_MB) { cb(new Error(this.$t('backup.Bandwidth Min'))); return; }
+            cb();
+          },
+          trigger: 'change',
         }],
         localPath: [{
           validator: (_, val, cb) => {
@@ -388,6 +422,7 @@ export default {
         s3Endpoint: '', s3Bucket: '', s3AccessKeyId: '', s3SecretAccessKey: '', s3Region: '',
         localPath: '',
         compression: 'gzip', checksum: true, clean: false,
+        bandwidth_limited: false, max_bandwidth_mb: 100,
       };
     },
     loadFromTask() {
@@ -420,6 +455,8 @@ export default {
         compression: p.compression || 'gzip',
         checksum: !!p.checksum,
         clean: !!p.clean,
+        bandwidth_limited: p.max_bandwidth_mb > 0,
+        max_bandwidth_mb: p.max_bandwidth_mb > 0 ? p.max_bandwidth_mb : 100,
       };
       this.originalInstance = this.form.instance;
     },
@@ -487,6 +524,10 @@ export default {
         compression: f.compression,
         checksum: f.checksum,
         clean: f.clean,
+        // 显式写 0 覆盖 {...p} 里的旧值，关掉开关才能真正取消限速
+        max_bandwidth_mb: f.target_type === 's3' && f.bandwidth_limited
+          ? Math.max(MIN_BANDWIDTH_MB, Math.round(f.max_bandwidth_mb || 0))
+          : 0,
       };
       if (f.target_type === 's3') {
         body.s3 = {
@@ -525,6 +566,8 @@ export default {
 }
 .section-title:first-child { margin-top: 0; }
 .form-hint { font-size: 12px; color: #909399; line-height: 1.5; }
+.bandwidth-input { margin-left: 12px; }
+.bandwidth-off { margin-left: 8px; }
 .checksum-hint {
   display: block; margin-top: 2px;
   font-size: 11px; line-height: 1.4; color: #c0c4cc;
