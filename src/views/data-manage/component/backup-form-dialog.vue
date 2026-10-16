@@ -231,7 +231,7 @@
                         <el-input-number
                             v-model="form.daysBefore"
                             :min="1"
-                            :max="365"
+                            :max="3650"
                             controls-position="right"
                             style="width:120px"
                         />
@@ -420,6 +420,19 @@
                     </span>
                     <div class="form-hint-text">{{ $t('backup.Bandwidth Hint') }}</div>
                 </el-form-item>
+
+                <el-form-item :label="$t('backup.Max Read Seconds')" prop="maxReadSeconds">
+                    <el-input-number
+                        v-model="form.maxReadSeconds"
+                        :min="MIN_MAX_READ_SECONDS"
+                        :max="MAX_MAX_READ_SECONDS"
+                        :step="3600"
+                        controls-position="right"
+                        style="width:140px"
+                    />
+                    <span style="margin-left:6px">{{ $t('backup.Seconds Unit') }}</span>
+                    <div class="form-hint-text">{{ $t('backup.Max Read Seconds Hint') }}</div>
+                </el-form-item>
             </div>
 
         </el-form>
@@ -445,6 +458,11 @@ import { parseCronNextRuns } from '@/helpers';
 
 // 上传限速下限（MB/s）：前端强制，避免设得过小导致备份慢到不可用
 const MIN_BANDWIDTH_MB = 1;
+
+// 单分区读超时（秒）范围：与后端 validateMaxReadSeconds 的上限（1 天）对齐
+const MIN_MAX_READ_SECONDS = 60;
+const MAX_MAX_READ_SECONDS = 86400;
+const DEFAULT_MAX_READ_SECONDS = 21600;
 
 export default {
     name: 'BackupFormDialog',
@@ -891,7 +909,8 @@ export default {
                 clean: false,
                 checksum: true,
                 bandwidthLimited: false,
-                maxBandwidthMB: 100
+                maxBandwidthMB: 100,
+                maxReadSeconds: DEFAULT_MAX_READ_SECONDS
             };
         },
 
@@ -1070,6 +1089,12 @@ export default {
             if (this.form.target === 's3' && this.form.bandwidthLimited) {
                 params.max_bandwidth_mb = Math.max(MIN_BANDWIDTH_MB, Math.round(this.form.maxBandwidthMB || 0));
             }
+
+            // 单分区读超时对 local / S3 都生效；0 表示用后端默认 6h
+            params.max_read_seconds = Math.min(
+                MAX_MAX_READ_SECONDS,
+                Math.max(MIN_MAX_READ_SECONDS, Math.round(this.form.maxReadSeconds || 0))
+            );
 
             // task_name: include only if non-empty (backend auto-generates when absent)
             if (this.form.task_name && this.form.task_name.trim()) {

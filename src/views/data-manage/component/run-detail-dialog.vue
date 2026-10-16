@@ -83,6 +83,15 @@
     <span slot="footer">
       <el-button @click="$emit('input', false)">{{ $t('history.Close') }}</el-button>
       <el-button
+        v-if="canStopRun"
+        type="danger"
+        plain
+        :loading="stopping"
+        @click="onStopRun"
+      >
+        {{ $t('history.Stop Run') }}
+      </el-button>
+      <el-button
         v-if="canRestoreFromRun"
         type="primary"
         @click="onRestoreFromRun"
@@ -104,7 +113,7 @@ export default {
     runId: { type: String, default: '' },
   },
   data() {
-    return { run: null, loading: false };
+    return { run: null, loading: false, stopping: false };
   },
   computed: {
     succCount() {
@@ -113,6 +122,10 @@ export default {
     },
     canRestoreFromRun() {
       return this.run && this.run.operation === 'backup' && this.run.status === 'success';
+    },
+    // queued/running 的 run 可以主动停止；终态 run 只能看
+    canStopRun() {
+      return this.run && (this.run.status === 'queued' || this.run.status === 'running');
     },
     elapsedText() {
       if (!this.run || !this.run.elapsed) return '—';
@@ -163,6 +176,31 @@ export default {
         table: this.run.table,
       });
       this.$emit('input', false);
+    },
+    async onStopRun() {
+      try {
+        await this.$confirm(this.$t('history.Stop Run Confirm'), this.$t('history.Stop Run'), {
+          type: 'warning',
+          confirmButtonText: this.$t('history.Stop Run'),
+          cancelButtonText: this.$t('history.Cancel'),
+        });
+      } catch {
+        return; // 用户取消
+      }
+      this.stopping = true;
+      try {
+        const res = await DataManageApi.stopRun(this.run.run_id);
+        if (res.data.retCode === '0000') {
+          this.$message.success(this.$t('history.Stop Run Done'));
+          this.fetchRun();
+        } else {
+          this.$message.error(this.$t('history.Stop Run Failed') + ': ' + res.data.retMsg);
+        }
+      } catch (e) {
+        this.$message.error(this.$t('history.Stop Run Failed') + ': ' + e.message);
+      } finally {
+        this.stopping = false;
+      }
     },
     capitalize(s) {
       if (!s) return '';

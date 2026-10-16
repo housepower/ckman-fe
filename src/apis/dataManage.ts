@@ -59,6 +59,10 @@ export const DataManageApi = {
   deleteRun(runId: string) {
     return axios.delete(`${url}/backup/run/${runId}`);
   },
+  // 主动停止 queued/running 的备份/恢复 run（替代重启 ckman）
+  stopRun(runId: string) {
+    return axios.post(`${url}/backup/run/${runId}/stop`);
+  },
   // 表维度：cluster.database.table 过去 days 天的 run
   listRunsByTable(clusterName: string, database: string, table: string, days?: number) {
     return axios.get(`${url}/backup/table/${clusterName}/${database}/${table}/runs`, {
