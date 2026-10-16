@@ -195,13 +195,22 @@
                         filterable
                         allow-create
                         default-first-option
+                        :loading="partitionListLoading"
                         :placeholder="$t('backup.Enter partition names')"
                         class="form-input"
+                        @visible-change="onPartitionDropdownVisible"
                     >
+                        <el-option
+                            v-for="p in partitionOptions"
+                            :key="p.partition"
+                            :label="p.partition + ' · ' + formatBytes(p.bytes)"
+                            :value="p.partition"
+                        />
                     </el-select>
                     <div class="selection-counter">
                         {{ $t('backup.Partition Count', { count: form.partitions.length, max: 200 }) }}
                     </div>
+                    <div class="form-hint-text">{{ $t('backup.Partition Picker Hint') }}</div>
                 </el-form-item>
 
                 <!-- 按时间段：模式切换（仅 immediate 出现 radio） -->
@@ -910,13 +919,39 @@ export default {
                 checksum: true,
                 bandwidthLimited: false,
                 maxBandwidthMB: 100,
-                maxReadSeconds: DEFAULT_MAX_READ_SECONDS
+                maxReadSeconds: DEFAULT_MAX_READ_SECONDS,
+                partitionOptions: [],   // 分区选择器选项：[{partition, bytes, rows}]
+                partitionListLoading: false,
+                partitionListKey: ''    // 已加载分区列表对应的 'database:table'，防重复拉取
             };
         },
 
+        // ── Partition picker ───────────────────────────────────────
+        // 下拉展开时加载该表分区列表（多表时不加载——分区名按表而不同，避免误导）
+        async onPartitionDropdownVisible(visible) {
+            if (!visible) return;
+            if (this.form.tables.length !== 1) return;
+            const table = this.form.tables[0];
+            const key = `${this.form.database}:${table}`;
+            if (this.partitionListKey === key && this.partitionOptions.length > 0) return;
+            this.partitionListLoading = true;
+            try {
+                const { data } = await DataManageApi.listTablePartitions(this.cluster, this.form.database, table);
+                if (data.retCode === '0000') {
+                    this.partitionOptions = data.entity || [];
+                    this.partitionListKey = key;
+                } else {
+                    this.$message.error(this.$t('backup.Partition Load Failed') + ': ' + data.retMsg);
+                }
+            } catch (e) {
+                this.$message.error(this.$t('backup.Partition Load Failed') + ': ' + e.message);
+            } finally {
+                this.partitionListLoading = false;
+            }
+        },
+
         // ── Partition tag helpers ──────────────────────────────────
-        partitionTagClass(format) {
-            const map = { day: 'daily', month: 'month', hour: 'daily', custom: 'custom', none: 'none' };
+        partitionTagClass(format) {            const map = { day: 'daily', month: 'month', hour: 'daily', custom: 'custom', none: 'none' };
             return map[format] || 'custom';
         },
         partitionTagLabel(format) {
@@ -1014,6 +1049,9 @@ export default {
         },
 
         handleTablesChange() {
+            // 表选择变化后，已加载的分区列表可能属于别的表，清掉避免误导
+            this.partitionOptions = [];
+            this.partitionListKey = '';
             // If daily is selected but now becomes disabled, switch to partition
             if (this.dailyDisabled && this.form.backupType === 'daily') {
                 this.form.backupType = 'partition';

@@ -69,6 +69,10 @@ export const DataManageApi = {
       params: { days: days ?? 0 },
     });
   },
+  // 表的全部分区及体量（最近的在前），供「按分区备份」勾选
+  listTablePartitions(clusterName: string, database: string, table: string) {
+    return axios.get(`${url}/backup/table/${clusterName}/${database}/${table}/partitions`);
+  },
   // 删除分区备份记录(按分区名作用于全部历史 run);clean_remote 同时清理远端数据
   deletePartitionRecords(
     clusterName: string,
