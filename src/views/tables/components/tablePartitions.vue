@@ -51,7 +51,7 @@
       class="partitions__table"
       :data="currentPageData"
       :row-class-name="tableRowClassName"
-      height="480"
+      :height="tableHeight"
       :border="false"
       @selection-change="handleSelectionChange"
     >
@@ -63,11 +63,22 @@
         width="120"
         show-overflow-tooltip
       />
-      <el-table-column prop="parts" :label="$t('tables.Parts')" show-overflow-tooltip />
-      <el-table-column prop="rows" :label="$t('tables.Rows')" show-overflow-tooltip />
+      <el-table-column
+        prop="parts"
+        :label="$t('tables.Parts')"
+        min-width="110"
+        show-overflow-tooltip
+      />
+      <el-table-column
+        prop="rows"
+        :label="$t('tables.Rows')"
+        min-width="140"
+        show-overflow-tooltip
+      />
       <el-table-column
         prop="uncompressed"
         :label="$t('tables.UnCompressed')"
+        min-width="170"
         show-overflow-tooltip
       >
         <template slot-scope="{ row }">{{ byteConvert(row.uncompressed) }}</template>
@@ -75,6 +86,7 @@
       <el-table-column
         prop="compressed"
         :label="$t('tables.Compressed')"
+        min-width="170"
         show-overflow-tooltip
       >
         <template slot-scope="{ row }">{{ byteConvert(row.compressed) }}</template>
@@ -82,16 +94,21 @@
       <el-table-column
         prop="min_time"
         :label="$t('tables.Min Time')"
-        width="160"
+        min-width="170"
         show-overflow-tooltip
       />
       <el-table-column
         prop="max_time"
         :label="$t('tables.Max Time')"
-        width="160"
+        min-width="170"
         show-overflow-tooltip
       />
-      <el-table-column prop="disk_name" :label="$t('tables.Disk Name')" show-overflow-tooltip />
+      <el-table-column
+        prop="disk_name"
+        :label="$t('tables.Disk Name')"
+        min-width="120"
+        show-overflow-tooltip
+      />
       <el-table-column
         fixed="right"
         align="center"
@@ -159,9 +176,14 @@ export default {
       statusFilter: 'all',
       selectedPartitions: [],
       pagination: { currentPage: 1, pageSize: 10, total: 0 },
+      windowHeight: window.innerHeight,
     };
   },
   computed: {
+    // 弹框里除表格外还有工具栏、分页和 header,小屏上固定 480 会顶出视口
+    tableHeight() {
+      return Math.max(260, Math.min(480, this.windowHeight - 340));
+    },
     filteredList() {
       const { searchKey, statusFilter, list } = this;
       return list.filter((item) => {
@@ -189,8 +211,17 @@ export default {
   created() {
     this.getList();
   },
+  mounted() {
+    window.addEventListener('resize', this.handleResize);
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.handleResize);
+  },
   methods: {
     byteConvert,
+    handleResize() {
+      this.windowHeight = window.innerHeight;
+    },
     tableRowClassName({ row }) {
       return row.status === false ? 'partitions__row--disabled' : '';
     },
