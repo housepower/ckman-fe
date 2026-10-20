@@ -434,8 +434,10 @@ export default {
       $modal({
         component: TablePartitionsComponent,
         props: {
+          // 分区表列多,800px 太窄;但上限只放到 1080px,笔记本上不铺满整屏
           title: this.$t("tables.Partition Management"),
-          width: 800,
+          width: 'min(1080px, 90vw)',
+          top: '8vh',
           cancelText: null,
           okText: null,
         },
