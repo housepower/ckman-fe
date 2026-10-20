@@ -4,7 +4,10 @@ import { MetricData } from '@/models';
 export const chartOption = (data: MetricData[], min: number, max: number) => ({
   tooltip: {
     trigger: 'axis',
+    // grafana 式的细竖线游标
     axisPointer: {
+      type: 'line',
+      lineStyle: { width: 1, type: 'solid' },
     },
     confine: true,
     enterable: true,
@@ -73,6 +76,13 @@ export const chartOption = (data: MetricData[], min: number, max: number) => ({
     })(),
     data: values.map(item => ([item[0] * 1000, Number(item[1]).toFixed(2).replace('.00', '')])),
     type: 'line',
-    symbol: 'none',
+    // 线宽对齐 grafana 的 1px：主题里给折线定的是 2px，监控这种多条线叠在
+    // 一起的场景太粗，交叠处会糊成一片
+    lineStyle: { width: 1 },
+    // 平时不画点，hover 时在交点冒一个(grafana 的行为)，比 symbol:'none'
+    // 更容易看清当前读的是哪条线上的哪个点
+    symbol: 'circle',
+    showSymbol: false,
+    symbolSize: 5,
   })),
 });
