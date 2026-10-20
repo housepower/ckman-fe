@@ -5,11 +5,11 @@
       :title="$t(tabs[active].label)"
     />
     <div class="tables-body">
-      <table-metric v-show="active === 0" />
-      <table-merges v-show="active === 1" />
-      <replication-table v-show="active === 2" />
-      <background-pool v-show="active === 3" />
-      <zk-table v-show="active === 4" />
+      <table-metric v-show="active === 0" ref="metric" />
+      <table-merges v-show="active === 1" ref="merges" />
+      <replication-table v-show="active === 2" ref="replication" />
+      <background-pool v-show="active === 3" ref="background" />
+      <zk-table v-show="active === 4" ref="zk" />
     </div>
   </main>
 </template>
@@ -33,6 +33,22 @@ export default {
     // 二级导航在侧边栏，选中项由 URL 的 ?tab= 决定
     active() {
       return tabIndexOf(this.tabs, this.$route.query.tab);
+    },
+  },
+  mounted() {
+    // 进页面只拉当前 tab，其余 tab 切过去再拉
+    this.fetchActive();
+  },
+  watch: {
+    active() {
+      this.fetchActive();
+    },
+  },
+  methods: {
+    fetchActive() {
+      const child = [this.$refs.metric, this.$refs.merges, this.$refs.replication,
+        this.$refs.background, this.$refs.zk][this.active];
+      if (child) child.fetchData();
     },
   },
   components: {

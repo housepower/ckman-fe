@@ -7,6 +7,7 @@
 
     <vxe-table
       class="ddl-queue__table"
+      v-loading="loading"
       :data="pageData"
       :border="false"
       align="center"
@@ -70,6 +71,7 @@ export default {
   data() {
     return {
       list: [],
+      loading: false,
       sort: {},
       pagination: { total: 0, pageSize: 10, pageSizes: [10, 20, 50, 100, 200], currentPage: 1 },
     };
@@ -95,13 +97,12 @@ export default {
       return sorted.slice((currentPage - 1) * pageSize, currentPage * pageSize);
     },
   },
-  mounted() {
-    this.fetchData();
-  },
   methods: {
     async fetchData() {
+      this.loading = true;
       const id = this.$route.params.id;
-      const { data: { entity } } = await SessionApi.ddl_queue(id);
+      const { data: { entity } } = await SessionApi.ddl_queue(id)
+        .finally(() => (this.loading = false));
       this.list = (entity || []).map((x) => ({
         ...x,
         queryDuration: parseDurationBySplit(x.queryDuration),

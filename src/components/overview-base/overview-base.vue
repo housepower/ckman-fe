@@ -79,6 +79,8 @@
   </section>
 </template>
 <script>
+import axios from "axios";
+
 import { chartOption } from "./chartOption";
 import { MetricApi } from "@/apis";
 import { tabIndexOf } from "@/constants";
@@ -105,15 +107,12 @@ export default {
     },
   },
   computed: {
+    // 只统计当前分组的指标：其余分组按需加载，没请求过不代表没数据
     allEmpty() {
-      if (!this.chartMetrics.length) return false;
-      const allLoaded = this.chartMetrics.every(g =>
-        g.metrics.every(m => m.option !== null || m.isEmpty === true)
-      );
-      if (!allLoaded) return false;
-      return this.chartMetrics.every(g =>
-        g.metrics.every(m => m.isEmpty === true)
-      );
+      const group = this.chartMetrics[this.activeGroupIndex];
+      if (!group) return false;
+      const loaded = group.metrics.every(m => m.option !== null || m.isEmpty === true);
+      return loaded && group.metrics.every(m => m.isEmpty === true);
     },
     expandedMetric() {
       if (!this.expanded) return null;
@@ -147,7 +146,7 @@ export default {
         metrics: (metrics || []).map(m => ({ ...m, option: null, isEmpty: false })),
       };
     });
-    this.fetchData();
+    this.fetchGroup(this.activeGroupIndex);
     document.addEventListener('keydown', this.onKeydown);
   },
   beforeDestroy() {
@@ -156,22 +155,28 @@ export default {
   },
   watch: {
     timeFilter() {
-      this.fetchData();
+      this.fetchGroup(this.activeGroupIndex);
     },
     refreshDuration() {
-      this.fetchData();
+      this.fetchGroup(this.activeGroupIndex);
     },
     refreshTick() {
-      this.fetchData();
+      this.fetchGroup(this.activeGroupIndex);
+    },
+    // 指标分组切换是路由跳转，切到哪个分组才拉哪个分组的指标
+    activeGroupIndex(index) {
+      this.fetchGroup(index);
     },
   },
   methods: {
-    fetchData() {
-      let flatIndex = 0;
-      this.chartMetrics.forEach((group) => {
-        group.metrics.forEach((metric) => {
-          this.fetchChartData(metric, flatIndex++);
-        });
+    fetchGroup(groupIndex) {
+      const group = this.chartMetrics[groupIndex];
+      if (!group) return;
+      let flatIndex = this.chartMetrics
+        .slice(0, groupIndex)
+        .reduce((sum, g) => sum + g.metrics.length, 0);
+      group.metrics.forEach((metric) => {
+        this.fetchChartData(metric, flatIndex++);
       });
     },
     async fetchChartData(chart, index) {
@@ -193,6 +198,9 @@ export default {
           this.$set(chart, "option", chartOption(entity, min, max));
         }
       } catch (e) {
+        // 路由跳转（切换指标分组/离开页面）会 cancel 进行中的请求，
+        // 保留原状态，切回该分组时 watcher 会重新拉取
+        if (axios.isCancel(e)) return;
         this.$set(chart, "isEmpty", true);
         this.$set(chart, "option", null);
       }

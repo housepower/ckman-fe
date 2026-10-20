@@ -160,7 +160,6 @@ export default {
   },
   created() {
     this.clusterName = this.$route.params.id;
-    this.fetchData();
   },
   methods: {
     percentiles,

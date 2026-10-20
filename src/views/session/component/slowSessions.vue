@@ -26,6 +26,7 @@
 
     <vxe-table
       class="slow-sessions__table"
+      v-loading="loading"
       :data="pageData"
       :border="false"
       align="center"
@@ -77,6 +78,7 @@ export default {
   data() {
     return {
       list: [],
+      loading: false,
       sort: {},
       pagination: { total: 0, pageSize: 10, pageSizes: [10, 20, 50, 100, 200], currentPage: 1 },
       timeFilter: ['now-7d', 'now'],
@@ -105,18 +107,16 @@ export default {
       return sorted.slice((currentPage - 1) * pageSize, currentPage * pageSize);
     },
   },
-  mounted() {
-    this.fetchData();
-  },
   methods: {
     async fetchData() {
+      this.loading = true;
       const id = this.$route.params.id;
       const { min, max } = convertTimeBounds(this.timeFilter);
       const { data: { entity } } = await SessionApi.close(id, {
         limit: this.limit,
         start: parseInt(min / 1000, 10),
         end: parseInt(max / 1000, 10),
-      });
+      }).finally(() => (this.loading = false));
       this.list = (entity || []).map((x) => ({
         ...x,
         queryDuration: parseDurationBySplit(x.queryDuration),

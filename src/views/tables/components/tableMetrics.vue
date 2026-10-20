@@ -274,7 +274,6 @@ export default {
   created() {
     const { id: clusterName } = this.$route.params;
     this.clusterName = clusterName;
-    this.fetchData();
   },
   methods: {
     byteConvert: byteConvert,

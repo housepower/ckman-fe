@@ -86,9 +86,6 @@ export default {
       });
     },
   },
-  mounted() {
-    this.fetchData();
-  },
   methods: {
     async fetchData() {
       this.loading = true;

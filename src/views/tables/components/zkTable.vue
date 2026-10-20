@@ -67,9 +67,6 @@ export default {
       return this.tableData.map(({ host }) => ({ field: host, label: host }));
     },
   },
-  mounted() {
-    this.fetchData();
-  },
   methods: {
     async fetchData() {
       const { data: { entity } } = await TablesApi.zkStatus(this.$route.params.id);
