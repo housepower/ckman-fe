@@ -91,6 +91,7 @@
         <div class="kv-row"><span class="kv-key">{{ $t('backup.Compression Format') }}</span><span class="kv-val">{{ firstPolicy.compression || 'none' }}</span></div>
         <div class="kv-row"><span class="kv-key">{{ $t('backup.Checksum') }}</span><span class="kv-val"><i v-if="firstPolicy.checksum" class="el-icon-check" style="color:#67C23A" /><i v-else class="el-icon-close" style="color:#909399" /></span></div>
         <div v-if="firstPolicy.target_type === 's3'" class="kv-row"><span class="kv-key">{{ $t('backup.Upload Bandwidth') }}</span><span class="kv-val">{{ firstPolicy.max_bandwidth_mb > 0 ? firstPolicy.max_bandwidth_mb + ' MB/s' : $t('backup.Bandwidth Unlimited') }}</span></div>
+        <div class="kv-row"><span class="kv-key">{{ $t('backup.Max Read Seconds') }}</span><span class="kv-val">{{ (firstPolicy.max_read_seconds > 0 ? firstPolicy.max_read_seconds : 21600) + ' ' + $t('backup.Seconds Unit') }}</span></div>
         <div class="kv-row"><span class="kv-key">{{ $t('backup.Clean Successful Partitions') }}</span><span class="kv-val"><i v-if="firstPolicy.clean" class="el-icon-check" style="color:#67C23A" /><i v-else class="el-icon-close" style="color:#909399" /></span></div>
       </div>
     </div>

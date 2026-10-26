@@ -200,6 +200,19 @@
         </span>
         <div class="form-hint">{{ $t('backup.Bandwidth Hint') }}</div>
       </el-form-item>
+      <el-form-item :label="$t('backup.Max Read Seconds')" prop="max_read_seconds">
+        <el-input-number
+          v-model="form.max_read_seconds"
+          :min="MIN_MAX_READ_SECONDS"
+          :max="MAX_MAX_READ_SECONDS"
+          :step="3600"
+          :precision="0"
+          controls-position="right"
+          style="width:140px"
+        />
+        <span style="margin-left:6px">{{ $t('backup.Seconds Unit') }}</span>
+        <div class="form-hint">{{ $t('backup.Max Read Seconds Hint') }}</div>
+      </el-form-item>
       <el-form-item :label="$t('backup.Clean Successful Partitions')">
         <el-switch v-model="form.clean" active-color="#C9A100" inactive-color="#c0c4cc" />
         <div v-if="form.clean" class="danger-hint">⚠ {{ $t('history.Clean Partition Danger') }}</div>
@@ -222,6 +235,9 @@ import { parseCronNextRuns } from '@/helpers';
 
 // 上传限速下限（MB/s）：前端强制，避免设得过小导致备份慢到不可用
 const MIN_BANDWIDTH_MB = 1;
+const MIN_MAX_READ_SECONDS = 60;
+const MAX_MAX_READ_SECONDS = 86400;
+const DEFAULT_MAX_READ_SECONDS = 21600;
 
 export default {
   name: 'TaskEditDialog',
@@ -423,6 +439,7 @@ export default {
         localPath: '',
         compression: 'gzip', checksum: true, clean: false,
         bandwidth_limited: false, max_bandwidth_mb: 100,
+        max_read_seconds: DEFAULT_MAX_READ_SECONDS,
       };
     },
     loadFromTask() {
@@ -457,6 +474,7 @@ export default {
         clean: !!p.clean,
         bandwidth_limited: p.max_bandwidth_mb > 0,
         max_bandwidth_mb: p.max_bandwidth_mb > 0 ? p.max_bandwidth_mb : 100,
+        max_read_seconds: p.max_read_seconds > 0 ? p.max_read_seconds : DEFAULT_MAX_READ_SECONDS,
       };
       this.originalInstance = this.form.instance;
     },
@@ -528,6 +546,8 @@ export default {
         max_bandwidth_mb: f.target_type === 's3' && f.bandwidth_limited
           ? Math.max(MIN_BANDWIDTH_MB, Math.round(f.max_bandwidth_mb || 0))
           : 0,
+        max_read_seconds: Math.min(MAX_MAX_READ_SECONDS,
+          Math.max(MIN_MAX_READ_SECONDS, Math.round(f.max_read_seconds || 0))),
       };
       if (f.target_type === 's3') {
         body.s3 = {
